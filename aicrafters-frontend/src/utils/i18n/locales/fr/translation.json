@@ -1,0 +1,1090 @@
+{
+  "common": {
+    "currency": "MAD",
+    "or": "OU",
+    "off": "OFF",
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "buttons": {
+      "login": "Se connecter",
+      "signup": "S'inscrire",
+      "submit": "Soumettre",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "remove": "Supprimer"
+    },
+    "cart": {
+      "title": "Panier",
+      "itemCount": "{{count}} Cours dans le Panier",
+      "itemCount_plural": "{{count}} Cours dans le Panier",
+      "addedToCart": {
+        "title": "Ajouté au panier",
+        "button": "Aller au panier"
+      },
+      "popularPack": {
+        "title": "Ce cours est inclus dans le pack populaire",
+        "addToCart": "Ajouter tous au panier",
+        "total": "Total"
+      },
+      "summary": {
+        "title": "Résumé",
+        "originalPrice": "Prix Original",
+        "discount": "Réduction",
+        "total": "Total",
+        "enterCoupon": "Entrer un Code Promo",
+        "removeCode": "Supprimer",
+        "checkout": "Commander",
+        "apply": "Appliquer",
+        "isApplied": "est appliqué",
+        "promotions": "Promotions"
+      }
+    },
+    "checkout": {
+      "title": "Passer à la caisse",
+      "billingAddress": "Adresse de facturation",
+      "country": "Pays",
+      "paymentMethod": "Méthode de paiement",
+      "secureAndEncrypted": "Sécurisé et crypté",
+      "paypal": "PayPal",
+      "creditDebitCard": "Carte de crédit/débit",
+      "nameOnCard": "Nom sur la carte",
+      "cardNumber": "Numéro de carte",
+      "expiryDate": "Date d'expiration",
+      "securelySaveCard": "Sauvegarder cette carte pour mon achat ultérieur",
+      "googlePay": "GooglePay",
+      "orderDetails": "Détails de la commande",
+      "summary": "Résumé",
+      "discounts": "Remises",
+      "subtotal": "Sous-total",
+      "tax": "Taxe",
+      "total": "Total",
+      "byCompletingPurchase": "En complétant votre achat, vous acceptez ces",
+      "termsOfService": "Conditions d'utilisation",
+      "completeCheckout": "Compléter le paiement",
+      "thirtyDayMoneyBackGuarantee": "Garantie de remboursement de 30 jours",
+      "pleaseLoginToPurchaseCourse": "Veuillez vous connecter pour acheter ce cours",
+      "summary": "Résumé",
+      "morocco": "Maroc",
+      "algeria": "Algérie",
+      "tunisia": "Tunisie",
+      "egypt": "Égypte",
+      "saudi": "Arabie saoudite",
+      "uae": "Émirats arabes unis",
+      "qatar": "Qatar",
+      "kuwait": "Koweït"
+    },
+    "navigation": {
+      "home": "Accueil",
+      "courses": "Cours",
+      "business": "Adwin Entreprise",
+      "teach": "Enseigner sur Adwin",
+      "businessLink": "Adwin Entreprise",
+      "teachLink": "Enseigner sur Adwin"
+    },
+    "languages": {
+      "en": "Anglais",
+      "fr": "Français",
+      "ar": "Arabe"
+    },
+    "accessibility": {
+      "languageSelector": "Sélectionner la langue",
+      "mainNavigation": "Navigation principale",
+      "userMenu": "Menu utilisateur",
+      "currencySelector": "Sélectionner la devise"
+    },
+    "footer": {
+      "explore": "Explorer",
+      "resources": "Ressources",
+      "company": "Entreprise",
+      "getApp": "Obtenir l'Application",
+      "aboutUs": "À Propos",
+      "contactUs": "Nous Contacter",
+      "blog": "Blog",
+      "helpSupport": "Aide et Support",
+      "affiliate": "Affiliés",
+      "investors": "Investisseurs",
+      "terms": "Conditions",
+      "privacy": "Politique de Confidentialité",
+      "cookieSettings": "Paramètres des Cookies",
+      "sitemap": "Plan du Site",
+      "accessibility": "Déclaration d'Accessibilité",
+      "language": "Langue"
+    },
+    "pages": {
+      "placeholder": {
+        "title": "{{pageName}}",
+        "description": "Cette page est en construction."
+      }
+    }
+  },
+  "auth": {
+    "googleLoginFailed": "Connexion Google échouée. Veuillez réessayer.",
+    "googleSignupFailed": "Inscription Google échouée. Veuillez réessayer.",
+    "linkedinLoginSuccess": "Connexion LinkedIn réussie.",
+    "linkedinLoginFailed": "Connexion LinkedIn échouée. Veuillez réessayer.",
+    "linkedinSignupSuccess": "Inscription LinkedIn réussie.",
+    "linkedinSignupFailed": "Inscription LinkedIn échouée. Veuillez réessayer.",
+    "signupWithLinkedin": "S'inscrire avec LinkedIn",
+    "loginWithLinkedin": "Se connecter avec LinkedIn",
+    "popupBlocked": "Popup bloqué. Veuillez réessayer.",
+    "signin": {
+      "title": "Connexion",
+      "emailLabel": "Email",
+      "passwordLabel": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "createAccount": "Créer un compte",
+      "googleSignIn": "Se connecter avec Google",
+      "linkedinSignIn": "Se connecter avec LinkedIn"
+    },
+    "signup": {
+      "title": "Inscrivez-vous et commencez à apprendre",
+      "fullNamePlaceholder": "Votre nom complet",
+      "emailPlaceholder": "Votre email",
+      "passwordPlaceholder": "Mot de passe",
+      "marketingConsent": "Envoyez-moi des offres spéciales, des recommandations personnalisées et des conseils d'apprentissage.",
+      "termsText": "En vous inscrivant, vous acceptez nos",
+      "termsLink": "Conditions d'utilisation",
+      "and": "et",
+      "privacyLink": "Politique de confidentialité",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "loginLink": "Se connecter",
+      "signupButton": "S'inscrire",
+      "successMessage": "Inscription réussie!",
+      "errorMessage": "Inscription échouée. Veuillez réessayer.",
+      "continueWithEmail": "Continuer avec Email",
+      "or": "ou",
+      "signIn": "Se connecter",
+      "alreadyHaveAccount": "Vous avez déjà un compte ?",
+      "continueWithGoogle": "Continuer avec Google",
+      "continueWithLinkedIn": "Continuer avec LinkedIn",
+      "termsOfService": "Conditions d'utilisation",
+      "privacyPolicy": "Politique de confidentialité",
+      "loading": "Chargement...",
+      "passwordStrength": "Force du mot de passe",
+      "submit": "Soumettre"
+    },
+    "login": {
+      "title": "Connectez-vous pour continuer votre parcours d'apprentissage",
+      "emailPlaceholder": "exemple@gmail.com",
+      "continueWithEmail": "Continuer avec Email",
+      "googleSignIn": "Se connecter avec Google",
+      "linkedinSignIn": "Se connecter avec LinkedIn",
+      "organizationLogin": "Se connecter avec votre ",
+      "organizationText": "Organisation",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "signupLink": "S'inscrire",
+      "organizationLoginTitle": "Informations de Connexion à l'Organisation",
+      "organizationLoginDescription": "Si votre organisation vous a invité à cette plateforme, elle vous envoie des identifiants de connexion (email et mot de passe) via votre adresse email.",
+      "organizationLoginDescription2": "Une fois que vous recevez ces identifiants, vous pouvez les utiliser pour vous connecter et accéder aux cours que votre organisation a mis à disposition pour vous.",
+      "organizationLoginDescription3": "Veuillez vérifier votre boîte email pour l'invitation et suivre les instructions fournies.",
+      "organizationLoginButton": "Compris"
+    },
+    "verifyingEmail": "Vérification de votre email...",
+    "emailVerified": "Email vérifié avec succès !",
+    "verificationFailed": "Échec de la vérification de l'email",
+    "redirectingToLogin": "Redirection vers la page de connexion...",
+    "resendVerification": "Renvoyer l'email de vérification",
+    "checkEmailForVerification": "Veuillez vérifier votre email pour les instructions de vérification.",
+    "emailNotVerified": "Veuillez vérifier votre email avant de vous connecter.",
+    "verificationEmailSent": "L'email de vérification a été envoyé. Veuillez vérifier votre boîte de réception.",
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      "emailSent": "Le lien de réinitialisation du mot de passe a été envoyé à votre e-mail",
+      "error": "Échec de l'envoi du lien de réinitialisation du mot de passe",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "checkEmail": "Veuillez vérifier votre e-mail pour le lien de réinitialisation du mot de passe",
+      "checkSpam": "Si vous ne le voyez pas, veuillez vérifier votre dossier spam"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "description": "Veuillez entrer votre nouveau mot de passe ci-dessous",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "success": "Le mot de passe a été réinitialisé avec succès",
+      "error": "Échec de la réinitialisation du mot de passe",
+      "submit": "Réinitialiser le mot de passe"
+    },
+    "errors": {
+      "passwordLength": "Le mot de passe doit contenir entre 8 et 40 caractères",
+      "passwordMustContainAtLeastOneNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Le mot de passe doit contenir des lettres majuscules et minuscules",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Le mot de passe doit contenir au moins un caractère spécial",
+      "newPasswordRequired": "Le nouveau mot de passe est requis",
+      "pleaseConfirmYourNewPassword": "Veuillez confirmer votre nouveau mot de passe",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas"
+    }
+  },
+  "courses": {
+    "search": "Rechercher des cours...",
+    "filter": {
+      "all": "Tous",
+      "popular": "Populaires",
+      "new": "Nouveaux",
+      "trending": "Tendances"
+    },
+    "level": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    }
+  },
+  "components": {
+    "title": "Bibliothèque de Composants",
+    "description": "En-têtes, pieds de page et composants liés à la navigation.",
+    "sections": {
+      "common": {
+        "title": "Composants Communs",
+        "buttons": {
+          "title": "Boutons",
+          "description": "Variations de boutons standard utilisées dans l'application.",
+          "variants": "Variantes",
+          "sizes": "Tailles",
+          "contained": "Plein",
+          "outlined": "Contour",
+          "text": "Texte",
+          "small": "Petit",
+          "medium": "Moyen",
+          "large": "Grand",
+          "iconButtons": {
+            "title": "Boutons avec Icônes",
+            "google": "Se connecter avec Google",
+            "linkedin": "Se connecter avec LinkedIn",
+            "send": "Envoyer le Message",
+            "add": "Ajouter un Élément"
+          },
+          "states": {
+            "title": "États",
+            "disabled": "Désactivé",
+            "fullWidth": "Pleine Largeur"
+          },
+          "linkButtons": {
+            "title": "Boutons de Lien",
+            "default": "Bouton de Lien",
+            "outlined": "Bouton de Lien avec Contour",
+            "text": "Bouton de Lien Texte"
+          }
+        },
+        "inputs": {
+          "title": "Champs de Saisie",
+          "description": "Composants de saisie pour les formulaires et la saisie de données.",
+          "types": {
+            "text": "Champ Texte",
+            "password": "Champ Mot de Passe",
+            "search": "Champ de Recherche",
+            "language": "Sélection de Langue"
+          },
+          "searchInput": {
+            "title": "Champ de Recherche",
+            "label": "Rechercher",
+            "placeholder": "Saisir les termes de recherche..."
+          },
+          "basic": {
+            "title": "Champs de Base",
+            "default": {
+              "label": "Champ par Défaut",
+              "placeholder": "Saisir du texte..."
+            },
+            "error": {
+              "label": "Champ avec Erreur",
+              "helper": "Ce champ est requis"
+            },
+            "disabled": {
+              "label": "Champ Désactivé",
+              "value": "Valeur désactivée"
+            }
+          },
+          "withIcons": {
+            "title": "Champs avec Icônes",
+            "email": {
+              "label": "Email",
+              "placeholder": "Saisir votre email"
+            },
+            "password": {
+              "label": "Mot de passe",
+              "placeholder": "Saisir votre mot de passe",
+              "helper": "Utilisez 8+ caractères avec un mélange de lettres, chiffres et symboles"
+            },
+            "name": {
+              "label": "Nom Complet",
+              "placeholder": "Saisir votre nom complet"
+            },
+            "phone": {
+              "label": "Numéro de Téléphone",
+              "placeholder": "Saisir votre numéro de téléphone"
+            }
+          }
+        },
+        "cards": {
+          "title": "Cartes",
+          "description": "Composants de carte pour afficher du contenu dans un format structuré.",
+          "course": {
+            "sampleTitle1": "Fondamentaux de l'Apprentissage Automatique",
+            "sampleTrainer1": "Dr. James Wilson",
+            "sampleTitle2": "Introduction à l'Intelligence Artificielle et aux Réseaux de Neurones",
+            "sampleTrainer2": "Dr. Sarah Johnson",
+            "sampleTitle3": "Techniques Avancées d'Apprentissage Profond",
+            "sampleTrainer3": "Prof. Michael Chen",
+            "bestSeller": "Meilleure Vente",
+            "comingSoon": "Bientôt Disponible"
+          }
+        }
+      },
+      "layout": {
+        "title": "Composants de Mise en Page",
+        "navigation": {
+          "title": "Composants de Navigation",
+          "description": "En-têtes, pieds de page et composants liés  la navigation."
+        }
+      },
+      "feature": {
+        "title": "Composants Fonctionnels",
+        "course": {
+          "title": "Composants de Cours",
+          "description": "Composants spécifiques à l'affichage et à l'interaction des cours."
+        },
+        "auth": {
+          "title": "Composants d'Authentification",
+          "description": "Connexion, inscription et composants liés à l'authentification."
+        }
+      },
+      "colors": {
+        "title": "Couleurs"
+      }
+    }
+  },
+  "home": {
+    "hero": {
+      "titleStart": "L'ère de",
+      "titleHighlight": "Déverrouillage",
+      "titleEnd": "le potentiel des femmes africaines et des femmes afro-descendantes",
+      "description": "La 1ère plateforme mondiale de solidarité, de technologie et d'innovation pour le changement",
+      "emailPlaceholder": "exemple@gmail.com",
+      "subscribeButton": "S'abonner",
+      "emailRequired": "Email est requis",
+      "subscribeSuccess": "Abonnement réussi!",
+      "subscribeError": "Abonnement échoué. Veuillez réessayer.",
+      "connectToday": "Connecter aujourd'hui"
+    },
+    "courses": {
+      "title": "Introduction à l'IA",
+      "description": "Commencez votre voyage dans l'Intelligence Artificielle avec nos cours fondamentaux",
+      "errorLoading": "Erreur lors du chargement des cours",
+      "noCourses": "Aucun cours trouvé",
+      "errorMessage": "Une erreur est survenue lors du chargement des cours",
+      "introToAI": {
+        "title": "Introduction à l'IA",
+        "description": "Maîtrisez les fondamentaux de l'IA et du machine learning",
+        "cards": {
+          "fundamentals": {
+            "title": "Introduction à l'Intelligence Artificielle et aux Réseaux de Neurones",
+            "trainer": "Dr. James Wilson"
+          },
+          "ethics": {
+            "title": "Enjeux de l'IA : Éthique, Sécurité, Impact sur l'Emploi et l'Éducation",
+            "trainer": "Dr. Sarah Johnson"
+          },
+          "tools": {
+            "title": "Pas à pas avec les outils d'IA : ChatGPT, Gamma, Notion AI et autres",
+            "trainer": "Prof. Michael Chen"
+          }
+        },
+        "tags": {
+          "bestSeller": "Meilleure Vente",
+          "comingSoon": "Bientôt Disponible"
+        }
+      },
+      "AIAugmtedSofDev": "Développement de logiciels augmenté par l'IA",
+      "MarkCommunAugmtedAI": "Marketing et communication augmentés par l'IA",
+      "ProdAugmtedAI": "Productivité augmentée par l'IA"
+    }
+  },
+  "course": {
+    "loadingCourse": "Chargement du cours...",
+    "courseNotFound": "Cours non trouvé",
+    "loginToSaveCourse": "Veuillez vous connecter pour enregistrer ce cours",
+    "hero": {
+      "title": "LangChain - Développer des applications LLM avec LangChain",
+      "description": "Apprenez LangChain en construisant un vrai monde génératif AI LLM (Python, Version 0.3.0)",
+      "breadcrumb": {
+        "courses": "Cours"
+      }
+    },
+    "placeholder": {
+      "title": "Cours {{courseId}}"
+    },
+    "content": {
+      "learning": {
+        "title": "Ce que vous allez apprendre",
+        "langchain": "Devenez compétent en LangChain",
+        "prompting": "Théorie de l'ingénierie des prompts : Chaîne de pensée, ReAct, Few Shot prompting et comprendre comment LangChain est construit en interne",
+        "llm": "Théorie des grands modèles de langage pour les ingénieurs logiciels",
+        "rag": "RAG, Vectorestores/Bases de données vectorielles (Pinecone, FAISS)",
+        "have": "Avoir 3 applications d'IA générative basées sur LangChain fonctionnant de bout en bout",
+        "understand": "Comprendre comment naviguer dans le code source open source de LangChain",
+        "llc": "LangChain : Nombreuses chaînes, Agents, DocumentLoader, TextSplitter, OutputParser, Memory"
+      },
+      "title": "Contenu du cours",
+      "stats": "{{sections}} sections • {{lectures}} leçons • {{duration}} durée totale",
+      "collapse_all_sections": "Réduire toutes les sections",
+      "expand_all_sections": "Agrandir toutes les sections",
+      "preview": "Aperçu",
+      "lectures": "Leçons",
+      "sections": "Sections"
+    },
+    "relatedTopics": {
+      "title": "Sujets Connexes",
+      "topics": {
+        "langchain": "LangChain",
+        "dataScience": "Science des Données",
+        "development": "Développement"
+      }
+    },
+    "requirements": {
+      "title": "Conditions d'accès"
+    },
+    "includes": {
+      "title": "Ce cours comprend",
+      "features": {
+        "clock": "heures de vidéo à la demande",
+        "article": "article",
+        "download": "19 ressources téléchargeables",
+        "access": "Accès sur mobile et TV",
+        "certificate": "Certificat de complétion"
+      }
+    },
+    "purchase": {
+      "personal": "Personnel",
+      "enterprise": "Entreprise",
+      "add_to_cart": "Ajouter au panier",
+      "guarantee": "30 jours de garantie",
+      "lifetime_access": "Accès à vie",
+      "access_to_all_courses": "Accès à tous les cours de la plateforme",
+      "access_to_all_courses_description": "Obtenez ce cours, plus 1,000+ de cours de qualité, avec le plan Personnel.",
+      "access_to_all_courses_button": "Accès à tous les cours",
+      "starting_at": "À partir de 20$ par mois après essai",
+      "cancel_anytime": "Annuler à tout moment",
+      "learn_more": "En savoir plus",
+      "already_purchased": "Vous avez déjà acheté ce cours",
+      "already_in_cart": "Ce cours est déjà dans votre panier",
+      "check_cart": "Voir votre panier"
+    },
+    "description": {
+      "title": "Description"
+    },
+    "instructor": {
+      "title": "Instructeur",
+      "rating": "Note de l'instructeur",
+      "reviews": "Avis",
+      "users": "Utilisateurs",
+      "courses": "Cours",
+      "showLess": "Afficher moins",
+      "showMore": "Afficher plus"
+    }
+  },
+  "placeholder": {
+    "title": "{{pageName}}",
+    "subtitle": "Nous travaillons dur pour vous apporter quelque chose de génial",
+    "featureDescription": "Notre équipe travaille jour et nuit pour vous apporter cette fonctionnalité",
+    "comingSoon": "Bientôt Disponible",
+    "stayTuned": "Restez connecté",
+    "titles": {
+      "business": "Adwin Entreprise",
+      "teach": "Enseigner sur Adwin",
+      "app": "Obtenir l'Application",
+      "affiliate": "Affiliés",
+      "about": "À Propos",
+      "contact": "Contact",
+      "blog": "Blog",
+      "help": "Aide",
+      "terms": "Conditions",
+      "privacy": "Politique de Confidentialité",
+      "accessibility": "Déclaration d'Accessibilité",
+      "cookieSettings": "Paramètres des Cookies",
+      "sitemap": "Plan du Site",
+      "investors": "Investisseurs"
+    }
+  },
+  "user": {
+    "navbar": {
+      "myLearning": "Mon Parcours",
+      "accountSettings": "Paramètres du compte",
+      "logout": "Déconnexion"
+    },
+    "sidebar": {
+      "profile": "Profil",
+      "password": "Mot de passe",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "accountSettings": "Paramètres du compte"
+    },
+    "profileSettings": {
+      "title": "Paramètres du Profil",
+      "personalInformation": "Informations Personnelles",
+      "fullName": "Nom Complet",
+      "email": "Email",
+      "saveChanges": "Enregistrer les modifications"
+    },
+    "passwordSettings": {
+      "title": "Paramètres du Mot de Passe",
+      "changePassword": "Changer le Mot de Passe",
+      "setPassword": "Définir le Mot de Passe",
+      "currentPassword": "Mot de Passe Actuel",
+      "newPassword": "Nouveau Mot de Passe",
+      "confirmNewPassword": "Confirmer le Nouveau Mot de Passe",
+      "updatePassword": "Mettre à jour le Mot de Passe"
+    },
+    "errors": {
+      "loginToUpdateProfileImage": "Vous devez être connecté pour mettre à jour votre image de profil",
+      "failedToUpdateProfileImage": "Erreur lors de la mise à jour de l'image de profil",
+      "loginToUpdateProfile": "Vous devez être connecté pour mettre à jour votre profil",
+      "nameRequired": "Nom est requis",
+      "failedToUpdateProfile": "Erreur lors de la mise à jour du profil",
+      "currentPasswordRequired": "Mot de Passe Actuel est requis",
+      "newPasswordRequired": "Nouveau Mot de Passe est requis",
+      "pleaseConfirmYourNewPassword": "Veuillez confirmer votre nouveau mot de passe",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "passwordLength": "Le mot de passe doit contenir entre 8 et 40 caractères",
+      "passwordMustContainAtLeastOneNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Le mot de passe doit contenir des lettres majuscules et minuscules",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Le mot de passe doit contenir au moins un caractère spécial",
+      "failedToUpdatePassword": "Erreur lors de la mise à jour du mot de passe",
+      "currentPasswordIncorrect": "Mot de Passe Actuel est incorrect"
+    },
+    "success": {
+      "profileImageUpdatedSuccessfully": "Image de profil mise à jour avec succès",
+      "profileUpdatedSuccessfully": "Profil mis à jour avec succès",
+      "passwordUpdatedSuccessfully": "Mot de Passe mis à jour avec succès"
+    },
+    "learning": {
+      "title": "Mon Parcours",
+      "description": "Suivez votre progression et restez au top de vos cours.",
+      "inProgress": "En cours",
+      "saved": "Enregistré",
+      "completed": "Terminé",
+      "course": "Cours",
+      "by": "Par",
+      "downloadCertificate": "Télécharger le certificat",
+      "share": "Partager",
+      "noInProgress": "Vous n'avez pas de cours en cours. Commencez à apprendre!",
+      "noSaved": "Vous n'avez pas enregistré de cours. Parcourez notre catalogue pour trouver des cours intéressants!",
+      "noCompleted": "Vous n'avez pas terminé de cours. Continuez à apprendre!",
+      "allCourses": "Tous les Cours"
+    },
+    "courseLearning": {
+      "search": "Rechercher dans le cours",
+      "markComplete": "Marquer comme terminé",
+      "watchProgress": "Regarder la progression",
+      "congratulations": "Félicitations ! 🎉",
+      "courseCompleted": "Vous avez terminé {{courseTitle}}",
+      "completionMessage": "Vous pouvez maintenant télécharger votre certificat et partager votre réussite",
+      "getCertificate": "Obtenir le certificat",
+      "backToCourses": "Retour aux cours",
+      "share": "Partager sur LinkedIn"
+    },
+    "certificate": {
+      "title": "Certificat de cours",
+      "description": "Partagez votre réalisation avec votre réseau",
+      "noCourseId": "Aucun identifiant de cours fourni",
+      "shareWith": "Partager avec",
+      "shareThoughts": "Partagez votre réalisation avec votre réseau",
+      "shareButton": "Partager sur LinkedIn",
+      "shareLink": "Vérifiez-le :",
+      "shareCourse": "Je viens de terminer le cours :",
+      "tip": "Conseil : utilisez @ pour mentionner votre connexion.",
+      "downloadPDF": "Télécharger le PDF",
+      "postOnLinkedIn": "Publier sur LinkedIn",
+      "course": "Cours"
+    },
+    "rateCourse": {
+      "title": "Évaluer le cours",
+      "description": "Évaluez le cours en fonction de votre expérience",
+      "commentPlaceholder": "Commentaire",
+      "rate": "Note",
+      "rateCourse": "Évaluer le cours",
+      "cancel": "Annuler",
+      "submit": "Soumettre",
+      "submitting": "Soumission en cours",
+      "oneTimeNote": "Note: Cette évaluation est uniquement pour ce cours. Vous ne pouvez évaluer le cours qu'une fois."
+    }
+  },
+  "trainer": {
+    "navbar": {
+      "dashboard": "Tableau de bord",
+      "logout": "Déconnexion"
+    },
+    "sidebar": {
+      "title": "Tableau de bord de l'enseignant",
+      "courses": "Cours",
+      "users": "Utilisateurs",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "settings": "Paramètres"
+    },
+    "profileSettings": {
+      "title": "Paramètres du Profil",
+      "fullName": "Nom Complet",
+      "email": "Email",
+      "saveChanges": "Enregistrer les modifications",
+      "security": "Sécurité",
+      "changePassword": "Changer le Mot de Passe",
+      "setPassword": "Définir le Mot de Passe",
+      "updatePassword": "Mettre à jour le Mot de Passe",
+      "currentPassword": "Mot de Passe Actuel",
+      "newPassword": "Nouveau Mot de Passe",
+      "confirmNewPassword": "Confirmer le Nouveau Mot de Passe"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "totalUsers": "Total des Utilisateurs",
+      "activeUsers": "Utilisateurs Actifs",
+      "averageProgress": "Progression Moyenne",
+      "courseCompletions": "Completions de Cours",
+      "user": "Utilisateur",
+      "status": "Statut",
+      "progress": "Progression",
+      "lastActive": "Dernière Activité",
+      "actions": "Actions",
+      "sendMessage": "Envoyer un message",
+      "messagePlaceholder": "Entrez votre message ici...",
+      "cancel": "Annuler",
+      "sending": "Envoi en cours...",
+      "send": "Envoyer"
+    },
+    "errors": {
+      "failedToLoadUsers": "Erreur lors du chargement des données des utilisateurs",
+      "failedToSendMessage": "Erreur lors de l'envoi du message",
+      "mustBeLoggedInToUpdateProfileImage": "Vous devez être connecté pour mettre à jour votre image de profil",
+      "failedToUpdateProfileImage": "Erreur lors de la mise à jour de l'image de profil",
+      "mustBeLoggedInToUpdateProfile": "Vous devez être connecté pour mettre à jour votre profil",
+      "nameIsRequired": "Nom est requis",
+      "failedToUpdateProfile": "Erreur lors de la mise à jour du profil",
+      "mustBeLoggedInToUpdatePassword": "Vous devez être connecté pour mettre à jour votre mot de passe",
+      "failedToUpdatePassword": "Erreur lors de la mise à jour du mot de passe",
+      "currentPasswordIncorrect": "Mot de Passe Actuel est incorrect",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "passwordLength": "Le mot de passe doit contenir entre 8 et 40 caractères",
+      "passwordMustContainAtLeastOneNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Le mot de passe doit contenir des lettres majuscules et minuscules",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Le mot de passe doit contenir au moins un caractère spécial",
+      "newPasswordRequired": "Nouveau mot de passe est requis",
+      "confirmPasswordRequired": "Veuillez confirmer votre nouveau mot de passe",
+      "currentPasswordRequired": "Mot de Passe Actuel est requis"
+    },
+    "success": {
+      "passwordUpdatedSuccessfully": "Mot de passe mis à jour avec succès"
+    },
+    "courses": {
+      "title": "Mes Cours",
+      "createCourse": "Créer un Cours",
+      "totalCourses": "Total des Cours",
+      "totalUsers": "Total des Utilisateurs",
+      "averageRating": "Note moyenne",
+      "totalHours": "Total des Heures",
+      "searchCourses": "Rechercher des cours...",
+      "allCourses": "Tous les Cours",
+      "published": "Publié",
+      "draft": "Brouillon",
+      "inReview": "En attente de validation",
+      "editCourse": "Modifier le Cours",
+      "preview": "Aperçu",
+      "changeToDraft": "Changer en Brouillon",
+      "delete": "Supprimer",
+      "deleteCourse": "Supprimer le Cours",
+      "deleteCourseMessage": "Êtes-vous sûr de vouloir supprimer ce cours ? Cette action est irréversible.",
+      "reviewCourseMessage": "Êtes-vous sûr de vouloir soumettre ce cours à la validation ?",
+      "draftCourseMessage": "Êtes-vous sûr de vouloir changer ce cours en brouillon ?",
+      "reviewCourse": "Valider le Cours",
+      "draftCourse": "Brouillon le Cours",
+      "deleteCourseConfirmation": "Confirmation de suppression de cours",
+      "draftCourseConfirmation": "Confirmation de changement en brouillon",
+      "reviewCourseConfirmation": "Confirmation de validation de cours",
+      "changeCourseStatus": "Changer le statut du cours",
+      "inviteUser": "Inviter un utilisateur",
+      "inviteUserDescription": "Entrez l'adresse email de l'utilisateur à inviter à ce cours. Il recevra un email avec les instructions pour accéder au cours.",
+      "userEmail": "Email de l'utilisateur",
+      "sendInvite": "Envoyer l'invitation"
+    },
+    "createCourse": {
+      "courseInformation": "Informations du Cours",
+      "courseTitle": "Titre du Cours",
+      "courseSubtitle": "Sous-titre du Cours",
+      "courseDescription": "Description du Cours",
+      "coursePrice": "Prix du Cours",
+      "oldPrice": "Prix Ancien",
+      "currentPrice": "Prix Actuel",
+      "courseMedia": "Média du Cours",
+      "duration": "Durée",
+      "vimeoCoursePromoVideoLink": "Lien de la vidéo promotionnelle de Vimeo",
+      "coursePromoVideo": "Vidéo promotionnelle du Cours",
+      "categories": "Catégories",
+      "addCustomCategory": "Ajouter une catégorie personnalisée",
+      "whatYoullLearn": "Ce que vous allez apprendre",
+      "addLearningPoint": "Ajouter un point de cours",
+      "addRequirement": "Ajouter une condition",
+      "add": "Ajouter",
+      "requirements": "Conditions",
+      "pleaseCompleteTheFollowingRequirements": "Veuillez compléter les conditions suivantes :",
+      "updateCourse": "Mettre à jour le Cours",
+      "addCourse": "Ajouter un Cours",
+      "clickToUploadCourseImage": "Cliquer pour télécharger l'image du Cours",
+      "maximumSize": "Taille maximale : 1.5MB",
+      "enterCourseDescription": "Entrez la description du Cours...",
+      "editCourse": "Modifier le Cours",
+      "createCourse": "Créer un Cours",
+      "courseContent": "Contenu du Cours",
+      "totalCourseDuration": "Durée totale du Cours",
+      "sectionTitle": "Titre de la Section",
+      "addSection": "Ajouter une Section",
+      "note": "Note: Seul le contenu dans la zone de prévisualisation sera ajouté au cours. Le contenu dans la zone de modification sera ignoré jusqu'à ce qu'il soit ajouté.",
+      "addAtLeastOneSectionWithOneLesson": "Ajouter au moins une section avec une leçon",
+      "fillInAllCourseInformation": "Remplir toutes les informations du cours (titre, sous-titre et description)",
+      "setCoursePricing": "Définir le prix du cours (prix original et prix actuel)",
+      "selectAtLeastOneCategory": "Sélectionner au moins une catégorie",
+      "addAtLeastOneLearningPoint": "Ajouter au moins un point de cours",
+      "addAtLeastOneRequirement": "Ajouter au moins une condition",
+      "uploadACourseThumbnail": "Télécharger une image du Cours",
+      "sectionDuration": "Durée de la Section",
+      "previewZone": "Zone de Prévisualisation",
+      "questions": "Questions",
+      "makeThisPreview": "Faites cet aperçu pour le public",
+      "contentItems": "Éléments de contenu",
+      "videoContent": "Contenu vidéo",
+      "textContent": "Contenu texte",
+      "addLesson": "Ajouter une leçon",
+      "addQuiz": "Ajouter un quiz",
+      "editorZone": "Zone de modification",
+      "imageSizeMustBeLessThan": "La taille de l'image doit être inférieure à 1.5MB",
+      "lessonTitle": "Titre de la leçon",
+      "addNewLesson": "Ajouter une nouvelle leçon",
+      "editLesson": "Modifier la leçon",
+      "saveChanges": "Enregistrer les modifications",
+      "totalDuration": "Durée totale",
+      "minutes": "minutes",
+      "writeYourContentHere": "Écrivez votre contenu ici...",
+      "vimeoVideoLink": "Lien de la vidéo de Vimeo",
+      "hours": "Heures",
+      "lessonVideo": "Vidéo de la leçon",
+      "addText": "Ajouter du texte",
+      "addVimeoVideo": "Ajouter une vidéo de Vimeo",
+      "quizTitle": "Titre du quiz",
+      "addQuestion": "Ajouter une question",
+      "editQuiz": "Modifier le quiz",
+      "saveQuiz": "Enregistrer le quiz",
+      "addNewQuiz": "Ajouter un nouveau quiz",
+      "updateQuiz": "Mettre à jour le quiz",
+      "question": "Question",
+      "options": "Options",
+      "selectCorrectAnswer": "Sélectionner la réponse correcte",
+      "optionText": "Texte de l'option",
+      "addOption": "Ajouter une option",
+      "cancel": "Annuler",
+      "saveQuestion": "Enregistrer la question",
+      "context": "Contexte (Optionnel)"
+    },
+    "coursePreview": {
+      "coursePreview": "Aperçu du Cours",
+      "aboutThisCourse": "À Propos de ce Cours",
+      "whatYoullLearn": "Ce que vous allez apprendre",
+      "requirements": "Conditions",
+      "courseContent": "Contenu du Cours"
+    }
+  },
+  "admin": {
+    "navbar": {
+      "adminDashboard": "Tableau de bord Administratif",
+      "userManagement": "Gestion des Utilisateurs",
+      "courseManagement": "Gestion des Cours",
+      "platformSettings": "Paramètres de la Plateforme",
+      "logout": "Déconnexion"
+    },
+    "sidebar": {
+      "overview": "Aperçu",
+      "users": "Utilisateurs",
+      "courses": "Cours",
+      "myCourses": "Mes Cours",
+      "categories": "Catégories",
+      "reports": "Rapports",
+      "settings": "Paramètres",
+      "adminDashboard": "Tableau de bord Administratif",
+      "certificateSettings": "Paramètres des Certificats",
+      "newsletter": "Newsletter",
+      "notifications": "Notifications",
+      "organizations": "Organisations"
+    },
+    "courses": {
+      "publishCourse": "Publier le Cours"
+    },
+    "organizations": {
+      "title": "Organisations",
+      "createOrganization": "Créer une Organisation",
+      "organizationName": "Nom de l'Organisation",
+      "addUsers": "Ajouter des Utilisateurs",
+      "fullName": "Nom Complet",
+      "email": "Email",
+      "name": "Nom",
+      "users": "Utilisateurs",
+      "courses": "Cours",
+      "createdAt": "Créé le",
+      "actions": "Actions",
+      "user": "Utilisateur",
+      "course": "Cours",
+      "update": "Mettre à jour",
+      "create": "Créer",
+      "editOrganization": "Modifier l'Organisation",
+      "addOrganization": "Ajouter une Organisation",
+      "addedUsers": "{{count}} Utilisateurs ajoutés",
+      "noUsersAddedYet": "Aucun utilisateur ajouté",
+      "organizationUsers": "Utilisateurs de l'Organisation",
+      "noUsersInThisOrganization": "Aucun utilisateur dans cette organisation",
+      "createAccount": "Créer un compte",
+      "createAccounts": "Créer {{count}} comptes",
+      "noCoursesAssignedToThisOrganizationYet": "Aucun cours assigné à cette organisation",
+      "createUserAccount": "Créer un compte utilisateur",
+      "createUserAccountMessage": "Message de création de compte utilisateur",
+      "sendEmailNotificationToUser": "Envoyer une notification par email à l'utilisateur",
+      "userWillReceiveAnEmailWithTheirLoginCredentials": "L'utilisateur recevra un email avec ses identifiants de connexion",
+      "userWillNeedToBeNotifiedManuallyOfTheirAccounts": "L'utilisateur devra être notifié manuellement de ses comptes",
+      "selectCoursesAvailableToOrganizationUsers": "Sélectionner les cours disponibles aux utilisateurs de l'organisation",
+      "noPublishedCoursesAvailable": "Aucun cours publié disponible",
+      "createUserAccountsMessage": "{{orgName}} Créer des comptes pour les utilisateurs qui n'ont pas de comptes",
+      "saveCourses": "Enregistrer les cours",
+      "cancel": "Annuler",
+      "addUser": "Ajouter",
+      "close": "Fermer",
+      "organizationCourses": "Cours de l'Organisation",
+      "currentCoursesAssignedToThisOrganization": "Cours actuellement assignés à cette organisation",
+      "manageCourses": "Gérer les cours",
+      "phone": "Téléphone",
+      "importUsers": "Importer des utilisateurs",
+      "importUsersDescription": "Téléchargez un fichier CSV ou Excel contenant les informations des utilisateurs. Le fichier doit inclure des colonnes pour le nom complet, l'email et le téléphone (facultatif).",
+      "selectFile": "Sélectionner un fichier",
+      "createUserAccounts": "Créer des comptes utilisateurs",
+      "sendEmailNotificationsToUsers": "Envoyer des notifications par email aux utilisateurs",
+      "usersWillReceiveAnEmailWithTheirLoginCredentials": "Les utilisateurs recevront un email avec leurs identifiants de connexion",
+      "deleteOrganization": "Supprimer l'organisation",
+      "deleteOrganizationConfirmation": "Confirmation de suppression de l'organisation",
+      "deleteOrganizationWarning": "Êtes-vous sûr de vouloir supprimer cette organisation ? Cette action est irréversible.",
+      "usersWillNeedToBeNotifiedManuallyOfTheirAccounts": "Les utilisateurs devront être notifiés manuellement de leurs comptes",
+      "userWillNeedToBeNotifiedManuallyOfTheirAccount": "L'utilisateur devra être notifié manuellement de son compte"
+    },
+    "courseManagement": {
+      "title": "Gestion des Cours",
+      "searchPlaceholder": "Rechercher des cours...",
+      "filter": "Filtrer",
+      "allCourses": "Tous les Cours",
+      "published": "Publié",
+      "archived": "Archivé",
+      "users": "Utilisateurs",
+      "rating": "Note",
+      "previewCourse": "Aperçu du cours",
+      "approveAndPublishCourse": "Approuver et publier le cours",
+      "areYouSureYouWantToApproveAndPublishThisCourse": "Êtes-vous sûr de vouloir approuver et publier ce cours?",
+      "rejectCourse": "Rejeter le cours",
+      "moveCourseToDraft": "Déplacer vers le brouillon",
+      "areYouSureYouWantToMoveThisCourseToDraft": "Êtes-vous sûr de vouloir déplacer ce cours vers le brouillon?",
+      "moveCourseToReview": "Déplacer vers la validation",
+      "areYouSureYouWantToRejectThisCourseAndMoveItToDraft": "Êtes-vous sûr de vouloir rejeter ce cours et le déplacer vers le brouillon?",
+      "moveCourseToArchived": "Déplacer vers l'archivé",
+      "areYouSureYouWantToMoveThisCourseToArchived": "Êtes-vous sûr de vouloir déplacer ce cours vers l'archivé?"
+    },
+    "categoryManagement": {
+      "title": "Gestion des Catégories",
+      "searchPlaceholder": "Rechercher des catégories...",
+      "filter": "Filtrer",
+      "allCourses": "Tous les Cours",
+      "courses": "Cours",
+      "addCategory": "Ajouter une catégorie",
+      "addNewCategory": "Ajouter une nouvelle catégorie",
+      "categoryName": "Nom de la catégorie",
+      "editCategory": "Modifier la catégorie",
+      "selectPublishedCourseToAdd": "Sélectionner un cours publié à ajouter à cette catégorie. Seuls les cours avec moins de 3 catégories sont affichés.",
+      "noAvailableCoursesFound": "Aucun cours disponible trouvé",
+      "selectCourse": "Sélectionner un cours",
+      "currentCategories": "Catégories actuelles:",
+      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer",
+      "deleteCategory": "Supprimer la catégorie",
+      "addCourseTo": "Ajouter un cours à ",
+      "removeCourseFromCategory": "Retirer le cours de la catégorie",
+      "removeCourseConfirmation": "Êtes-vous sûr de vouloir retirer '{{course}}' de cette catégorie ?"
+    },
+    "errors": {
+      "atLeastOneUserEmailRequired": "Au moins un email d'utilisateur est requis",
+      "organizationNameRequired": "Le nom de l'organisation est requis",
+      "emailRequired": "L'email est requis",
+      "fullNameRequired": "Le nom complet est requis",
+      "userAlreadyExists": "L'utilisateur existe déjà",
+      "failedToCreateAccountForEmail": "Erreur lors de la création du compte pour l'email {{email}}",
+      "userDoesNotExist": "L'utilisateur n'existe pas",
+      "organizationAlreadyExists": "L'organisation existe déjà",
+      "organizationDoesNotExist": "L'organisation n'existe pas",
+      "courseAlreadyExists": "Le cours existe déjà",
+      "courseDoesNotExist": "Le cours n'existe pas",
+      "courseAlreadyAssignedToOrganization": "Le cours est déjà assigné à l'organisation",
+      "courseNotAssignedToOrganization": "Le cours n'est pas assigné à l'organisation",
+      "courseAlreadyAssignedToAnotherOrganization": "Le cours est déjà assigné à une autre organisation",
+      "courseNotAssignedToAnotherOrganization": "Le cours n'est pas assigné à une autre organisation",
+      "organizationAlreadyAssignedToAnotherUser": "L'organisation est déjà assignée à un autre utilisateur",
+      "organizationNotAssignedToAnotherUser": "L'organisation n'est pas assignée à un autre utilisateur",
+      "userAlreadyAssignedToAnotherOrganization": "L'utilisateur est déjà assigné à une autre organisation",
+      "userNotAssignedToAnotherOrganization": "L'utilisateur n'est pas assigné à une autre organisation",
+      "failedToLoadCourses": "Erreur lors du chargement des cours",
+      "failedToUpdateCourses": "Erreur lors de la mise à jour des cours",
+      "failedToLoadCourseDetails": "Erreur lors du chargement des détails du cours",
+      "failedToLoadCoursePreview": "Erreur lors du chargement de l'aperçu du cours",
+      "failedToFetchCategories": "Erreur lors de la récupération des catégories",
+      "failedToAddCategory": "Erreur lors de l'ajout d'une catégorie",
+      "failedToUpdateCategory": "Erreur lors de la mise à jour d'une catégorie",
+      "failedToDeleteCategory": "Erreur lors de la suppression d'une catégorie",
+      "failedToAddCourseToCategory": "Erreur lors de l'ajout d'un cours à une catégorie",
+      "failedToRemoveCourseFromCategory": "Échec du retrait du cours de la catégorie",
+      "failedToImportUsers": "Échec de l'importation des utilisateurs. Veuillez vérifier le format de votre fichier et réessayer.",
+      "invalidEmail": "Email invalide",
+      "emailAlreadyAdded": "Email déjà ajouté",
+      "failedToSaveOrganization": "Erreur lors de la sauvegarde de l'organisation",
+      "failedToDeleteOrganization": "Erreur lors de la suppression de l'organisation",
+      "failedToCheckExistingAccounts": "Erreur lors de la vérification des comptes existants",
+      "failedToCreateUserAccounts": "Erreur lors de la création des comptes utilisateurs",
+      "failedToFetchCourses": "Erreur lors de la récupération des cours"
+    },
+    "success": {
+      "coursesUpdatedSuccessfully": "Cours mis à jour avec succès",
+      "organizationCreated": "Organisation créée avec succès",
+      "organizationUpdated": "Organisation mise à jour avec succès",
+      "organizationDeleted": "Organisation supprimée avec succès",
+      "accountCreatedSuccessfullyForEmail": "Compte créé avec succès pour l'email {{email}}",
+      "usersAddedToOrganization": "Utilisateurs ajoutés à l'organisation avec succès",
+      "usersRemovedFromOrganization": "Utilisateurs supprimés de l'organisation avec succès",
+      "coursesAssignedToOrganization": "Cours assignés à l'organisation avec succès",
+      "coursesRemovedFromOrganization": "Cours supprimés de l'organisation avec succès",
+      "coursePublishedSuccessfully": "Cours publié avec succès",
+      "courseMovedToDraft": "Cours mis en brouillon avec succès",
+      "courseMovedToReview": "Cours mis en attente de validation avec succès",
+      "categoryAddedSuccessfully": "Catégorie ajoutée avec succès",
+      "categoryUpdatedSuccessfully": "Catégorie mise à jour avec succès",
+      "categoryDeletedSuccessfully": "Catégorie supprimée avec succès",
+      "courseAddedToCategorySuccessfully": "Cours ajouté à la catégorie avec succès",
+      "courseRemovedFromCategorySuccessfully": "Le cours a été retiré de la catégorie avec succès",
+      "usersImportedSuccessfully": "{{count}} utilisateurs importés avec succès",
+      "userAccountsCreatedSuccessfully": "Comptes utilisateurs créés avec succès",
+      "coursesSaved": "Cours enregistrés avec succès",
+      "organizationUpdatedSuccessfully": "Organisation mise à jour avec succès",
+      "organizationCreatedSuccessfully": "Organisation créée avec succès",
+      "organizationDeletedSuccessfully": "Organisation supprimée avec succès"
+    },
+    "settings": {
+      "certificate": {
+        "title": "Paramètres des Certificats",
+        "template": "Modèle de Certificat",
+        "templateDescription": "Télécharger un modèle d'image qui sera utilisé pour tous les certificats de cours. L'image doit être au format PNG et avoir une orientation paysage.",
+        "uploadTemplate": "Télécharger le Modèle",
+        "uploading": "Téléchargement..."
+      }
+    },
+    "overview": {
+      "dashboardOverview": "Aperçu du Tableau de bord",
+      "userStatistics": "Statistiques des Utilisateurs",
+      "totalUsers": "Total des Utilisateurs",
+      "newsletterSubscriptions": "Abonnements",
+      "admins": "Administrateurs",
+      "trainers": "Enseignants",
+      "users": "Utilisateurs",
+      "courseStatistics": "Statistiques des Cours",
+      "totalCourses": "Total des Cours",
+      "activeCourses": "Cours Actifs",
+      "categories": "Catégories",
+      "averageRating": "Note moyenne",
+      "noDataAvailable": "Aucune donnée disponible"
+    },
+    "newsletter": {
+      "title": "Abonnements à la Newsletter",
+      "email": "Email",
+      "subscribedAt": "Date d'abonnement",
+      "deleteSubscription": "Supprimer l'abonnement",
+      "deleteConfirmation": "Êtes-vous sûr de vouloir supprimer cet abonnement?",
+      "deleteSuccess": "Abonnement supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression de l'abonnement",
+      "actions": "Actions",
+      "emailAddress": "Adresse email",
+      "subscriptionDate": "Date d'abonnement"
+    },
+    "userManagement": {
+      "title": "Gestion des Utilisateurs",
+      "searchUsers": "Rechercher des utilisateurs...",
+      "allRoles": "Tous les Rôles",
+      "admin": "Administrateur",
+      "trainer": "Enseignant",
+      "user": "Utilisateur",
+      "allStatus": "Tous les Statuts",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "suspended": "Suspendu",
+      "pending": "En attente",
+      "role": "Rôle",
+      "status": "Statut",
+      "lastActive": "Dernière activité",
+      "actions": "Actions",
+      "editUser": "Modifier l'utilisateur",
+      "deleteUser": "Supprimer l'utilisateur",
+      "uploading": "Téléchargement",
+      "importUsers": "Importer des utilisateurs",
+      "createUser": "Créer un utilisateur",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "phone": "Téléphone",
+      "alreadyRegistered": "Déjà enregistré",
+      "cancel": "Annuler",
+      "creatingUsers": "Création des utilisateurs",
+      "createValidUsers": "Créer des utilisateurs valides",
+      "deleteUserConfirmation": "Confirmation de suppression d'utilisateur",
+      "deleteUserDatabaseConfirmation": "Confirmation de suppression d'utilisateur dans la base de données",
+      "deleteUserListConfirmation": "Confirmation de suppression d'utilisateur dans la liste",
+      "deleteAllUsers": "Supprimer tous les utilisateurs",
+      "deleteAllUsersConfirmation": "Confirmation de suppression de tous les utilisateurs",
+      "deleting": "Suppression",
+      "deleteAll": "Supprimer tous",
+      "someEmailsAreAlreadyRegisteredAndWillBeSkipped": "Certains emails sont déjà enregistrés et seront ignorés",
+      "delete": "Supprimer",
+      "sendWelcomeEmails": "Envoyer des emails de bienvenue",
+      "confirmUserCreation": "Confirmation de création d'utilisateur",
+      "saveChanges": "Enregistrer les modifications",
+      "fullNameRequired": "Le nom est requis",
+      "emailRequired": "L'email est requis",
+      "invalidEmail": "Email invalide",
+      "fullName": "Nom",
+      "sendWelcomeEmail": "Envoyer un email de bienvenue",
+      "uploadImage": "Télécharger une image",
+      "newPassword": "Nouveau mot de passe",
+      "leaveBlankToKeepCurrent": "Laisser vide pour conserver le mot de passe actuel"
+    }
+  },
+  "messages": {
+    "conversations": "Conversations",
+    "typeMessage": "Type message...",
+    "send": "Envoyer",
+    "selectConversation": "Sélectionner une conversation",
+    "searchUsers": "Rechercher des utilisateurs...",
+    "messagePlaceholder": "Entrez votre message ici..."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "all": "Toutes",
+    "unread": "Non lues",
+    "read": "Lues",
+    "markAllAsRead": "Marquer toutes comme lues",
+    "markAsRead": "Marquer comme lue",
+    "delete": "Supprimer",
+    "justNow": "Juste maintenant",
+    "minutesAgo": "minutes",
+    "hoursAgo": "heures",
+    "daysAgo": "jours",
+    "noNotifications": "Aucune notification à afficher"
+  }
+} 

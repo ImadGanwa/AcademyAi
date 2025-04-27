@@ -1,0 +1,889 @@
+import { Request, Response } from 'express';
+import { User } from '../models/User';
+import { Course, ICourse } from '../models/Course';
+import { Category } from '../models/Category';
+import { sendWelcomeEmail, sendCourseApprovalEmail, sendCourseRejectionEmail } from '../utils/email';
+import { parseExcelUsers } from '../utils/excelParser';
+import { createNotification } from './notificationController';
+import mongoose, { Document } from 'mongoose';
+import bcryptjs from 'bcryptjs';
+import { Organization } from '../models/Organization';
+import { generateRandomPassword } from '../utils/passwordGenerator';
+import { uploadToCloudinary, deleteFromCloudinary } from '../utils/fileUpload';
+
+interface EmailError extends Error {
+  message: string;
+  stack?: string;
+}
+
+interface PopulatedCourse extends Document {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  status: 'draft' | 'review' | 'published' | 'archived';
+  instructor: {
+    _id: mongoose.Types.ObjectId;
+    fullName: string;
+    email: string;
+  };
+}
+
+export const adminController = {
+  getDashboardStats: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      // Get user statistics
+      const [
+        totalUsers,
+        adminUsers,
+        trainerUsers,
+        userUsers,
+        totalCourses,
+        activeCourses,
+        categories,
+        averageRating
+      ] = await Promise.all([
+        User.countDocuments({ status: 'active' }),
+        User.countDocuments({ role: 'admin', status: 'active' }),
+        User.countDocuments({ role: 'trainer', status: 'active' }),
+        User.countDocuments({ role: 'user', status: 'active' }),
+        Course.countDocuments(),
+        Course.countDocuments({ status: 'published' }),
+        Category.countDocuments(),
+        Course.aggregate([
+          { $match: { status: 'published' } },
+          { $group: { _id: null, avgRating: { $avg: '$rating' } } }
+        ]).then(result => result[0]?.avgRating || 0)
+      ]);
+
+      res.json({
+        users: {
+          total: totalUsers,
+          admins: adminUsers,
+          trainers: trainerUsers,
+          users: userUsers
+        },
+        courses: {
+          total: totalCourses,
+          active: activeCourses,
+          categories: categories,
+          averageRating: Number(averageRating.toFixed(1))
+        }
+      });
+    } catch (error) {
+      console.error('Get dashboard stats error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error fetching dashboard statistics' });
+    }
+  },
+
+  getUsers: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { search, role, status } = req.query;
+      const query: any = {};
+
+      // Apply filters
+      if (role && ['admin', 'trainer', 'user'].includes(role as string)) {
+        query.role = role;
+      }
+      if (status && ['active', 'inactive', 'suspended', 'pending'].includes(status as string)) {
+        query.status = status;
+      }
+      if (search) {
+        query.$or = [
+          { fullName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      const users = await User.find(query)
+        .select('fullName email role status lastActive profileImage')
+        .sort({ lastActive: -1 });
+
+      const transformedUsers = users.map(user => ({
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        lastActive: user.lastActive || null,
+        initials: user.fullName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase(),
+        profileImage: user.profileImage
+      }));
+
+      res.json(transformedUsers);
+    } catch (error) {
+      console.error('Get users error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error fetching users' });
+    }
+  },
+
+  updateUser: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { id } = req.params;
+      const { role, status, fullName, email, password } = req.body;
+
+      // Validate input
+      if (!['admin', 'trainer', 'user'].includes(role)) {
+        return res.status(400).json({ message: 'Invalid role' });
+      }
+
+      if (!['active', 'inactive', 'suspended', 'pending'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+
+      // Prevent self-demotion
+      if (req.user._id === id && role !== 'admin') {
+        return res.status(400).json({ message: 'Cannot change your own admin role' });
+      }
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // If status is being changed to active, ensure email is verified
+      if (status === 'active' && !user.isEmailVerified) {
+        user.isEmailVerified = true;
+      }
+
+      // Update basic fields
+      user.role = role;
+      user.status = status;
+
+      // Update optional fields if provided
+      if (fullName) user.fullName = fullName;
+      if (email) {
+        // Check if email is already taken by another user
+        const existingUser = await User.findOne({ email, _id: { $ne: id } });
+        if (existingUser) {
+          return res.status(400).json({ message: 'Email already taken' });
+        }
+        user.email = email;
+      }
+      if (password) {
+        // Don't hash the password here, let the pre-save middleware handle it
+        user.password = password;
+      }
+      
+      // Handle profile image upload
+      if (req.file) {
+        // If user already has a profile image, delete it from Cloudinary
+        if (user.profileImage) {
+          await deleteFromCloudinary(user.profileImage);
+        }
+        // Upload new image to Cloudinary
+        const imageUrl = await uploadToCloudinary(req.file, 'profile-images');
+        user.profileImage = imageUrl;
+      }
+
+      await user.save();
+
+      const updatedUser = {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+        lastActive: user.lastActive || null,
+        initials: user.fullName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase(),
+        profileImage: user.profileImage
+      };
+
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Update user error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error updating user' });
+    }
+  },
+
+  deleteUser: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { id } = req.params;
+
+      // Prevent self-deletion
+      if (req.user.id === id) {
+        return res.status(400).json({ message: 'Cannot delete your own account' });
+      }
+
+      const user = await User.findById(id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      await User.findByIdAndDelete(id);
+      res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+      console.error('Delete user error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error deleting user' });
+    }
+  },
+
+  getCourses: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { search, status } = req.query;
+      const query: any = {
+        status: { $in: ['published', 'review'] }
+      };
+
+      if (search) {
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } }
+        ];
+      }
+      if (status && ['published', 'review'].includes(status as string)) {
+        query.status = status;
+      }
+
+      const courses = await Course.find(query)
+        .populate({
+          path: 'instructor',
+          select: 'fullName email'
+        })
+        .sort({ updatedAt: -1 });
+
+      const transformedCourses = courses.map(course => {
+        const instructor = course.instructor as unknown as { fullName: string; email: string; };
+        const usersCount = course.users?.length || 0;
+        const thumbnailPath = course.thumbnail 
+          ? `${course.thumbnail}` 
+          : '/images/placeholder-course.jpg';
+
+        return {
+          id: course._id,
+          title: course.title,
+          instructor: instructor?.fullName || 'Unknown',
+          instructorEmail: instructor?.email,
+          thumbnail: thumbnailPath,
+          status: course.status,
+          usersCount,
+          rating: course.rating || 0,
+          createdAt: course.createdAt,
+          updatedAt: course.updatedAt
+        };
+      });
+
+      res.json(transformedCourses);
+    } catch (error) {
+      console.error('Get courses error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error fetching courses' });
+    }
+  },
+
+  updateCourseStatus: async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        res.status(403).json({ message: 'Not authorized' });
+        return;
+      }
+
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!['published', 'review', 'draft'].includes(status)) {
+        res.status(400).json({ message: 'Invalid status' });
+        return;
+      }
+
+      const course = await Course.findById(id).populate('instructor', 'fullName email') as PopulatedCourse | null;
+      if (!course) {
+        res.status(404).json({ message: 'Course not found' });
+        return;
+      }
+
+      const previousStatus = course.status;
+      course.status = status;
+      await course.save();
+
+      // Send notification and email to trainer if course is published
+      if (status === 'published' && previousStatus !== 'published') {
+        try {
+          // Create notification
+          await createNotification({
+            recipient: course.instructor._id.toString(),
+            type: 'course',
+            title: 'Course Approved',
+            message: `Your course "${course.title}" has been approved and is now published.`,
+            action: 'View Course',
+            relatedId: course._id.toString()
+          });
+
+          // Send email notification
+          await sendCourseApprovalEmail(
+            course.instructor.email,
+            course.instructor.fullName,
+            course.title,
+            course._id.toString()
+          );
+        } catch (error) {
+          console.error('Error sending course approval notification:', error);
+          // Don't fail the request if notification fails
+        }
+      }
+
+      // Send notification and email to trainer if course is rejected (moved to draft)
+      if (status === 'draft' && previousStatus === 'review') {
+        try {
+          // Create notification
+          await createNotification({
+            recipient: course.instructor._id.toString(),
+            type: 'course',
+            title: 'Course Rejected',
+            message: `Your course "${course.title}" requires revisions before it can be published.`,
+            relatedId: course._id.toString()
+          });
+
+          // Send email notification
+          await sendCourseRejectionEmail(
+            course.instructor.email,
+            course.instructor.fullName,
+            course.title,
+            course._id.toString()
+          );
+        } catch (error) {
+          console.error('Error sending course rejection notification:', error);
+          // Don't fail the request if notification fails
+        }
+      }
+
+      res.json({ message: 'Course status updated successfully', status });
+    } catch (error) {
+      console.error('Update course status error:', error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+        return;
+      }
+      res.status(500).json({ message: 'Error updating course status' });
+    }
+  },
+
+  createUser: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { email, fullName, role, sendEmail = true } = req.body;
+
+      // Validate input
+      if (!email || !fullName || !role) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already registered' });
+      }
+
+      // Generate a random password
+      const password = generateRandomPassword();
+      const hashedPassword = await bcryptjs.hash(password, 10);
+
+      // Create new user
+      const user = new User({
+        email,
+        password: hashedPassword,
+        fullName,
+        role,
+        isEmailVerified: true, // Since admin is creating the account
+        status: 'active',
+        lastActive: new Date()
+      });
+
+      await user.save();
+
+      // Send welcome email with credentials if sendEmail is true
+      let emailSent = false;
+      let emailError: EmailError | null = null;
+
+      if (sendEmail) {
+        try {
+          await sendWelcomeEmail(email, fullName, password);
+          emailSent = true;
+        } catch (error) {
+          console.error('Error sending welcome email:', error);
+          emailError = error as EmailError;
+        }
+      }
+
+      const response = {
+        user: {
+          id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+          lastActive: user.lastActive || null,
+          initials: user.fullName
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+        },
+        emailSent,
+        emailError: emailError ? emailError.message : null
+      };
+
+      res.status(201).json(response);
+    } catch (error) {
+      console.error('Create user error:', error);
+      res.status(500).json({ message: 'Error creating user' });
+    }
+  },
+
+  checkEmails: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { emails } = req.body;
+      if (!emails || !Array.isArray(emails)) {
+        return res.status(400).json({ message: 'Invalid email list' });
+      }
+
+      // Find existing emails
+      const existingUsers = await User.find({
+        email: { $in: emails }
+      }).select('email');
+
+      const duplicates = existingUsers.map(user => user.email);
+
+      res.json({ duplicates });
+    } catch (error) {
+      console.error('Check emails error:', error);
+      if (error instanceof Error) {
+        return res.status(500).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error checking emails' });
+    }
+  },
+
+  parseExcelUsers: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+
+      // Parse Excel file
+      const users = parseExcelUsers(req.file.buffer);
+
+      res.json(users);
+    } catch (error) {
+      console.error('Excel parsing error:', error);
+      if (error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
+      res.status(500).json({ message: 'Error parsing Excel file' });
+    }
+  },
+
+  createBulkUsers: async (req: Request, res: Response) => {
+    try {
+      const { users, organizationId } = req.body;
+
+      if (!users || !Array.isArray(users)) {
+        return res.status(400).json({ message: 'Invalid users data' });
+      }
+
+      // Get organization and its courses if organizationId is provided
+      let organizationCourses: mongoose.Types.ObjectId[] = [];
+      if (organizationId) {
+        const organization = await Organization.findById(organizationId);
+        if (organization && organization.courses) {
+          organizationCourses = organization.courses;
+        }
+      }
+
+      const results = [];
+      const errors = [];
+
+      for (const userData of users) {
+        try {
+          const { firstName, lastName, email, sendEmail } = userData;
+          
+          // Check if user already exists
+          const existingUser = await User.findOne({ email: email.toLowerCase() });
+          if (existingUser) {
+            errors.push({ email, error: 'User already exists' });
+            continue;
+          }
+
+          // Generate random password
+          const password = generateRandomPassword();
+
+          // Send welcome email before creating user
+          if (sendEmail) {
+            await sendWelcomeEmail(email, `${firstName} ${lastName}`.trim(), password);
+          }
+
+          // Prepare user courses if organization has courses
+          const userCourses = organizationCourses.map(courseId => ({
+            courseId,
+            status: 'in progress',
+            organizationId,
+            progress: {
+              timeSpent: 0,
+              percentage: 0,
+              completedLessons: []
+            }
+          }));
+
+          // Create new user with combined fullName and courses
+          // Password will be hashed by the pre-save middleware
+          const newUser = await User.create({
+            fullName: `${firstName} ${lastName}`.trim(),
+            email: email.toLowerCase(),
+            password: password,
+            role: 'user',
+            isEmailVerified: true,
+            organizations: organizationId ? [organizationId] : [],
+            courses: userCourses
+          });
+
+          results.push({ email, success: true });
+        } catch (error) {
+          console.error('Error creating user:', error);
+          errors.push({ email: userData.email, error: 'Failed to create user' });
+        }
+      }
+
+      res.json({
+        message: 'Bulk user creation completed',
+        results,
+        errors
+      });
+    } catch (error) {
+      console.error('Bulk create users error:', error);
+      res.status(500).json({ message: 'Error creating users' });
+    }
+  },
+
+  // Get all categories with course counts
+  getCategories: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const categories = await Category.find().sort({ name: 1 });
+      
+      // Get course counts for each category
+      const categoriesWithCounts = await Promise.all(
+        categories.map(async (category) => {
+          const courseCount = await Course.countDocuments({
+            categories: category.name
+          });
+
+          const courses = await Course.find({
+            categories: category.name
+          }).select('title').limit(5);
+
+          return {
+            id: category._id,
+            name: category.name,
+            courseCount,
+            courses: courses.map(course => ({
+              id: course._id,
+              title: course.title
+            }))
+          };
+        })
+      );
+
+      res.json(categoriesWithCounts);
+    } catch (error) {
+      console.error('Get categories error:', error);
+      res.status(500).json({ message: 'Error fetching categories' });
+    }
+  },
+
+  // Create a new category
+  createCategory: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { name } = req.body;
+
+      if (!name) {
+        return res.status(400).json({ message: 'Category name is required' });
+      }
+
+      const existingCategory = await Category.findOne({ name: name.trim() });
+      if (existingCategory) {
+        return res.status(400).json({ message: 'Category already exists' });
+      }
+
+      const category = new Category({
+        name: name.trim(),
+        createdBy: req.user._id
+      });
+
+      await category.save();
+
+      res.status(201).json({
+        id: category._id,
+        name: category.name,
+        courseCount: 0,
+        courses: []
+      });
+    } catch (error) {
+      console.error('Create category error:', error);
+      res.status(500).json({ message: 'Error creating category' });
+    }
+  },
+
+  // Update a category
+  updateCategory: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { id } = req.params;
+      const { name } = req.body;
+
+      if (!name) {
+        return res.status(400).json({ message: 'Category name is required' });
+      }
+
+      const existingCategory = await Category.findOne({
+        name: name.trim(),
+        _id: { $ne: id }
+      });
+
+      if (existingCategory) {
+        return res.status(400).json({ message: 'Category name already exists' });
+      }
+
+      // Find the category first to get the old name
+      const category = await Category.findById(id);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+
+      const oldName = category.name;
+      category.name = name.trim();
+      await category.save();
+
+      // Update the category name in all courses that use it
+      await Course.updateMany(
+        { categories: oldName },
+        { $set: { 'categories.$': name.trim() } }
+      );
+
+      // Get updated course count and courses
+      const courseCount = await Course.countDocuments({
+        categories: category.name
+      });
+
+      const courses = await Course.find({
+        categories: category.name
+      }).select('title').limit(5);
+
+      res.json({
+        id: category._id,
+        name: category.name,
+        courseCount,
+        courses: courses.map(course => ({
+          id: course._id,
+          title: course.title
+        }))
+      });
+    } catch (error) {
+      console.error('Update category error:', error);
+      res.status(500).json({ message: 'Error updating category' });
+    }
+  },
+
+  // Delete a category
+  deleteCategory: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { id } = req.params;
+
+      const category = await Category.findById(id);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+
+      // Check if category is being used by any courses
+      const courseCount = await Course.countDocuments({
+        categories: category.name
+      });
+
+      if (courseCount > 0) {
+        return res.status(400).json({
+          message: 'Cannot delete category that is being used by courses'
+        });
+      }
+
+      await Category.findByIdAndDelete(id);
+      res.json({ message: 'Category deleted successfully' });
+    } catch (error) {
+      console.error('Delete category error:', error);
+      res.status(500).json({ message: 'Error deleting category' });
+    }
+  },
+
+  // Get courses with less than 3 categories
+  getAvailableCourses: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const courses = await Course.find({
+        status: 'published',
+        $expr: {
+          $lt: [{ $size: { $ifNull: ['$categories', []] } }, 3]
+        }
+      })
+      .select('title thumbnail categories')
+      .sort({ title: 1 });
+
+      const transformedCourses = courses.map(course => ({
+        id: course._id,
+        title: course.title,
+        thumbnail: course.thumbnail,
+        categoryCount: course.categories?.length || 0
+      }));
+
+      res.json(transformedCourses);
+    } catch (error) {
+      console.error('Get available courses error:', error);
+      res.status(500).json({ message: 'Error fetching available courses' });
+    }
+  },
+
+  // Add course to category
+  addCourseToCategory: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { categoryId } = req.params;
+      const { courseId } = req.body;
+
+      // Find the category
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+
+      // Find the course
+      const course = await Course.findById(courseId);
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+
+      // Check if course already has this category
+      if (course.categories.includes(category.name)) {
+        return res.status(400).json({ message: 'Course already in this category' });
+      }
+
+      // Check if course has less than 3 categories
+      if (course.categories.length >= 3) {
+        return res.status(400).json({ message: 'Course already has maximum number of categories' });
+      }
+
+      // Add category to course
+      course.categories.push(category.name);
+      await course.save();
+
+      res.json({ message: 'Course added to category successfully' });
+    } catch (error) {
+      console.error('Add course to category error:', error);
+      res.status(500).json({ message: 'Error adding course to category' });
+    }
+  },
+
+  // Remove course from category
+  removeCourseFromCategory: async (req: Request, res: Response) => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+
+      const { categoryId, courseId } = req.params;
+
+      // Find the course
+      const course = await Course.findById(courseId);
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+
+      // Find the category
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+
+      // Check if course has this category
+      if (!course.categories.includes(category.name)) {
+        return res.status(400).json({ message: 'Course is not in this category' });
+      }
+
+      // Remove category from course
+      course.categories = course.categories.filter(cat => cat !== category.name);
+      await course.save();
+
+      res.json({ message: 'Course removed from category successfully' });
+    } catch (error) {
+      console.error('Remove course from category error:', error);
+      res.status(500).json({ message: 'Error removing course from category' });
+    }
+  }
+}; 

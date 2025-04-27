@@ -1,0 +1,1096 @@
+{
+  "common": {
+    "currency": "MAD",
+    "or": "OR",
+    "off": "OFF",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "buttons": {
+      "login": "Login",
+      "signup": "Sign Up",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "add": "Add",
+      "save": "Save",
+      "remove": "Remove"
+    },
+    "cart": {
+      "title": "Shopping Cart",
+      "itemCount": "{{count}} Course in Cart",
+      "itemCount_plural": "{{count}} Courses in Cart",
+      "addedToCart": {
+        "title": "Added to Cart",
+        "button": "Go to Cart"
+      },
+      "popularPack": {
+        "title": "This course is part of the popular pack",
+        "addToCart": "Add all to Cart",
+        "total": "Total"
+      },
+      "summary": {
+        "title": "Subtotal",
+        "originalPrice": "Original Price",
+        "discount": "Discount",
+        "total": "Total",
+        "enterCoupon": "Enter Coupon",
+        "removeCode": "Remove",
+        "checkout": "Checkout",
+        "apply": "Apply",
+        "isApplied": "is applied",
+        "promotions": "Promotions"
+      }
+    },
+    "checkout": {
+      "title": "Checkout",
+      "billingAddress": "Billing Address",
+      "country": "Country",
+      "paymentMethod": "Payment Method",
+      "secureAndEncrypted": "Secure and encrypted",
+      "paypal": "PayPal",
+      "creditDebitCard": "Credit/Debit Card",
+      "nameOnCard": "Name on card",
+      "cardNumber": "Card number",
+      "expiryDate": "Expiry date",
+      "securelySaveCard": "Securely save this card for my later purchase",
+      "googlePay": "GooglePay",
+      "orderDetails": "Order details",
+      "summary": "Summary",
+      "discounts": "Discounts",
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "total": "Total",
+      "byCompletingPurchase": "By completing your purchase you agree to these",
+      "termsOfService": "Terms of Service",
+      "completeCheckout": "Complete Checkout",
+      "thirtyDayMoneyBackGuarantee": "30-Day Money-Back Guarantee",
+      "pleaseLoginToPurchaseCourse": "Please login to purchase this course",
+      "morocco": "Morocco",
+      "algeria": "Algeria",
+      "tunisia": "Tunisia",
+      "egypt": "Egypt",
+      "saudi": "Saudi Arabia",
+      "uae": "United Arab Emirates",
+      "qatar": "Qatar",
+      "kuwait": "Kuwait"
+    },
+    "navigation": {
+      "home": "Home",
+      "courses": "Courses",
+      "business": "Adwin Business",
+      "teach": "Teach on Adwin",
+      "businessLink": "Adwin Business",
+      "teachLink": "Teach on Adwin"
+    },
+    "languages": {
+      "en": "English",
+      "fr": "French",
+      "ar": "Arabic"
+    },
+    "accessibility": {
+      "languageSelector": "Select language",
+      "mainNavigation": "Main navigation",
+      "userMenu": "User menu",
+      "currencySelector": "Select currency"
+    },
+    "footer": {
+      "explore": "Explore",
+      "resources": "Resources",
+      "company": "Company",
+      "getApp": "Get the App",
+      "aboutUs": "About Us",
+      "contactUs": "Contact Us",
+      "blog": "Blog",
+      "helpSupport": "Help and Support",
+      "affiliate": "Affiliate",
+      "investors": "Investors",
+      "terms": "Terms",
+      "privacy": "Privacy Policy",
+      "cookieSettings": "Cookie Settings",
+      "sitemap": "Sitemap",
+      "accessibility": "Accessibility Statement",
+      "language": "Language"
+    },
+    "pages": {
+      "placeholder": {
+        "title": "{{pageName}}",
+        "description": "This page is under construction."
+      }
+    }
+  },
+  "auth": {
+    "googleLoginFailed": "Google login failed. Please try again.",
+    "googleSignupFailed": "Google signup failed. Please try again.",
+    "signupWithLinkedin": "Sign up with LinkedIn",
+    "loginWithLinkedin": "Sign in with LinkedIn",
+    "linkedinLoginSuccess": "Successfully signed in with LinkedIn",
+    "linkedinLoginFailed": "Failed to sign in with LinkedIn. Please try again.",
+    "linkedinSignupSuccess": "Successfully signed up with LinkedIn",
+    "linkedinSignupFailed": "Failed to sign up with LinkedIn. Please try again.",
+    "popupBlocked": "Popup blocked. Please try again.",
+    "signin": {
+      "title": "Sign In",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot Password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create Account",
+      "googleSignIn": "Sign in with Google",
+      "linkedinSignIn": "Sign in with LinkedIn"
+    },
+    "signup": {
+      "title": "Sign Up and Start Learning",
+      "fullNamePlaceholder": "Your Full Name",
+      "emailPlaceholder": "Your Email",
+      "passwordPlaceholder": "Password",
+      "marketingConsent": "Send me special offers, personalized recommendations, and learning tips.",
+      "termsText": "By signing up, you agree to our",
+      "termsLink": "Terms of Use",
+      "and": "and",
+      "privacyLink": "Privacy Policy",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in",
+      "signupButton": "Sign up",
+      "successMessage": "Registration successful!",
+      "errorMessage": "Registration failed. Please try again.",
+      "continueWithEmail": "Continue with Email",
+      "or": "or",
+      "signIn": "Sign In",
+      "alreadyHaveAccount": "Already have an account?",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithLinkedIn": "Continue with LinkedIn",
+      "loading": "Loading...",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "passwordStrength": "Password Strength",
+      "submit": "Submit"
+    },
+    "login": {
+      "title": "Log in to continue Your Learning Journey",
+      "emailPlaceholder": "example@gmail.com",
+      "continueWithEmail": "Continue with Email",
+      "googleSignIn": "Sign in with Google",
+      "linkedinSignIn": "Sign in with LinkedIn",
+      "organizationLogin": "Log in with your ",
+      "organizationText": "Organization",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up",
+      "forgotPassword": "Forgot Password?",
+      "organizationLoginTitle": "Organization Login Information",
+      "organizationLoginDescription": "If your organization has invited you to this platform, they will send you login credentials (email and password) via your email address.",
+      "organizationLoginDescription2": "Once you receive these credentials, you can use them to log in and access the courses that your organization has made available to you.",
+      "organizationLoginDescription3": "Please check your email inbox for the invitation and follow the instructions provided.",
+      "organizationLoginButton": "Got it"
+    },
+    "verifyingEmail": "Verifying your email...",
+    "emailVerified": "Email verified successfully!",
+    "verificationFailed": "Email verification failed",
+    "redirectingToLogin": "Redirecting you to login...",
+    "resendVerification": "Resend verification email",
+    "checkEmailForVerification": "Please check your email for verification instructions.",
+    "emailNotVerified": "Please verify your email before logging in.",
+    "verificationEmailSent": "Verification email has been sent. Please check your inbox.",
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "description": "Enter your email and we'll send you a link to reset your password.",
+      "emailSent": "The password reset link has been sent to your email",
+      "error": "Failed to send password reset link",
+      "resetPassword": "Reset Password",
+      "checkEmail": "Please check your email for password reset instructions",
+      "checkSpam": "If you don't see it, please check your spam folder"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Please enter your new password below",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters long",
+      "success": "Password has been reset successfully",
+      "error": "Failed to reset password",
+      "submit": "Reset Password"
+    },
+    "errors": {
+      "passwordLength": "Password must be between 8 and 40 characters",
+      "passwordMustContainAtLeastOneNumber": "Password must contain at least one number",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Password must contain both lowercase and uppercase letters",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Password must contain at least one special character",
+      "newPasswordRequired": "New password is required",
+      "pleaseConfirmYourNewPassword": "Please confirm your new password",
+      "passwordsDoNotMatch": "Passwords do not match"
+    }
+  },
+  "courses": {
+    "search": "Search courses...",
+    "filter": {
+      "all": "All",
+      "popular": "Popular",
+      "new": "New",
+      "trending": "Trending"
+    },
+    "level": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "components": {
+    "title": "Components Library",
+    "description": "Headers, footers, and navigation-related components.",
+    "sections": {
+      "common": {
+        "title": "Common Components",
+        "buttons": {
+          "title": "Buttons",
+          "description": "Standard button variations used throughout the application.",
+          "variants": "Variants",
+          "sizes": "Sizes",
+          "contained": "Contained",
+          "outlined": "Outlined",
+          "text": "Text",
+          "small": "Small",
+          "medium": "Medium",
+          "large": "Large",
+          "iconButtons": {
+            "title": "Icon Buttons",
+            "google": "Sign in with Google",
+            "linkedin": "Sign in with LinkedIn",
+            "send": "Send Message",
+            "add": "Add Item"
+          },
+          "states": {
+            "title": "States",
+            "disabled": "Disabled",
+            "fullWidth": "Full Width"
+          },
+          "linkButtons": {
+            "title": "Link Buttons",
+            "default": "Link Button",
+            "outlined": "Link Button Outlined",
+            "text": "Link Button Text"
+          }
+        },
+        "inputs": {
+          "title": "Inputs",
+          "description": "Input components for forms and data entry.",
+          "types": {
+            "text": "Text Input",
+            "password": "Password Input",
+            "search": "Search Input",
+            "language": "Language Select"
+          },
+          "searchInput": {
+            "title": "Search Input",
+            "label": "Search",
+            "placeholder": "Enter search terms..."
+          },
+          "basic": {
+            "title": "Basic Inputs",
+            "default": {
+              "label": "Default Input",
+              "placeholder": "Enter text..."
+            },
+            "error": {
+              "label": "Error Input",
+              "helper": "This field is required"
+            },
+            "disabled": {
+              "label": "Disabled Input",
+              "value": "Disabled value"
+            }
+          },
+          "withIcons": {
+            "title": "Inputs with Icons",
+            "email": {
+              "label": "Email",
+              "placeholder": "Enter your email"
+            },
+            "password": {
+              "label": "Password",
+              "placeholder": "Enter your password",
+              "helper": "Use 8+ characters with a mix of letters, numbers & symbols"
+            },
+            "name": {
+              "label": "Full Name",
+              "placeholder": "Enter your full name"
+            },
+            "phone": {
+              "label": "Phone Number",
+              "placeholder": "Enter your phone number"
+            }
+          }
+        },
+        "cards": {
+          "title": "Cards",
+          "description": "Card components for displaying content in a contained format.",
+          "course": {
+            "sampleTitle1": "Machine Learning Fundamentals",
+            "sampleTrainer1": "Dr. James Wilson",
+            "sampleTitle2": "Introduction to Artificial Intelligence and Neural Networks",
+            "sampleTrainer2": "Dr. Sarah Johnson",
+            "sampleTitle3": "Advanced Deep Learning Techniques",
+            "sampleTrainer3": "Prof. Michael Chen",
+            "bestSeller": "Best Seller",
+            "comingSoon": "Coming Soon"
+          }
+        }
+      },
+      "feature": {
+        "title": "Feature Components",
+        "course": {
+          "title": "Course Components",
+          "description": "Components specific to course display and interaction."
+        },
+        "auth": {
+          "title": "Authentication Components",
+          "description": "Login, registration, and authentication-related components."
+        }
+      },
+      "layout": {
+        "title": "Layout Components",
+        "navigation": {
+          "title": "Navigation Components",
+          "description": "Headers, footers, and navigation-related components."
+        }
+      },
+      "colors": {
+        "title": "Colors"
+      }
+    }
+  },
+  "home": {
+    "hero": {
+      "titleStart": "The",
+      "titleHighlight": "Unlocking",
+      "titleEnd": "the potential of African and African-Descendant Women",
+      "description": "The 1st Global Platform of Solidarity, Technology, and Innovation for Change",
+      "emailPlaceholder": "example@gmail.com",
+      "subscribeButton": "Subscribe",
+      "emailRequired": "Email is required",
+      "subscribeSuccess": "Subscription successful!",
+      "subscribeError": "Subscription failed. Please try again.",
+      "connectToday": "Connect Today"
+    },
+    "courses": {
+      "title": "Introduction to AI",
+      "description": "Start your journey into Artificial Intelligence with our foundational courses",
+      "errorLoading": "Error loading courses",
+      "noCourses": "No courses found",
+      "errorMessage": "An error occurred while loading courses",
+      "introToAI": {
+        "title": "Introduction to AI",
+        "description": "Master the fundamentals of AI and machine learning",
+        "cards": {
+          "fundamentals": {
+            "title": "Introduction to Artificial Intelligence and Neural Networks",
+            "trainer": "Dr. James Wilson"
+          },
+          "ethics": {
+            "title": "AI Issues: Ethics, Security, Impact on Employment and Education",
+            "trainer": "Dr. Sarah Johnson"
+          },
+          "tools": {
+            "title": "Step by step with AI tools: ChatGPT, Gamma, Notion AI and others",
+            "trainer": "Prof. Michael Chen"
+          }
+        },
+        "tags": {
+          "bestSeller": "Best Seller",
+          "comingSoon": "Coming Soon"
+        }
+      },
+      "AIAugmtedSofDev": "AI-augmented software development",
+      "MarkCommunAugmtedAI": "Marketing and Communication augmented by AI",
+      "ProdAugmtedAI": "Productivity augmented by AI"
+    }
+  },
+  "course": {
+    "loadingCourse": "Loading course...",
+    "courseNotFound": "Course not found",
+    "loginToSaveCourse": "Please login to save this course",
+    "hero": {
+      "title": "LangChain - Develop LLM powered applications with LangChain",
+      "description": "Learn LangCHain by building FAST a real world generative AI LLM powered application LLM (Python, Latest Version 0.3.0)",
+      "breadcrumb": {
+        "courses": "Courses"
+      }
+    },
+    "placeholder": {
+      "title": "Course {{courseId}}"
+    },
+    "content": {
+      "title": "Course content",
+      "stats": "{{sections}} sections • {{lectures}} lectures • {{duration}} total length",
+      "collapse_all_sections": "Collapse All Sections",
+      "expand_all_sections": "Expand All Sections",
+      "preview": "Preview",
+      "lectures": "Lectures",
+      "sections": "Sections",
+      "learning": {
+        "title": "What you'll learn",
+        "langchain": "Learn LangChain from scratch",
+        "prompting": "Master prompt engineering",
+        "llm": "Understand LLM fundamentals",
+        "rag": "Build RAG applications",
+        "have": "Have hands-on experience",
+        "understand": "Understand AI concepts",
+        "llc": "Create LangChain applications"
+      }
+    },
+    "relatedTopics": {
+      "title": "Explore Related Topics",
+      "topics": {
+        "langchain": "LangChain",
+        "dataScience": "Data Science",
+        "development": "Development"
+      }
+    },
+    "requirements": {
+      "title": "Requirements"
+    },
+    "includes": {
+      "title": "This course includes",
+      "features": {
+        "clock": "hours on-demand video",
+        "article": "articles",
+        "download": "19 downloadable resources",
+        "access": "Access on mobile and TV",
+        "certificate": "Certificate of completion"
+      }
+    },
+    "purchase": {
+      "personal": "Personal",
+      "enterprise": "Enterprise",
+      "add_to_cart": "Add to cart",
+      "guarantee": "30-Day Money-Back Guarantee",
+      "lifetime_access": "Full Lifetime Access",
+      "access_to_all_courses": "Access to all courses on the platform",
+      "access_to_all_courses_description": "Get this course, plus 1,000+ of top-rated courses, with Personal Plan.",
+      "access_to_all_courses_button": "Access to all courses",
+      "starting_at": "Starting at $20.00 per month after trial",
+      "cancel_anytime": "Cancel anytime",
+      "learn_more": "Learn More",
+      "already_purchased": "You already purchased this course",
+      "already_in_cart": "This course is already in your cart",
+      "check_cart": "Check your cart"
+    },
+    "description": {
+      "title": "Description"
+    },
+    "instructor": {
+      "title": "Instructor",
+      "rating": "Instructor Rating",
+      "reviews": "Reviews",
+      "users": "Users",
+      "courses": "Courses",
+      "showLess": "Show less",
+      "showMore": "Show more"
+    }
+  },
+  "placeholder": {
+    "title": "{{pageName}}",
+    "subtitle": "We're working hard to bring you something amazing",
+    "featureDescription": "Our team is working around the clock to deliver this feature to you",
+    "comingSoon": "Coming Soon",
+    "stayTuned": "Stay Tuned",
+    "titles": {
+      "business": "Adwin Business",
+      "teach": "Teach on Adwin",
+      "app": "Get the App",
+      "affiliate": "Affiliate",
+      "about": "About",
+      "contact": "Contact",
+      "blog": "Blog",
+      "help": "Help",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "accessibility": "Accessibility Statement",
+      "cookieSettings": "Cookie Settings",
+      "sitemap": "Sitemap",
+      "investors": "Investors"
+    }
+  },
+  "user": {
+    "navbar": {
+      "myLearning": "My Learning",
+      "accountSettings": "Account Settings",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "profile": "Profile",
+      "password": "Password",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "accountSettings": "Account Settings"
+    },
+    "profileSettings": {
+      "title": "Profile Settings",
+      "personalInformation": "Personal Information",
+      "fullName": "Full Name",
+      "email": "Email",
+      "saveChanges": "Save Changes"
+    },
+    "passwordSettings": {
+      "title": "Password Settings",
+      "changePassword": "Change Password",
+      "setPassword": "Set Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "updatePassword": "Update Password"
+    },
+    "errors": {
+      "loginToUpdateProfileImage": "You must be logged in to update your profile image",
+      "failedToUpdateProfileImage": "Failed to update profile image",
+      "loginToUpdateProfile": "You must be logged in to update your profile",
+      "nameRequired": "Name is required",
+      "failedToUpdateProfile": "Failed to update profile",
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "pleaseConfirmYourNewPassword": "Please confirm your new password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordLength": "Password must be between 8 and 40 characters",
+      "passwordMustContainAtLeastOneNumber": "Password must contain at least one number",
+      "failedToUpdatePassword": "Failed to update password",
+      "currentPasswordIncorrect": "Current password is incorrect"
+    },
+    "success": {
+      "profileImageUpdatedSuccessfully": "Profile image updated successfully",
+      "profileUpdatedSuccessfully": "Profile updated successfully",
+      "passwordUpdatedSuccessfully": "Password updated successfully"
+    },
+    "learning": {
+      "title": "My Learning",
+      "description": "Track your learning progress and stay on top of your courses.",
+      "inProgress": "In Progress",
+      "saved": "Saved",
+      "completed": "Completed",
+      "course": "Course",
+      "by": "By",
+      "downloadCertificate": "Download Certificate",
+      "share": "Share",
+      "noInProgress": "You don't have any courses in progress yet. Start learning!",
+      "noSaved": "You haven't saved any courses yet. Browse our catalog to find interesting courses!",
+      "noCompleted": "You haven't completed any courses yet. Keep learning!",
+      "allCourses": "All Courses"
+    },
+    "courseLearning": {
+      "search": "Search in course",
+      "markComplete": "Mark as Complete",
+      "watchProgress": "Watch Progress",
+      "congratulations": "Congratulations! 🎉",
+      "courseCompleted": "You have completed {{courseTitle}}",
+      "completionMessage": "You can now download your certificate and share your achievement",
+      "getCertificate": "Get Certificate",
+      "backToCourses": "Back to Courses",
+      "share": "Share on LinkedIn"
+    },
+    "certificate": {
+      "title": "Course Certificate",
+      "description": "Share your achievement with your network",
+      "noCourseId": "No course ID provided",
+      "shareWith": "Share with",
+      "shareThoughts": "Share your achievement with your network",
+      "shareButton": "Share on LinkedIn",
+      "shareLink": "Check it out:",
+      "shareCourse": "Just finished the course:",
+      "tip": "Tip: use @ to mention your connection.",
+      "downloadPDF": "Download PDF",
+      "postOnLinkedIn": "Post on LinkedIn",
+      "course": "Course"
+    },
+    "rateCourse": {
+      "title": "Rate Course",
+      "description": "Rate the course based on your experience",
+      "commentPlaceholder": "Comment",
+      "rate": "Rate",
+      "rateCourse": "Rate Course",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "submitting": "Submitting",
+      "oneTimeNote": "Note: This rating is only for this course. You can rate the course only once."
+    }
+  },
+  "trainer": {
+    "navbar": {
+      "dashboard": "Dashboard",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "title": "Trainer Dashboard",
+      "courses": "Courses",
+      "users": "Users",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "settings": "Settings"
+    },
+    "profileSettings": {
+      "title": "Profile Settings",
+      "fullName": "Full Name",
+      "email": "Email",
+      "saveChanges": "Save Changes",
+      "security": "Security",
+      "changePassword": "Change Password",
+      "setPassword": "Set Password",
+      "updatePassword": "Update Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password"
+    },
+    "errors": {
+      "failedToLoadUsers": "Failed to load users data",
+      "failedToSendMessage": "Failed to send message",
+      "mustBeLoggedInToUpdateProfileImage": "You must be logged in to update your profile image",
+      "failedToUpdateProfileImage": "Failed to update profile image",
+      "mustBeLoggedInToUpdateProfile": "You must be logged in to update your profile",
+      "nameIsRequired": "Name is required",
+      "failedToUpdateProfile": "Failed to update profile",
+      "mustBeLoggedInToUpdatePassword": "You must be logged in to update your password",
+      "failedToUpdatePassword": "Failed to update password",
+      "currentPasswordIncorrect": "Current password is incorrect",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordLength": "Password must be between 8 and 40 characters",
+      "passwordMustContainAtLeastOneNumber": "Password must contain at least one number",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Password must contain both lowercase and uppercase letters",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Password must contain at least one special character",
+      "newPasswordRequired": "New password is required",
+      "confirmPasswordRequired": "Please confirm your new password",
+      "currentPasswordRequired": "Current password is required"
+    },
+    "success": {
+      "passwordUpdatedSuccessfully": "Password updated successfully"
+    },
+    "users": {
+      "title": "Users",
+      "totalUsers": "Total Users",
+      "activeUsers": "Active Users",
+      "averageProgress": "Average Progress",
+      "courseCompletions": "Course Completions",
+      "user": "User",
+      "status": "Status",
+      "progress": "Progress",
+      "lastActive": "Last Active",
+      "actions": "Actions",
+      "sendMessage": "Send Message",
+      "messagePlaceholder": "Type your message here...",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "send": "Send"
+    },
+    "courses": {
+      "title": "My Courses",
+      "createCourse": "Create Course",
+      "totalCourses": "Total Courses",
+      "totalUsers": "Total Users",
+      "averageRating": "Average Rating",
+      "totalHours": "Total Hours",
+      "searchCourses": "Search courses...",
+      "allCourses": "All Courses",
+      "published": "Published",
+      "draft": "Draft",
+      "inReview": "In Review",
+      "editCourse": "Edit Course",
+      "preview": "Preview",
+      "changeToDraft": "Change to Draft",
+      "delete": "Delete",
+      "deleteCourse": "Delete Course",
+      "deleteCourseMessage": "Are you sure you want to delete this course? This action cannot be undone.",
+      "reviewCourseMessage": "Are you sure you want to submit this course for review?",
+      "draftCourseMessage": "Are you sure you want to change this course to draft status?",
+      "reviewCourse": "Review Course",
+      "draftCourse": "Draft Course",
+      "deleteCourseConfirmation": "Delete Course Confirmation",
+      "draftCourseConfirmation": "Draft Course Confirmation",
+      "reviewCourseConfirmation": "Review Course Confirmation",
+      "changeCourseStatus": "Change Course Status",
+      "inviteUser": "Invite User",
+      "inviteUserDescription": "Enter the user's email address to invite them to this course. They will receive an email with instructions to access the course.",
+      "userEmail": "User Email",
+      "sendInvite": "Send Invitation"
+    },
+    "createCourse": {
+      "courseInformation": "Course Information",
+      "courseTitle": "Course Title",
+      "courseSubtitle": "Course Subtitle",
+      "courseDescription": "Course Description",
+      "coursePrice": "Course Price",
+      "oldPrice": "Old Price",
+      "duration": "Duration",
+      "currentPrice": "Current Price",
+      "courseMedia": "Course Media",
+      "vimeoCoursePromoVideoLink": "Vimeo Course Promo Video Link",
+      "coursePromoVideo": "Course Promo Video",
+      "categories": "Categories",
+      "addCustomCategory": "Add Custom Category",
+      "whatYoullLearn": "What You'll Learn",
+      "addLearningPoint": "Add Learning Point",
+      "addRequirement": "Add Requirement",
+      "add": "Add",
+      "requirements": "Requirements",
+      "pleaseCompleteTheFollowingRequirements": "Please complete the following requirements:",
+      "updateCourse": "Update Course",
+      "addCourse": "Add Course",
+      "clickToUploadCourseImage": "Click to upload course image",
+      "maximumSize": "Maximum size: 1.5MB",
+      "enterCourseDescription": "Enter course description...",
+      "editCourse": "Edit Course",
+      "createCourse": "Create Course",
+      "courseContent": "Course Content",
+      "totalCourseDuration": "Total Course Duration",
+      "sectionTitle": "Section Title",
+      "addSection": "Add Section",
+      "note": "Note: Only content in the Preview Zone will be added to the course. Content in the Editor Zone will be ignored until added.",
+      "addAtLeastOneSectionWithOneLesson": "Add at least one section with one lesson",
+      "fillInAllCourseInformation": "Fill in all course information (title, subtitle, and description)",
+      "setCoursePricing": "Set course pricing (original and current price)",
+      "selectAtLeastOneCategory": "Select at least one category",
+      "addAtLeastOneLearningPoint": "Add at least one learning point",
+      "addAtLeastOneRequirement": "Add at least one requirement",
+      "uploadACourseThumbnail": "Upload a course thumbnail",
+      "sectionDuration": "Section Duration",
+      "previewZone": "Preview Zone",
+      "questions": "Questions",
+      "makeThisPreview": "Make this preview for the public",
+      "contentItems": "Content Items",
+      "videoContent": "Video Content",
+      "textContent": "Text Content",
+      "addLesson": "Add Lesson",
+      "addQuiz": "Add Quiz",
+      "editorZone": "Editor Zone",
+      "imageSizeMustBeLessThan": "Image size must be less than 1.5MB",
+      "lessonTitle": "Lesson Title",
+      "addNewLesson": "Add New Lesson",
+      "editLesson": "Edit Lesson",
+      "saveChanges": "Save Changes",
+      "totalDuration": "Total Duration",
+      "minutes": "minutes",
+      "writeYourContentHere": "Write your content here...",
+      "vimeoVideoLink": "Vimeo Video Link",
+      "hours": "Hours",
+      "lessonVideo": "Lesson Video",
+      "addText": "Add Text",
+      "addVimeoVideo": "Add Vimeo Video",
+      "quizTitle": "Quiz Title",
+      "addNewQuiz": "Add New Quiz",
+      "editQuiz": "Edit Quiz",
+      "updateQuiz": "Update Quiz",
+      "saveQuiz": "Save Quiz",
+      "addQuestion": "Add Question",
+      "question": "Question",
+      "options": "Options",
+      "selectCorrectAnswer": "Select correct answer(s)",
+      "optionText": "Option text",
+      "addOption": "Add Option",
+      "cancel": "Cancel",
+      "saveQuestion": "Save Question",
+      "context": "Context (Optional)"
+    },
+    "coursePreview": {
+      "coursePreview": "Course Preview",
+      "aboutThisCourse": "About This Course",
+      "whatYoullLearn": "What You'll Learn",
+      "requirements": "Requirements",
+      "courseContent": "Course Content"
+    }
+  },
+  "admin": {
+    "navbar": {
+      "adminDashboard": "Admin Dashboard",
+      "userManagement": "User Management",
+      "courseManagement": "Course Management",
+      "platformSettings": "Platform Settings",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "adminDashboard": "Admin Dashboard",
+      "overview": "Overview",
+      "users": "Users",
+      "courses": "Courses",
+      "myCourses": "My Courses",
+      "categories": "Categories",
+      "reports": "Reports",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "certificateSettings": "Certificate Settings",
+      "organizations": "Organizations"
+    },
+    "courses": {
+      "publishCourse": "Publish Course",
+      "publishCourseMessage": "Are you sure you want to publish this course? Once published, it will be available to all users."
+    },
+    "organizations": {
+      "title": "Organizations",
+      "createOrganization": "Create Organization",
+      "organizationName": "Organization Name",
+      "addUsers": "Add Users",
+      "fullName": "Full Name",
+      "email": "Email",
+      "name": "Name",
+      "users": "Users",
+      "courses": "Courses",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "user": "User",
+      "course": "Course",
+      "update": "Update",
+      "create": "Create",
+      "editOrganization": "Edit Organization",
+      "addOrganization": "Add Organization",
+      "addedUsers": "{{count}} Users Added",
+      "noUsersAddedYet": "No users added yet",
+      "organizationUsers": "Organization Users",
+      "noUsersInThisOrganization": "No users in this organization",
+      "createAccount": "Create Account",
+      "createAccounts": "Create {{count}} Accounts",
+      "noCoursesAssignedToThisOrganizationYet": "No courses assigned to this organization yet",
+      "createUserAccount": "Create User Account",
+      "createUserAccountMessage": "Create User Account Message",
+      "sendEmailNotificationToUser": "Send Email Notification to User",
+      "userWillReceiveAnEmailWithTheirLoginCredentials": "User will receive an email with their login credentials",
+      "userWillNeedToBeNotifiedManuallyOfTheirAccounts": "User will need to be notified manually of their accounts",
+      "selectCoursesAvailableToOrganizationUsers": "Select courses available to organization users",
+      "noPublishedCoursesAvailable": "No published courses available",
+      "createUserAccountsMessage": "{{orgName}} Create accounts for users who do not have accounts",
+      "saveCourses": "Save Courses",
+      "cancel": "Cancel",
+      "addUser": "Add",
+      "close": "Close",
+      "organizationCourses": "Organization Courses",
+      "currentCoursesAssignedToThisOrganization": "Current Courses Assigned to This Organization",
+      "manageCourses": "Manage Courses",
+      "phone": "Phone",
+      "importUsers": "Import Users",
+      "importUsersDescription": "Upload a CSV or Excel file containing user information. The file should include columns for Full Name, Email, and Phone (optional).",
+      "selectFile": "Select File",
+      "createUserAccounts": "Create User Accounts",
+      "sendEmailNotificationsToUsers": "Send Email Notifications to Users",
+      "usersWillReceiveAnEmailWithTheirLoginCredentials": "Users will receive an email with their login credentials",
+      "deleteOrganization": "Delete Organization",
+      "deleteOrganizationConfirmation": "Delete Organization Confirmation",
+      "deleteOrganizationWarning": "Are you sure you want to delete this organization? This action cannot be undone.",
+      "usersWillNeedToBeNotifiedManuallyOfTheirAccounts": "Users will need to be notified manually of their accounts",
+      "userWillNeedToBeNotifiedManuallyOfTheirAccount": "User will need to be notified manually of their account"
+    },
+    "categoryManagement": {
+      "title": "Category Management",
+      "searchPlaceholder": "Search categories...",
+      "filter": "Filter",
+      "allCourses": "All Courses",
+      "courses": "Courses",
+      "addCategory": "Add Category",
+      "addNewCategory": "Add New Category",
+      "categoryName": "Category Name",
+      "editCategory": "Edit Category",
+      "selectPublishedCourseToAdd": "Select a published course to add",
+      "noAvailableCoursesFound": "No available courses found",
+      "selectCourse": "Select Course",
+      "currentCategories": "Current Categories",
+      "areYouSureYouWantToDelete": "Are you sure you want to delete",
+      "addCourseTo": "Add Course to",
+      "removeCourseFromCategory": "Remove Course from Category",
+      "removeCourseConfirmation": "Are you sure you want to remove '{{course}}' from this category?"
+    },
+    "courseManagement": {
+      "title": "Course Management",
+      "searchPlaceholder": "Search courses...",
+      "filter": "Filter",
+      "allCourses": "All Courses",
+      "published": "Published",
+      "archived": "Archived",
+      "users": "Users",
+      "rating": "Rating",
+      "previewCourse": "Preview Course",
+      "approveAndPublishCourse": "Approve & Publish Course",
+      "areYouSureYouWantToApproveAndPublishThisCourse": "Are you sure you want to approve and publish this course?",
+      "rejectCourse": "Reject Course",
+      "moveCourseToDraft": "Move to Draft",
+      "areYouSureYouWantToMoveThisCourseToDraft": "Are you sure you want to move this course to draft?",
+      "moveCourseToReview": "Move to Review",
+      "areYouSureYouWantToRejectThisCourseAndMoveItToDraft": "Are you sure you want to reject this course and move it to draft?",
+      "moveCourseToArchived": "Move to Archived",
+      "areYouSureYouWantToMoveThisCourseToArchived": "Are you sure you want to move this course to archived?"
+    },
+    "errors": {
+      "atLeastOneUserEmailRequired": "At least one user email is required",
+      "organizationNameRequired": "Organization name is required",
+      "emailRequired": "Email is required",
+      "fullNameRequired": "Full name is required",
+      "userAlreadyExists": "User already exists",
+      "failedToCreateAccountForEmail": "Failed to create account for email {{email}}",
+      "userDoesNotExist": "User does not exist",
+      "organizationAlreadyExists": "Organization already exists",
+      "organizationDoesNotExist": "Organization does not exist",
+      "courseAlreadyExists": "Course already exists",
+      "courseDoesNotExist": "Course does not exist",
+      "courseAlreadyAssignedToOrganization": "Course already assigned to organization",
+      "courseNotAssignedToOrganization": "Course not assigned to organization",
+      "courseAlreadyAssignedToAnotherOrganization": "Course already assigned to another organization",
+      "courseNotAssignedToAnotherOrganization": "Course not assigned to another organization",
+      "organizationAlreadyAssignedToAnotherUser": "Organization already assigned to another user",
+      "organizationNotAssignedToAnotherUser": "Organization not assigned to another user",
+      "userAlreadyAssignedToAnotherOrganization": "User already assigned to another organization",
+      "userNotAssignedToAnotherOrganization": "User not assigned to another organization",
+      "failedToLoadCourses": "Failed to load courses",
+      "failedToUpdateCourses": "Failed to update courses",
+      "failedToLoadCourseDetails": "Failed to load course details",
+      "failedToLoadCoursePreview": "Failed to load course preview",
+      "failedToFetchCategories": "Failed to fetch categories",
+      "failedToAddCategory": "Failed to add category",
+      "failedToUpdateCategory": "Failed to update category",
+      "failedToDeleteCategory": "Failed to delete category",
+      "failedToAddCourseToCategory": "Failed to add course to category",
+      "failedToRemoveCourseFromCategory": "Failed to remove course from category",
+      "failedToImportUsers": "Failed to import users. Please check your file format and try again.",
+      "invalidEmail": "Invalid email",
+      "emailAlreadyAdded": "Email already added",
+      "failedToSaveOrganization": "Failed to save organization",
+      "failedToDeleteOrganization": "Failed to delete organization",
+      "failedToCheckExistingAccounts": "Failed to check existing accounts",
+      "failedToCreateUserAccounts": "Failed to create user accounts",
+      "failedToFetchCourses": "Failed to fetch courses"
+    },
+    "success": {
+      "coursesUpdatedSuccessfully": "Courses updated successfully",
+      "organizationCreated": "Organization created successfully",
+      "organizationUpdated": "Organization updated successfully",
+      "organizationDeleted": "Organization deleted successfully",
+      "accountCreatedSuccessfullyForEmail": "Account created successfully for email {{email}}",
+      "usersAddedToOrganization": "Users added to organization successfully",
+      "usersRemovedFromOrganization": "Users removed from organization successfully",
+      "coursesAssignedToOrganization": "Courses assigned to organization successfully",
+      "coursesRemovedFromOrganization": "Courses removed from organization successfully",
+      "coursePublishedSuccessfully": "Course published successfully",
+      "courseMovedToDraft": "Course moved to draft successfully",
+      "courseMovedToReview": "Course moved to review successfully",
+      "categoryAddedSuccessfully": "Category added successfully",
+      "categoryUpdatedSuccessfully": "Category updated successfully",
+      "categoryDeletedSuccessfully": "Category deleted successfully",
+      "courseAddedToCategorySuccessfully": "Course added to category successfully",
+      "courseRemovedFromCategorySuccessfully": "Course removed from category successfully",
+      "usersImportedSuccessfully": "Successfully imported {{count}} users",
+      "userAccountsCreatedSuccessfully": "User accounts created successfully",
+      "coursesSaved": "Courses saved successfully",
+      "organizationUpdatedSuccessfully": "Organization updated successfully",
+      "organizationCreatedSuccessfully": "Organization created successfully",
+      "organizationDeletedSuccessfully": "Organization deleted successfully"
+    },
+    "settings": {
+      "certificate": {
+        "title": "Certificate Settings",
+        "template": "Certificate Template",
+        "templateDescription": "Upload a template image that will be used for all course certificates. The image should be in PNG format and have a landscape orientation.",
+        "uploadTemplate": "Upload Template",
+        "uploading": "Uploading..."
+      }
+    },
+    "overview": {
+      "dashboardOverview": "Dashboard Overview",
+      "userStatistics": "User Statistics",
+      "newsletterSubscriptions": "Subscriptions",
+      "totalUsers": "Total Users",
+      "admins": "Admins",
+      "trainers": "Trainers",
+      "users": "Users",
+      "courseStatistics": "Course Statistics",
+      "totalCourses": "Total Courses",
+      "activeCourses": "Active Courses",
+      "categories": "Categories",
+      "averageRating": "Average Rating",
+      "noDataAvailable": "No data available"
+    },
+    "newsletter": {
+      "title": "Newsletter Subscriptions",
+      "email": "Email",
+      "subscribedAt": "Subscribed At",
+      "deleteSubscription": "Delete Subscription",
+      "deleteConfirmation": "Are you sure you want to delete this subscription?",
+      "deleteSuccess": "Subscription deleted successfully",
+      "deleteError": "Error deleting subscription",
+      "actions": "Actions",
+      "emailAddress": "Email Address",
+      "subscriptionDate": "Subscription Date"
+    },
+    "userManagement": {
+      "title": "User Management",
+      "searchUsers": "Search users...",
+      "allRoles": "All Roles",
+      "admin": "Admin",
+      "trainer": "Trainer",
+      "user": "User",
+      "allStatus": "All Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "pending": "Pending",
+      "user": "User",
+      "role": "Role",
+      "status": "Status",
+      "lastActive": "Last Active",
+      "actions": "Actions",
+      "editUser": "Edit User",
+      "deleteUser": "Delete User",
+      "uploading": "Uploading",
+      "createUser": "Create User",
+      "importUsers": "Import Users",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "alreadyRegistered": "Already Registered",
+      "cancel": "Cancel",
+      "creatingUsers": "Creating Users",
+      "createValidUsers": "Create Valid Users",
+      "deleteUserConfirmation": "Delete User Confirmation",
+      "deleteUserDatabaseConfirmation": "Delete User Database Confirmation",
+      "deleteUserListConfirmation": "Delete User List Confirmation",
+      "deleteAllUsers": "Delete All Users",
+      "deleteAllUsersConfirmation": "Delete All Users Confirmation",
+      "deleting": "Deleting",
+      "deleteAll": "Delete All",
+      "someEmailsAreAlreadyRegisteredAndWillBeSkipped": "Some emails are already registered and will be skipped",
+      "delete": "Delete",
+      "sendWelcomeEmails": "Send Welcome Emails",
+      "confirmUserCreation": "Confirm User Creation",
+      "saveChanges": "Save Changes",
+      "fullNameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email",
+      "fullName": "Full name",
+      "sendWelcomeEmail": "Send Welcome Email",
+      "uploadImage": "Upload Image",
+      "newPassword": "New Password",
+      "leaveBlankToKeepCurrent": "Leave blank to keep current"
+    },
+    "settings": {
+      "certificate": {
+        "title": "Certificate Settings",
+        "template": "Certificate Template",
+        "templateDescription": "Upload a template image that will be used for all course certificates. The image should be in PNG format and have a landscape orientation.",
+        "uploadTemplate": "Upload Template",
+        "uploading": "Uploading..."
+      }
+    }
+  },
+  "messages": {
+    "conversations": "Conversations",
+    "typeMessage": "Type message...",
+    "send": "Send",
+    "selectConversation": "Select Conversation",
+    "searchUsers": "Search users...",
+    "messagePlaceholder": "Type a message..."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "markAllAsRead": "Mark all as read",
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "justNow": "Just now",
+    "minutesAgo": "minutes ago",
+    "hoursAgo": "hours ago",
+    "daysAgo": "days ago",
+    "noNotifications": "No notifications to display"
+  }
+} 
