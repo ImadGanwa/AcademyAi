@@ -29,6 +29,11 @@ import { BusinessPage } from '../pages/Business/BusinessPage';
 import { TeachPage } from '../pages/Teach/TeachPage';
 import { AboutPage } from '../pages/About/AboutPage';
 import { ContactPage } from '../pages/Contact/ContactPage';
+import { MentorshipPage } from '../pages/Mentorship/MentorshipPage';
+import MentorshipBookSession from '../pages/Mentorship/MentorshipBookSession';
+import MentorshipConfirmation from '../pages/Mentorship/MentorshipConfirmation';
+import BecomeMentor from '../pages/Mentorship/BecomeMentor';
+import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplicationConfirmation';
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -114,6 +119,11 @@ export const AppRoutes: React.FC = () => {
         <Route path="checkout" element={<CheckoutPage />} />
         <Route path="business" element={<BusinessPage />} />
         <Route path="teach" element={<TeachPage />} />
+        <Route path="mentorship" element={<MentorshipPage />} />
+        <Route path="mentorship/book/:mentorId" element={<MentorshipBookSession />} />
+        <Route path="mentorship/confirmation/:mentorId" element={<MentorshipConfirmation />} />
+        <Route path="mentorship/become-mentor" element={<BecomeMentor />} />
+        <Route path="mentorship/application-confirmation" element={<MentorApplicationConfirmation />} />
         <Route path="app" element={<PlaceholderPage pageName={t('placeholder.titles.app')} />} />
         <Route path="affiliate" element={<PlaceholderPage pageName={t('placeholder.titles.affiliate')} />} />
         <Route path="investors" element={<PlaceholderPage pageName={t('placeholder.titles.investors')} />} />

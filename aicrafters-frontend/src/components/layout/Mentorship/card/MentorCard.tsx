@@ -1,0 +1,267 @@
+import React from 'react';
+import styled from 'styled-components';
+import { Box, Typography, Button } from '@mui/material';
+import { VerifiedUser as VerifiedIcon } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+
+// Types
+export interface MentorSkill {
+  id: string;
+  name: string;
+}
+
+export interface MentorLanguage {
+  id: string;
+  name: string;
+}
+
+export interface Mentor {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  isVerified: boolean;
+  countryFlag: string;
+  skills: MentorSkill[];
+  languages: MentorLanguage[];
+}
+
+const CardContainer = styled(Box)`
+  display: flex;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eef0f3;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    flex-direction: column;
+  }
+`;
+
+const MentorImage = styled(Box)<{ imageUrl: string }>`
+  width: 220px;
+  height: 220px;
+  background-image: url(${props => props.imageUrl});
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  margin-right: 40px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 280px;
+    margin-right: 0;
+    margin-bottom: 24px;
+  }
+`;
+
+const ContentContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+`;
+
+const HeaderSection = styled(Box)`
+  display: flex;
+  flex-direction: column;
+`;
+
+const NameContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+`;
+
+const Name = styled(Typography)`
+  && {
+    font-size: 25px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+`;
+
+const Title = styled(Typography)`
+  font-size: 13px;
+  color: #555e68;
+  margin-bottom: 12px;
+  font-weight: 400;
+`;
+
+const SkillsContainer = styled(Box)`
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  gap: 10px;
+`;
+
+const SkillTag = styled.span`
+  background-color: #e6f7f2;
+  color: #007a5a;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    height: 7px;
+    width: 7px;
+    background-color: #007a5a;
+    border-radius: 50%;
+    margin-right: 7px;
+  }
+`;
+
+const Description = styled(Typography)`
+  font-size: 14px;
+  color: #485460;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 15px 0;
+  border-top: 1px solid #eef0f3;
+  border-bottom: 1px solid #eef0f3;
+`;
+
+const ButtonContainer = styled(Box)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+`;
+
+const BookButton = styled(Button)`
+  && {
+    background-color: ${props => props.theme.palette.primary.main};
+    color: white;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    text-transform: none;
+    height: 40px;
+    box-shadow: none;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: ${props => props.theme.palette.background.default};
+      box-shadow: none;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+`;
+
+const LanguagesContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const Language = styled(Typography)`
+  && {
+    font-size: 14px;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    position: relative;
+    padding-left: 12px;
+
+    &::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #007bff;
+      font-size: 20px;
+      line-height: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+`;
+
+const CountryFlag = styled.img`
+  width: 20px;
+  height: 15px;
+  border-radius: 2px;
+`;
+
+const VerifiedBadge = styled(VerifiedIcon)`
+  color: #007bff;
+  font-size: 20px;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+`;
+
+export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
+  const { lang } = useParams<{ lang: string }>();
+  
+  return (
+    <CardContainer>
+      <MentorImage imageUrl={mentor.imageUrl} />
+      <ContentContainer>
+        <HeaderSection>
+          <NameContainer>
+            <Name variant="body1">
+              {mentor.name}
+              {mentor.isVerified && <VerifiedBadge />}
+              <CountryFlag src={mentor.countryFlag} alt="Country flag" />
+            </Name>
+          </NameContainer>
+          <Title>{mentor.title}</Title>
+          
+          <SkillsContainer>
+            {mentor.skills.map(skill => (
+              <SkillTag key={skill.id}>
+                {skill.name}
+              </SkillTag>
+            ))}
+          </SkillsContainer>
+          
+          <Description>
+            {mentor.description}
+          </Description>
+        </HeaderSection>
+        <Box sx={{ padding: '10px 0' }} />
+        
+        <ButtonContainer>
+          <LanguagesContainer>
+            {mentor.languages.map(language => (
+              <Language key={language.id}>{language.name}</Language>
+            ))}
+          </LanguagesContainer>
+          <StyledLink to={`/${lang || 'en'}/mentorship/book/${mentor.id}`}>
+            <BookButton variant="contained">
+              Book a session
+            </BookButton>
+          </StyledLink>
+        </ButtonContainer>
+      </ContentContainer>
+    </CardContainer>
+  );
+}; 
