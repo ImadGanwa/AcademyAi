@@ -11,7 +11,7 @@ import courseRoutes from './routes/courses';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
-import trainerRoutes from './routes/trainer';
+import trainerRoutes from './routes/trainerRoutes';
 import certificateRoutes from './routes/certificate';
 import certificateSettingsRoutes from './routes/certificateSettings';
 import { errorHandler } from './middleware/errorHandler';
@@ -19,6 +19,9 @@ import { newsletterRoutes } from './routes/newsletterRoutes';
 import messageRoutes from './routes/messages';
 import notificationRoutes from './routes/notifications';
 import organizationRoutes from './routes/organizationRoutes';
+import transcriptionRoutes from './routes/transcriptionRoutes';
+import summaryRoutes from './routes/summaryRoutes';
+import mindMapRoutes from './routes/mindMapRoutes';
 
 const app = express();
 
@@ -27,8 +30,7 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'https://aicrafters.aicademy.com',
-    'https://aicrafters-backend.onrender.com',
-    'https://adwin-frontend.onrender.com'
+    'https://aicrafters-backend.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -59,6 +61,9 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/organizations', organizationRoutes);
+app.use('/api/transcriptions', transcriptionRoutes);
+app.use('/api/summaries', summaryRoutes);
+app.use('/api/mindmaps', mindMapRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/aicrafters')

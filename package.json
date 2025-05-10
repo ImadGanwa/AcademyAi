@@ -1,9 +1,15 @@
 {
-  "name": "AiCrafters",
+  "name": "aicrafters.aicademy",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI-powered platform for creating and managing crafts",
   "main": "index.js",
   "scripts": {
+    "install:all": "npm install && npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd aicrafters-frontend && npm install",
+    "install:backend": "cd aicrafters-backend && npm install",
+    "start:frontend": "cd aicrafters-frontend && npm start",
+    "start:backend": "cd aicrafters-backend && npm run dev",
+    "dev": "npx concurrently \"npm run start:backend\" \"npm run start:frontend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +24,12 @@
   },
   "homepage": "https://github.com/azertfx/aicrafters#readme",
   "dependencies": {
+    "@types/d3": "^7.4.3",
+    "markmap-lib": "^0.18.11",
+    "markmap-view": "^0.18.10",
     "mongodb": "^6.14.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

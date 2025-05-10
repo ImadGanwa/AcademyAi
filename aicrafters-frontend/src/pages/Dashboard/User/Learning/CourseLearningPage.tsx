@@ -393,8 +393,8 @@ export const CourseLearningPage: React.FC = () => {
     return <ErrorMessage>{error}</ErrorMessage>;
   }
 
-  if (!currentSection || !currentLesson) {
-    return <ErrorMessage>No course content available.</ErrorMessage>;
+  if (!currentSection || !currentLesson || !courseId) {
+    return <ErrorMessage>No course content available or course ID missing.</ErrorMessage>;
   }
 
   return (
@@ -431,6 +431,7 @@ export const CourseLearningPage: React.FC = () => {
           onMobileMenuClick={() => setIsMobileNavOpen(true)}
           sectionId={currentSection.id}
           lessonId={currentLesson.id}
+          courseId={courseId}
         />
       </ContentWrapper>
       <CongratulationsPopup

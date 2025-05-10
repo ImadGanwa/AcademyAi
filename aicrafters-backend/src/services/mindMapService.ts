@@ -1,0 +1,204 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+import { AppError } from '../utils/AppError'; // Assuming AppError exists for consistent error handling
+import logger from '../config/logger'; // Assuming a logger exists
+
+dotenv.config();
+
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
+  logger.error('GEMINI_API_KEY is not defined in the environment variables');
+  // Throwing here might stop the server start, consider logging and handling missing key in functions instead?
+  // For now, keeping original behavior:
+  throw new Error('GEMINI_API_KEY is not defined in the environment variables');
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// Using Gemini-pro model which is suitable for text generation
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// Enhanced interface with recursive node structure for unlimited depth
+export interface Node {
+  name: string;
+  children?: Node[];
+}
+
+export interface MindmapData {
+  title: string;
+  summary: string;
+  nodes: Node[];
+}
+
+/**
+ * Process transcription text and structure it into deeply nested hierarchical data
+ */
+async function structureTranscription(transcriptionText: string): Promise<MindmapData> {
+  if (!transcriptionText || transcriptionText.trim().length === 0) {
+    logger.warn('Attempted to structure empty transcription text.');
+    // Return a default empty structure or throw specific error?
+    // Returning empty structure for now:
+    return {
+        title: "Empty Transcription",
+        summary: "The provided transcription was empty.",
+        nodes: []
+    };
+    // Or: throw new AppError('Transcription text cannot be empty', 400);
+  }
+
+  const prompt = `
+    You are an expert in organizing educational content into extremely deep, hierarchical course outlines.
+    Your MOST IMPORTANT task is to extract the DEEPEST POSSIBLE hierarchical structure from the content.
+
+    Analyze the following transcription from an educational video and create a comprehensive, DEEPLY NESTED hierarchy.
+
+    PRIORITY INSTRUCTION:
+    GO AS DEEP AS POSSIBLE - create as many nested levels as the content allows.
+    Don't stop at 3-4 levels - keep going deeper until you've captured the finest details.
+
+    Your analysis must:
+    1. Identify the main title/subject of the course
+    2. Create a brief summary of the course
+    3. Extract main topics (level 1)
+    4. For each main topic, extract subtopics (level 2)
+    5. For each subtopic, extract sub-subtopics (level 3)
+    6. For each sub-subtopic, extract even finer points (level 4)
+    7. CONTINUE THIS PATTERN FURTHER, extracting ever more granular details at levels 5, 6, 7, and beyond
+
+    Think of this like a tree with many branches, and each branch has smaller branches, and those have even smaller branches.
+    The goal is to create the most detailed, fine-grained hierarchical representation possible.
+
+    The output must be structured JSON with a recursive node structure that can go arbitrarily deep:
+
+    {
+      "title": "Main Course Title",
+      "summary": "Brief summary of the course content",
+      "nodes": [
+        {
+          "name": "Main Topic 1",
+          "children": [
+            {
+              "name": "Subtopic 1.1",
+              "children": [
+                {
+                  "name": "Sub-subtopic 1.1.1",
+                  "children": [
+                    {
+                      "name": "Detail 1.1.1.1",
+                      "children": [
+                        {
+                          "name": "Fine point 1.1.1.1.1",
+                          "children": [
+                            {"name": "Specific example 1.1.1.1.1.1"},
+                            {"name": "Another specific detail 1.1.1.1.1.2"}
+                          ]
+                        }
+                      ]
+                    },
+                    {"name": "Detail 1.1.1.2"}
+                  ]
+                },
+                {"name": "Sub-subtopic 1.1.2"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+
+    CRITICAL INSTRUCTIONS:
+    - MAXIMIZE DEPTH: Aim for at least 6-7 levels of hierarchy where possible, but go even deeper if the content allows
+    - COMPLETENESS: Capture ALL content from the transcription with nothing left out
+    - GRANULARITY: Break down complex concepts into their smallest components
+    - PRECISION: Each node name should be concise yet descriptive
+    - CONSISTENCY: Maintain similar levels of detail across different branches
+    - NO TRUNCATION: If a node doesn't have children, omit the "children" property entirely
+    - EXTRACT DETAILS from examples, case studies, or technical descriptions - these often contain deeper hierarchical structure
+    - PAY SPECIAL ATTENTION to sequential processes, methodologies, or detailed explanations - these are opportunities for deep nesting
+
+    Remember: The PRIMARY GOAL is to create the DEEPEST POSSIBLE hierarchical structure.
+
+    Transcription text:
+    ${transcriptionText}
+  `;
+
+  try {
+    logger.info(`Sending transcription to Gemini for structuring (length: ${transcriptionText.length})`);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // Extract only the JSON part from the response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      logger.error('Invalid JSON response format from Gemini for structuring', { responseText: text });
+      throw new AppError('Failed to parse mind map structure from AI response', 500);
+    }
+
+    logger.info('Successfully structured transcription using Gemini.');
+    return JSON.parse(jsonMatch[0]) as MindmapData;
+  } catch (error: any) {
+    logger.error('Error calling Gemini API for structuring:', { message: error.message, stack: error.stack });
+    // Consider more specific error checking (e.g., rate limits, API key errors)
+    throw new AppError('Failed to generate mind map structure due to an external service error', 503); // Service Unavailable
+  }
+}
+
+/**
+ * Convert deeply nested hierarchical data to markmap compatible markdown
+ */
+async function convertToMarkmap(structuredData: MindmapData): Promise<string> {
+  // Basic check for empty data
+  if (!structuredData || !structuredData.title || !structuredData.nodes || structuredData.nodes.length === 0) {
+      logger.warn('Attempted to convert empty or invalid structured data to markmap.');
+      return `# ${structuredData?.title || 'Empty Mind Map'}\n\nNo content available.`;
+  }
+
+  const prompt = `
+    Convert the following deeply nested hierarchical course data into markdown format compatible with markmap.js.org.
+
+    The markdown should create the DEEPEST POSSIBLE hierarchical visualization using heading levels.
+
+    Course data:
+    ${JSON.stringify(structuredData, null, 2)}
+
+    Rules for creating the markdown:
+    1. Use # for the main course title (extracted from the 'title' field of the JSON)
+    2. Use ## for each top-level node (main topics, first level of the 'nodes' array)
+    3. Use ### for level 2 nodes (children of top-level nodes)
+    4. Use #### for level 3 nodes
+    5. Use ##### for level 4 nodes
+    6. Use ###### for level 5 nodes
+    7. For levels 6 and deeper, continue using ###### but add a prefix like "Level 6:", "Level 7:" etc. to the node name.
+
+    CRITICAL INSTRUCTIONS:
+    - START WITH THE MAIN TITLE: The first line MUST be '# {course title}'.
+    - PRESERVE THE COMPLETE HIERARCHY as it appears in the JSON, no matter how deep it goes.
+    - Include EVERY node name in the hierarchy with the appropriate heading level or prefix.
+    - For nodes deeper than level 5 (i.e., level 6 onwards), use the '###### Level X: {node name}' format.
+    - Maintain the exact hierarchical relationships from the input JSON data.
+    - Do not add any extra text, explanations, or summaries not present in the node names or title.
+    - Do not use bullet points or numbered lists - ONLY use markdown heading levels (#, ##, ###, ####, #####, ######).
+    - Ensure the output is purely markdown content, starting with the main title heading.
+
+    Output only the markdown content, nothing else.
+  `;
+
+  try {
+    logger.info(`Sending structured data to Gemini for markmap conversion (title: ${structuredData.title})`);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const markdownText = response.text();
+    logger.info(`Successfully converted structured data to markmap format for: ${structuredData.title}`);
+    return markdownText;
+  } catch (error: any) {
+    logger.error('Error calling Gemini API for markmap conversion:', { message: error.message, stack: error.stack });
+    throw new AppError('Failed to convert mind map to display format due to an external service error', 503);
+  }
+}
+
+export const MindMapService = {
+  structureTranscription,
+  convertToMarkmap,
+}; 

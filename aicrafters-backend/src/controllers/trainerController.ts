@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Course } from '../models/Course';
 import { User, IUser } from '../models/User';
 import mongoose, { Document, Types } from 'mongoose';
+import { chatWithTrainer } from '../services/trainerService';
 
 interface UserCourse {
   courseId: Types.ObjectId;
@@ -122,6 +123,47 @@ export const trainerController = {
         return res.status(500).json({ message: error.message });
       }
       res.status(500).json({ message: 'Error fetching users' });
+    }
+  },
+
+  /**
+   * Chat with the Trainer Coach
+   * @route GET /api/trainer/chat
+   */
+  chat: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { courseId, videoUrl, message, threadId } = req.query;
+      const userId = req.user?.id || 'anonymous';
+
+      // Validate required parameters
+      if (!courseId || !videoUrl || !message) {
+        res.status(400).json({ 
+          success: false,
+          error: 'Missing required parameters: courseId, videoUrl, and message are required'
+        });
+        return;
+      }
+
+      // Chat with the trainer
+      const response = await chatWithTrainer(
+        userId,
+        courseId as string,
+        videoUrl as string,
+        message as string,
+        threadId as string | undefined
+      );
+
+      // Return the response
+      res.status(200).json({
+        success: true,
+        data: response
+      });
+    } catch (error: any) {
+      console.error('Error in trainer chat controller:', error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || 'An error occurred while chatting with the trainer'
+      });
     }
   }
 }; 
