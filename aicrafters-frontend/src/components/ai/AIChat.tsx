@@ -35,8 +35,11 @@ const ChatHeader = styled(Box)`
   align-items: center;
   justify-content: center;
   padding: 16px 20px;
-  background-color: ${props => props.theme.palette.primary.main};
-  color: #fff;
+  background-color: #FAFBFC;
+  color: ${props => props.theme.palette.text.primary};
+  border-bottom: 1px solid ${props => props.theme.palette.divider};
+  border-radius: 0px 10px 0 0;
+
   flex-shrink: 0;
 `;
 
