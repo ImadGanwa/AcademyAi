@@ -102,7 +102,6 @@ interface CourseLearningContentProps {
   onMobileMenuClick: () => void;
   sectionId: string;
   lessonId: string;
-  courseId: string;
 }
 
 export const CourseLearningContent = React.forwardRef<HTMLDivElement, CourseLearningContentProps>(({
@@ -116,8 +115,7 @@ export const CourseLearningContent = React.forwardRef<HTMLDivElement, CourseLear
   onQuizProgress,
   onMobileMenuClick,
   sectionId,
-  lessonId,
-  courseId
+  lessonId
 }, ref) => {
   const [locallyCompletedLessons, setLocallyCompletedLessons] = useState<{ [key: string]: boolean }>({});
   const { t } = useTranslation();
@@ -168,7 +166,6 @@ export const CourseLearningContent = React.forwardRef<HTMLDivElement, CourseLear
                 videoUrl={item.content}
                 status={status}
                 onComplete={onLessonComplete}
-                courseId={courseId}
               />
             )}
           </div>

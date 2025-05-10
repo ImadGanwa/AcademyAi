@@ -24,10 +24,13 @@
   },
   "homepage": "https://github.com/azertfx/aicrafters#readme",
   "dependencies": {
+    "@react-spring/web": "^9.7.5",
     "@types/d3": "^7.4.3",
+    "d3": "^7.9.0",
     "markmap-lib": "^0.18.11",
     "markmap-view": "^0.18.10",
-    "mongodb": "^6.14.0"
+    "mongodb": "^6.14.0",
+    "react-spring": "^9.7.5"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
