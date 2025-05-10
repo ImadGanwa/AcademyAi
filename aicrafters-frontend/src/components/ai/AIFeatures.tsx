@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Box, Tabs, Tab, IconButton, Tooltip, useTheme, useMediaQuery } from '@mui/material';
-import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
@@ -9,7 +8,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-import AIChat from './AIChat';
 import AITranscript from './AITranscript';
 import AISummary from './AISummary';
 import AIMindMap from './AIMindMap';
@@ -93,12 +91,6 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
   
   // Initialize AI features
   const {
-    // Chat
-    messages,
-    chatLoading,
-    chatError,
-    sendMessage,
-    
     // Transcript
     transcript,
     transcriptLoading,
@@ -118,16 +110,23 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
     fetchMindMap,
   } = useAIFeatures({ courseId, videoUrl });
   
+  // When component mounts, fetch transcript for first tab
+  useEffect(() => {
+    if (!transcript && !transcriptLoading) {
+      fetchTranscript();
+    }
+  }, [transcript, transcriptLoading, fetchTranscript]);
+  
   // Handle tab change and fetch data if needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     
     // Fetch data based on selected tab if not already loaded
-    if (newValue === 1 && !transcript && !transcriptLoading) {
+    if (newValue === 0 && !transcript && !transcriptLoading) {
       fetchTranscript();
-    } else if (newValue === 2 && !summaries.videoSummary && !summariesLoading) {
+    } else if (newValue === 1 && !summaries.videoSummary && !summariesLoading) {
       fetchSummaries();
-    } else if (newValue === 3 && !mindMap && !mindMapLoading) {
+    } else if (newValue === 2 && !mindMap && !mindMapLoading) {
       fetchMindMap();
     }
   };
@@ -142,22 +141,13 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
     switch (activeTab) {
       case 0:
         return (
-          <AIChat
-            messages={messages}
-            loading={chatLoading}
-            error={chatError}
-            onSendMessage={sendMessage}
-          />
-        );
-      case 1:
-        return (
           <AITranscript
             transcript={transcript}
             loading={transcriptLoading}
             error={transcriptError}
           />
         );
-      case 2:
+      case 1:
         return (
           <AISummary
             summaries={summaries}
@@ -165,7 +155,7 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
             error={summariesError}
           />
         );
-      case 3:
+      case 2:
         return (
           <AIMindMap
             mindMap={mindMap}
@@ -188,11 +178,6 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
           scrollButtons="auto"
           allowScrollButtonsMobile
         >
-          <Tab 
-            icon={<SmartToyOutlinedIcon fontSize="small" />} 
-            label={!isMobile ? "AI Coach" : undefined}
-            aria-label="AI Coach"
-          />
           <Tab 
             icon={<TextSnippetOutlinedIcon fontSize="small" />} 
             label={!isMobile ? "Transcript" : undefined}

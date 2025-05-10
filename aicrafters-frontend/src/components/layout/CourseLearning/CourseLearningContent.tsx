@@ -16,6 +16,7 @@ const ContentContainer = styled.main`
   border: 1px solid ${props => props.theme.palette.divider};
   display: flex;
   flex-direction: column;
+  scroll-margin-top: 100px; /* Prevents the content from scrolling too far when using scrollIntoView */
 
   @media (max-width: 768px) {
     border-radius: 10px;

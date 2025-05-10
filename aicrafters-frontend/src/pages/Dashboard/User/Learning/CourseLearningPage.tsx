@@ -7,7 +7,7 @@ import { Layout } from '../../../../components/layout/Layout/Layout';
 import { CourseLearningHero } from '../../../../components/layout/CourseLearning/CourseLearningHero';
 import { CourseLearningContent } from '../../../../components/layout/CourseLearning/CourseLearningContent';
 import { CourseLearningNavigation } from '../../../../components/layout/CourseLearning/CourseLearningNavigation';
-import { Container, CircularProgress, Button } from '@mui/material';
+import { Container, CircularProgress, Button, useMediaQuery, useTheme } from '@mui/material';
 import { Section, Lesson, LessonContent } from '../../../../types/course';
 import { api } from '../../../../services/api';
 import { coursesService } from '../../../../services/coursesService';
@@ -15,16 +15,17 @@ import { updateUser } from '../../../../store/slices/authSlice';
 import { DEFAULT_LANGUAGE } from '../../../../utils/constants';
 import { CongratulationsPopup } from '../../../../components/common/Popup/CongratulationsPopup';
 import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
+import AICoach from '../../../../components/ai/AICoach';
 
 const PageContainer = styled.div`
-  
+  margin-bottom: 40px;
 `;
 
 const ContentWrapper = styled(Container)`
   display: flex !important;
   max-width: 1440px;
-  margin: -80px auto 40px;
-  padding: 0 48px;
+  margin: 0 auto;
+  padding: 0 24px;
   position: relative;
   gap: 0px;
   
@@ -47,6 +48,46 @@ const ErrorMessage = styled.div`
   text-align: center;
   padding: 24px;
   font-size: 1.1rem;
+`;
+
+const PageLayout = styled.div`
+  display: flex;
+  width: 100%;
+  margin: -80px auto 0;
+  gap: 12px;
+  align-items: flex-start;
+  
+  @media (max-width: 1200px) {
+    flex-direction: column;
+    margin-top: 20px;
+  }
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+`;
+
+const AICoachPanel = styled.div`
+  width: 520px;
+  flex-shrink: 0;
+  height: calc(100vh - 180px);
+  position: sticky;
+  top: 100px;
+  margin-right: 74px;
+  margin-left: 0px;
+  overflow-y: auto;
+  
+  @media (max-width: 1200px) {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    top: 0;
+    margin-top: 24px;
+    margin-right: 0;
+  }
 `;
 
 // First, let's create a type for the current lesson state that includes sectionId
@@ -79,6 +120,12 @@ export const CourseLearningPage: React.FC = () => {
   const dispatch = useDispatch();
   const currentLang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
   const [showCongratulations, setShowCongratulations] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Reset scroll position on component mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Check authentication and course access
   useEffect(() => {
@@ -161,11 +208,16 @@ export const CourseLearningPage: React.FC = () => {
           }
         }
 
+        // Force scroll to top after data is loaded
+        window.scrollTo(0, 0);
+
       } catch (err) {
         console.error('Error fetching course data:', err);
         setError('Failed to load course data. Please try again later.');
       } finally {
         setLoading(false);
+        // Set isInitialLoad to false after data is loaded
+        setIsInitialLoad(false);
       }
     };
 
@@ -213,7 +265,10 @@ export const CourseLearningPage: React.FC = () => {
           sectionId
         });
         setIsMobileNavOpen(false);
-        contentRef.current?.scrollIntoView({ behavior: 'smooth' });
+        // Only scroll into view if it's not the initial page load
+        if (!isInitialLoad) {
+          contentRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };
@@ -399,52 +454,69 @@ export const CourseLearningPage: React.FC = () => {
 
   return (
     <Layout title={`Learning - ${courseTitle || 'Course'}`}>
-    <PageContainer>
-      <CourseLearningHero 
+      <PageContainer>
+        <CourseLearningHero 
           title={courseTitle || ''}
-        progress={courseProgress}
-      />
-        <ContentWrapper>
-        <CourseLearningNavigation 
-          sections={sections}
-          currentLesson={{
-            id: currentLesson.id,
-            title: currentLesson.title,
-            sectionId: currentLesson.sectionId || currentSection.id,
-            status: currentLesson.status,
-            progress: currentLesson.progress,
-            type: currentLesson.type
-          } as NavigationLesson}
-          onLessonSelect={handleLessonSelect}
-          isMobileOpen={isMobileNavOpen}
-          onMobileClose={handleMobileClose}
+          progress={courseProgress}
         />
-        <CourseLearningContent
-          ref={contentRef}
-          lessonType={currentLesson?.type || 'article'}
-          title={currentLesson?.title || ''}
-          content={currentLesson?.content || { contentItems: [] }}
-          totalLessons={sections.reduce((total, section) => total + section.items.length, 0)}
-          showLessonCount={false}
-          status={currentLesson?.status || 'not_started'}
-          onLessonComplete={() => currentLesson?.sectionId && currentLesson?.id ? 
-            handleLessonComplete(currentLesson.sectionId, currentLesson.id) : undefined}
-          onQuizProgress={handleQuizProgress}
-          onMobileMenuClick={() => setIsMobileNavOpen(true)}
-          sectionId={currentLesson?.sectionId || ''}
-          lessonId={currentLesson?.id || ''}
-          courseId={courseId || ''}
+        <PageLayout>
+          <MainContent>
+            <ContentWrapper>
+              <CourseLearningNavigation 
+                sections={sections}
+                currentLesson={{
+                  id: currentLesson?.id || '',
+                  title: currentLesson?.title || '',
+                  sectionId: currentLesson?.sectionId || (currentSection?.id || ''),
+                  status: currentLesson?.status || 'not_started',
+                  progress: currentLesson?.progress || 0,
+                  type: currentLesson?.type || 'article'
+                } as NavigationLesson}
+                onLessonSelect={handleLessonSelect}
+                isMobileOpen={isMobileNavOpen}
+                onMobileClose={handleMobileClose}
+              />
+              <CourseLearningContent
+                ref={contentRef}
+                lessonType={currentLesson?.type || 'article'}
+                title={currentLesson?.title || ''}
+                content={currentLesson?.content || { contentItems: [] }}
+                totalLessons={sections.reduce((total, section) => total + section.items.length, 0)}
+                showLessonCount={false}
+                status={currentLesson?.status || 'not_started'}
+                onLessonComplete={() => currentLesson?.sectionId && currentLesson?.id ? 
+                  handleLessonComplete(currentLesson.sectionId, currentLesson.id) : undefined}
+                onQuizProgress={handleQuizProgress}
+                onMobileMenuClick={() => setIsMobileNavOpen(true)}
+                sectionId={currentLesson?.sectionId || ''}
+                lessonId={currentLesson?.id || ''}
+                courseId={courseId || ''}
+              />
+            </ContentWrapper>
+          </MainContent>
+          
+          {/* AI Coach Panel */}
+          {currentLesson?.type === 'video' && currentLesson.content?.contentItems?.some(item => item.type === 'video') && (
+            <AICoachPanel>
+              <AICoach 
+                courseId={courseId || ''}
+                videoUrl={
+                  (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
+                }
+              />
+            </AICoachPanel>
+          )}
+        </PageLayout>
+        
+        <CongratulationsPopup
+          open={showCongratulations}
+          onClose={() => setShowCongratulations(false)}
+          onBackToCourses={handleBackToCourses}
+          onGetCertificate={handleGetCertificate}
+          onShare={handleShare}
+          courseTitle={courseTitle}
         />
-      </ContentWrapper>
-      <CongratulationsPopup
-        open={showCongratulations}
-        onClose={() => setShowCongratulations(false)}
-        onBackToCourses={handleBackToCourses}
-        onGetCertificate={handleGetCertificate}
-        onShare={handleShare}
-        courseTitle={courseTitle}
-      />
-    </PageContainer>
+      </PageContainer>
     </Layout>
   );
 };

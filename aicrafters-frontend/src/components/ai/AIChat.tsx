@@ -37,6 +37,7 @@ const ChatHeader = styled(Box)`
   padding: 16px 20px;
   background-color: ${props => props.theme.palette.primary.main};
   color: #fff;
+  flex-shrink: 0;
 `;
 
 const ChatBody = styled(Box)`
@@ -55,6 +56,7 @@ const ChatInputContainer = styled(Box)`
   padding: 12px 16px;
   background-color: #fff;
   border-top: 1px solid ${props => props.theme.palette.divider};
+  flex-shrink: 0;
 `;
 
 const StyledTextField = styled(TextField)`
@@ -148,7 +150,14 @@ export const AIChat: React.FC<AIChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
 
+  // Scroll to bottom of messages when messages change, but only if it's not the initial render
+  const isInitialRender = useRef(true);
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+    
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -256,7 +265,7 @@ export const AIChat: React.FC<AIChatProps> = ({
 
   return (
     <ChatContainer elevation={0}>
-      <ChatHeader>
+      <ChatHeader className="ai-chat-header">
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <SmartToyOutlinedIcon fontSize="small" />
           <Typography variant="subtitle1" fontWeight={600}>
