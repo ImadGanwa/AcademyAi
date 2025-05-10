@@ -7,8 +7,7 @@ import { Layout } from '../../../../components/layout/Layout/Layout';
 import { CourseLearningHero } from '../../../../components/layout/CourseLearning/CourseLearningHero';
 import { CourseLearningContent } from '../../../../components/layout/CourseLearning/CourseLearningContent';
 import { CourseLearningNavigation } from '../../../../components/layout/CourseLearning/CourseLearningNavigation';
-import { AIFeatures } from '../../../../components/layout/CourseLearning/AIFeatures';
-import { Container, CircularProgress, Button, useMediaQuery, useTheme, Grid } from '@mui/material';
+import { Container, CircularProgress, Button } from '@mui/material';
 import { Section, Lesson, LessonContent } from '../../../../types/course';
 import { api } from '../../../../services/api';
 import { coursesService } from '../../../../services/coursesService';
@@ -33,15 +32,6 @@ const ContentWrapper = styled(Container)`
     padding: 0 16px;
     flex-direction: column;
     margin: 30px auto 40px;
-  }
-`;
-
-// Add grid layout for desktop to accommodate AI features
-const MainContentGrid = styled(Grid)`
-  margin-top: -80px;
-  
-  @media (max-width: 768px) {
-    margin-top: 30px;
   }
 `;
 
@@ -391,95 +381,70 @@ export const CourseLearningPage: React.FC = () => {
     );
   };
 
-  // Render the page with AIFeatures component
   if (loading) {
     return (
-      <Layout>
-        <LoadingContainer>
-          <CircularProgress />
-        </LoadingContainer>
-      </Layout>
+      <LoadingContainer>
+        <CircularProgress />
+      </LoadingContainer>
     );
   }
 
   if (error) {
-    return (
-      <Layout>
-        <ErrorMessage>{error}</ErrorMessage>
-      </Layout>
-    );
+    return <ErrorMessage>{error}</ErrorMessage>;
   }
 
-  // Get the current video URL if available
-  let currentVideoUrl = '';
-  if (currentLesson?.type === 'video' && currentLesson.content?.contentItems) {
-    const videoItem = currentLesson.content.contentItems.find(item => item.type === 'video');
-    if (videoItem) {
-      currentVideoUrl = videoItem.content;
-    }
+  if (!currentSection || !currentLesson) {
+    return <ErrorMessage>No course content available.</ErrorMessage>;
   }
 
   return (
-    <Layout>
-      <PageContainer>
-        <CourseLearningHero 
-          title={courseTitle} 
-          progress={courseProgress}
+    <Layout title={`Learning - ${courseTitle || 'Course'}`}>
+    <PageContainer>
+      <CourseLearningHero 
+          title={courseTitle || ''}
+        progress={courseProgress}
+      />
+        <ContentWrapper>
+        <CourseLearningNavigation 
+          sections={sections}
+          currentLesson={{
+            id: currentLesson.id,
+            title: currentLesson.title,
+            sectionId: currentLesson.sectionId || currentSection.id,
+            status: currentLesson.status,
+            progress: currentLesson.progress,
+            type: currentLesson.type
+          } as NavigationLesson}
+          onLessonSelect={handleLessonSelect}
+          isMobileOpen={isMobileNavOpen}
+          onMobileClose={handleMobileClose}
         />
-
-        <MainContentGrid container spacing={3} sx={{ px: { xs: 2, md: 6 }, maxWidth: '1440px', mx: 'auto' }}>
-          <Grid item xs={12} lg={9}>
-            <ContentWrapper>
-              <CourseLearningNavigation 
-                sections={sections}
-                currentLesson={{
-                  id: currentLesson?.id || '',
-                  title: currentLesson?.title || '',
-                  sectionId: currentLesson?.sectionId || currentSection?.id || ''
-                }}
-                onLessonSelect={handleLessonSelect}
-                isMobileOpen={isMobileNavOpen}
-                onMobileClose={handleMobileClose}
-              />
-              <CourseLearningContent
-                ref={contentRef}
-                lessonType={currentLesson?.type || 'article'}
-                title={currentLesson?.title || ''}
-                content={currentLesson?.content || { contentItems: [] }}
-                totalLessons={sections.reduce((total, section) => total + section.items.length, 0)}
-                showLessonCount={true}
-                status={currentLesson?.status || 'not_started'}
-                onLessonComplete={() => handleLessonComplete(currentLesson?.sectionId || '', currentLesson?.id || '')}
-                onQuizProgress={handleQuizProgress}
-                onMobileMenuClick={() => setIsMobileNavOpen(true)}
-                sectionId={currentLesson?.sectionId || ''}
-                lessonId={currentLesson?.id || ''}
-              />
-            </ContentWrapper>
-          </Grid>
-
-          {/* Add AI Features section */}
-          <Grid item xs={12} lg={3} sx={{ mt: { xs: -2, lg: 0 } }}>
-            {courseId && currentVideoUrl && (
-              <AIFeatures
-                courseId={courseId}
-                videoUrl={currentVideoUrl}
-              />
-            )}
-          </Grid>
-        </MainContentGrid>
-      </PageContainer>
-      
-      {showCongratulations && (
-        <CongratulationsPopup
-          open={showCongratulations}
-          onClose={() => setShowCongratulations(false)}
-          courseTitle={courseTitle}
-          onShare={handleShare}
-          onGetCertificate={handleGetCertificate}
-          onBackToCourses={handleBackToCourses}
+        <CourseLearningContent
+          ref={contentRef}
+          lessonType={currentLesson?.type || 'article'}
+          title={currentLesson?.title || ''}
+          content={currentLesson?.content || { contentItems: [] }}
+          totalLessons={sections.reduce((total, section) => total + section.items.length, 0)}
+          showLessonCount={false}
+          status={currentLesson?.status || 'not_started'}
+          onLessonComplete={() => currentLesson?.sectionId && currentLesson?.id ? 
+            handleLessonComplete(currentLesson.sectionId, currentLesson.id) : undefined}
+          onQuizProgress={handleQuizProgress}
+          onMobileMenuClick={() => setIsMobileNavOpen(true)}
+          sectionId={currentLesson?.sectionId || ''}
+          lessonId={currentLesson?.id || ''}
+          courseId={courseId || ''}
         />
-      )}
+      </ContentWrapper>
+      <CongratulationsPopup
+        open={showCongratulations}
+        onClose={() => setShowCongratulations(false)}
+        onBackToCourses={handleBackToCourses}
+        onGetCertificate={handleGetCertificate}
+        onShare={handleShare}
+        courseTitle={courseTitle}
+      />
+    </PageContainer>
     </Layout>
   );
 };

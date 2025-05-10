@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import AIFeatures from '../../../ai/AIFeatures';
 
 const Container = styled.div`
   display: flex;
@@ -49,6 +50,15 @@ const ProgressLabel = styled.div`
     color: ${props => props.theme.palette.success.main};
   font-size: 0.875rem;
   font-weight: 600;
+`;
+
+const AIFeaturesWrapper = styled(Box)`
+  margin-top: 16px;
+  height: 500px;
+  
+  @media (max-width: 768px) {
+    height: 400px;
+  }
 `;
 
 // Cache for formatted URLs
@@ -108,6 +118,7 @@ interface VideoContentProps {
   status: 'completed' | 'in_progress' | 'not_started';
   onComplete?: () => void;
   hideCompleteButton?: boolean;
+  courseId?: string;
 }
 
 export const VideoContent: React.FC<VideoContentProps> = ({
@@ -116,7 +127,8 @@ export const VideoContent: React.FC<VideoContentProps> = ({
   videoUrl,
   status,
   onComplete,
-  hideCompleteButton
+  hideCompleteButton,
+  courseId = ''
 }) => {
   const [formattedUrl, setFormattedUrl] = useState('');
   const [key, setKey] = useState(0);
@@ -261,23 +273,42 @@ export const VideoContent: React.FC<VideoContentProps> = ({
     };
   }, [formattedUrl, onComplete, status, videoUrl]);
 
-  if (!formattedUrl) {
-    return <Container>No video URL provided</Container>;
-  }
-
   return (
     <Container>
       <VideoWrapper>
-        {formattedUrl && (
+        {!formattedUrl ? (
+          <Box sx={{ 
+            width: '100%', 
+            height: '100%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            bgcolor: 'background.default'
+          }}>
+            <CircularProgress />
+          </Box>
+        ) : (
           <StyledIframe
             key={key}
             src={formattedUrl}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
-            referrerPolicy="origin"
+            title={title}
           />
         )}
       </VideoWrapper>
+      
+      {/* AI Features */}
+      {courseId && videoUrl && (
+        <AIFeaturesWrapper>
+          <AIFeatures 
+            courseId={courseId} 
+            videoUrl={videoUrl}
+          />
+        </AIFeaturesWrapper>
+      )}
     </Container>
   );
-}; 
+};
+
+export default VideoContent; 
