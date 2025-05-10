@@ -81,7 +81,10 @@
       "business": "Adwin Entreprise",
       "teach": "Enseigner sur Adwin",
       "businessLink": "Adwin Entreprise",
-      "teachLink": "Enseigner sur Adwin"
+      "teachLink": "Enseigner sur Adwin",
+      "becomeAMentor": "Devenir Mentor",
+      "mentorship": "Mentorat",
+      "searchPlaceholder": "Rechercher n'importe quoi"
     },
     "languages": {
       "en": "Anglais",

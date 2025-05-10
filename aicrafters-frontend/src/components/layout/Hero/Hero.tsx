@@ -53,7 +53,7 @@ const Title = styled(Typography)`
 `;
 
 const Highlight = styled.span`
-  color: ${props => props.theme.palette.primary.main};
+  color: ${props => props.theme.palette.secondary.main};
 `;
 
 const Description = styled(Typography)`

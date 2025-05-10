@@ -19,7 +19,7 @@ import { RootState } from '../../../store';
 import { logout } from '../../../store/slices/authSlice';
 import { authService } from '../../../services/authService';
 import { useLocalizedNavigate } from '../../../hooks/useLocalizedNavigate';
-import config from '../../../config';
+// import config from '../../../config';
 import { CartIcon } from '../../common/CartIcon/CartIcon';
 
 const NavbarWrapper = styled(AppBar)`
@@ -597,6 +597,12 @@ export const Navbar: React.FC = () => {
     navigate(`/${currentLang}/teach`, { replace: true });
   };
 
+  const handleMentorshipClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const currentLang = i18n.language;
+    navigate(`/${currentLang}/mentorship`, { replace: true });
+  };
+
   return (
     <NavbarWrapper position="sticky">
       <NavContainer>
@@ -612,6 +618,9 @@ export const Navbar: React.FC = () => {
           </NavLink>
           <NavLink to="/teach" onClick={handleTeachClick}>
             {t('common.navigation.teachLink')}
+          </NavLink>
+          <NavLink to="/mentorship" onClick={handleMentorshipClick}>
+            {t('common.navigation.mentorship')}
           </NavLink>
         </NavLinks>
 
@@ -692,6 +701,27 @@ export const Navbar: React.FC = () => {
         </MobileMenuHeader>
         <MobileMenuContent>
           <MobileNavLinks>
+            <MobileNavLink to="/business" onClick={(e) => {
+              e.preventDefault();
+              handleBusinessClick(e);
+              toggleMobileMenu();
+            }}>
+              {t('common.navigation.businessLink')}
+            </MobileNavLink>
+            <MobileNavLink to="/teach" onClick={(e) => {
+              e.preventDefault();
+              handleTeachClick(e);
+              toggleMobileMenu();
+            }}>
+              {t('common.navigation.teachLink')}
+            </MobileNavLink>
+            <MobileNavLink to="/mentorship" onClick={(e) => {
+              e.preventDefault();
+              handleMentorshipClick(e);
+              toggleMobileMenu();
+            }}>
+              {t('common.navigation.mentorship')}
+            </MobileNavLink>
             <LanguageTitle 
               onClick={() => setIsLanguageListOpen(!isLanguageListOpen)}
               className={isLanguageListOpen ? 'active' : ''}

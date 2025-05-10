@@ -81,7 +81,13 @@
       "business": "Adwin للأعمال",
       "teach": "علّم على Adwin",
       "businessLink": "Adwin للأعمال",
-      "teachLink": "علّم على Adwin"
+      "teachLink": "علّم على Adwin",
+      "homeLink": "الرئيسية",
+      "coursesLink": "الدورات",
+      "categoriesLink": "التصنيفات",
+      "becomeAMentor": "كن مرشدًا",
+      "mentorship": "الإرشاد",
+      "searchPlaceholder": "ابحث عن أي شيء"
     },
     "languages": {
       "en": "الإنجليزية",

@@ -142,6 +142,9 @@ export const Footer: React.FC = () => {
               <FooterLink to="/teach">
                 {t('common.navigation.teachLink')}
               </FooterLink>
+              <FooterLink to="/mentorship/become-mentor">
+                {t('common.navigation.becomeAMentor')}
+              </FooterLink>
               <FooterLink to="/about">
                 {t('common.footer.aboutUs')}
               </FooterLink>

@@ -81,6 +81,9 @@ export interface Translations {
       teach: string;
       businessLink: string;
       teachLink: string;
+      becomeAMentor: string;
+      mentorship: string;
+      searchPlaceholder: string;
     };
     languages: {
       en: string;
