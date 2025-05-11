@@ -34,6 +34,8 @@ import MentorshipBookSession from '../pages/Mentorship/MentorshipBookSession';
 import MentorshipConfirmation from '../pages/Mentorship/MentorshipConfirmation';
 import BecomeMentor from '../pages/Mentorship/BecomeMentor';
 import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplicationConfirmation';
+import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
+import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -77,6 +79,13 @@ const TrainerDashboardRoutes = () => (
   </TrainerRouteGuard>
 );
 
+// Mentor dashboard routes
+const MentorDashboardRoutes = () => (
+  <Routes>
+    <Route path="/*" element={<MentorDashboard />} />
+  </Routes>
+);
+
 // Admin dashboard routes
 const AdminDashboardRoutes = () => (
   <AdminRouteGuard>
@@ -96,6 +105,8 @@ export const AppRoutes: React.FC = () => {
         return '/dashboard/admin';
       case 'trainer':
         return '/dashboard/trainer/courses';
+      case 'mentor':
+        return '/dashboard/mentor/mentees';
       default:
         return '/dashboard/user/learning';
     }
@@ -187,6 +198,14 @@ export const AppRoutes: React.FC = () => {
               <TrainerRouteGuard>
                 <TrainerDashboardRoutes />
               </TrainerRouteGuard>
+            </ProtectedDashboardRoute>
+          } />
+
+          <Route path="mentor/*" element={
+            <ProtectedDashboardRoute>
+              <MentorRouteGuard>
+                <MentorDashboardRoutes />
+              </MentorRouteGuard>
             </ProtectedDashboardRoute>
           } />
         </Route>
