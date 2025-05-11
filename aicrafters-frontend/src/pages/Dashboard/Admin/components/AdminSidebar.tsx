@@ -12,6 +12,7 @@ import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import BusinessIcon from '@mui/icons-material/Business';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { Badge } from '@mui/material';
 import { api } from '../../../../services/api';
 import { UNREAD_NOTIFICATIONS_UPDATE } from '../../../../utils/notifications';
@@ -145,6 +146,10 @@ export const AdminSidebar: React.FC = () => {
         <NavItem to={`/${currentLang}/dashboard/admin/organizations`} $isActive={isActive('/organizations')}>
           <BusinessIcon />
           <span>{t('admin.sidebar.organizations')}</span>
+        </NavItem>
+        <NavItem to={`/${currentLang}/dashboard/admin/mentor-requests`} $isActive={isActive('/mentor-requests')}>
+          <SupervisorAccountIcon />
+          <span>Mentor Requests</span>
         </NavItem>
         <NavItem to={`/${currentLang}/dashboard/admin/courses`} $isActive={isActive('/courses')}>
           <SchoolIcon />

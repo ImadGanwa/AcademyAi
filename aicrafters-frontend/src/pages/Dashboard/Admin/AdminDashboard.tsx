@@ -10,6 +10,7 @@ import { AdminSettings } from './pages/AdminSettings';
 import { CertificateSettings } from './pages/CertificateSettings';
 import { NewsletterPage } from './pages/NewsletterPage';
 import { Notifications } from './pages/Notifications';
+import { MentorRequests } from './pages/MentorRequests';
 import OrganizationManagement from './pages/OrganizationManagement';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
@@ -55,6 +56,7 @@ export const AdminDashboard: React.FC = () => {
             <Route path="my-courses/add" element={<AddCourse />} />
             <Route path="my-courses/edit/:courseId" element={<AddCourse />} />
             <Route path="categories" element={<CategoryManagement />} />
+            <Route path="mentor-requests" element={<MentorRequests />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="certificate-settings" element={<CertificateSettings />} />
