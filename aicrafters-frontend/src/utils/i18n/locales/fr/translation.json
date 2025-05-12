@@ -1,7 +1,7 @@
 {
   "common": {
     "currency": "MAD",
-    "or": "OU",
+    "or": "ou",
     "off": "OFF",
     "loading": "Chargement...",
     "cancel": "Annuler",
@@ -80,8 +80,8 @@
       "courses": "Cours",
       "business": "Adwin Entreprise",
       "teach": "Enseigner sur Adwin",
-      "businessLink": "Adwin Entreprise",
-      "teachLink": "Enseigner sur Adwin",
+      "businessLink": "Entreprise",
+      "teachLink": "Enseigner",
       "becomeAMentor": "Devenir Mentor",
       "mentorship": "Mentorat",
       "searchPlaceholder": "Rechercher n'importe quoi"
@@ -120,7 +120,9 @@
         "title": "{{pageName}}",
         "description": "Cette page est en construction."
       }
-    }
+    },
+    "startLearning": "Commencer à Apprendre",
+    "viewAll": "Voir Tout"
   },
   "auth": {
     "googleLoginFailed": "Connexion Google échouée. Veuillez réessayer.",

@@ -5,6 +5,7 @@ export interface Translations {
     off: string;
     loading: string;
     cancel: string;
+    startLearning: string;
     buttons: {
       login: string;
       signup: string;

@@ -79,8 +79,8 @@
       "courses": "Courses",
       "business": "Adwin Business",
       "teach": "Teach on Adwin",
-      "businessLink": "Adwin Business",
-      "teachLink": "Teach on Adwin",
+      "businessLink": "Business",
+      "teachLink": "Teach",
       "becomeAMentor": "Become a Mentor",
       "mentorship": "Mentorship",
       "searchPlaceholder": "Search for anything"
@@ -112,14 +112,37 @@
       "cookieSettings": "Cookie Settings",
       "sitemap": "Sitemap",
       "accessibility": "Accessibility Statement",
-      "language": "Language"
+      "language": "Language",
+      "about": "About",
+      "careers": "Careers",
+      "cookie": "Cookie Policy",
+      "contact": "Contact Us"
     },
     "pages": {
       "placeholder": {
         "title": "{{pageName}}",
         "description": "This page is under construction."
       }
-    }
+    },
+    "languageSelector": {
+      "languages": {
+        "ar": "العربية",
+        "en": "English",
+        "fr": "Français"
+      }
+    },
+    "currencySelector": {
+      "currencies": {
+        "usd": "USD ($)",
+        "eur": "EUR (€)",
+        "gbp": "GBP (£)"
+      }
+    },
+    "search": "Search",
+    "all": "All",
+    "seeAll": "View all",
+    "startLearning": "Start Learning",
+    "viewAll": "View All"
   },
   "auth": {
     "googleLoginFailed": "Google login failed. Please try again.",

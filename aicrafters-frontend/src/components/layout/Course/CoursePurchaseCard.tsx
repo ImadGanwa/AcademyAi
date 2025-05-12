@@ -91,46 +91,20 @@ const PlayButtonDiv = styled.div`
     border-radius: 50%;
 `;
 
-const TabsContainer = styled.div`
-  display: flex;
-  border-bottom: 1px solid #E0E0E0;
-
-  @media (max-width: 768px) {
-    margin: 0 24px;
-  }
-`;
-
-const Tab = styled.button<{ active?: boolean }>`
-  flex: 1;
-  padding: 14px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid ${props => props.active ? props.theme.palette.text.title : 'transparent'};
-  color: ${props => props.active ? props.theme.palette.text.title : props.theme.palette.text.secondary};
-  font-weight: ${props => props.active ? 'bold' : '400'};
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 1rem;
-
-  &:hover {
-    color: ${props => props.theme.palette.text.title};
-  }
-`;
-
 const Content = styled.div`
-  padding: 24px;
+  padding: 16px;
 
   @media (max-width: 768px) {
     border-bottom: 1px solid #E0E0E0;
-    margin: 0 24px;
-    padding: 24px 0;
+    margin: 0 16px;
+    padding: 16px 0;
   }
 `;
 
 const PriceContainer = styled.div`
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 16px;
 `;
 
 const Price = styled.span`
@@ -158,8 +132,12 @@ const Discount = styled.span`
 
 const ActionButtons = styled.div`
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  width: 100%;
 
   button {
     width: 100%;
@@ -205,13 +183,14 @@ const WishlistButton = styled.button<{ $isSaved?: boolean }>`
 const GuaranteeText = styled(Typography)`
   text-align: center;
   color: ${props => props.theme.palette.text.secondary};
-  margin-bottom: 8px !important;
+  margin-bottom: 4px !important;
+  font-size: 0.8rem;
 `;
 
 const Divider = styled.div`
   text-align: center;
   color: ${props => props.theme.palette.text.secondary};
-  margin: 24px 0;
+  margin: 16px 0;
   position: relative;
 
   &::before, &::after {
@@ -233,14 +212,14 @@ const Divider = styled.div`
 `;
 
 const SubTitle = styled(Typography)`
-  font-size: 1.2rem !important;
-  line-height: 1.4 !important;
+  font-size: 1.1rem !important;
+  line-height: 1.3 !important;
   font-weight: bold !important;
   color: ${props => props.theme.palette.text.title} !important;
-  margin-bottom: 14px !important;
+  margin-bottom: 10px !important;
 
   @media (max-width: 768px) {
-    font-size: 1.3rem !important;
+    font-size: 1.05rem !important;
   }
 `;
 
@@ -255,23 +234,23 @@ const MobileContent = styled.div`
   
   @media (max-width: 768px) {
     display: block;
-    padding: 24px;
+    padding: 16px;
   }
 `;
 
 const MobileTitle = styled(Typography)`
-  font-size: 1.2rem !important;
+  font-size: 1.1rem !important;
   font-weight: bold !important;
   line-height: 1.2 !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
   color: ${props => props.theme.palette.text.title} !important;
 `;
 
 const MobileDescription = styled(Typography)`
-  font-size: 1rem !important;
+  font-size: 0.9rem !important;
   color: #5A5A5A !important;
   margin-bottom: 0 !important;
-  line-height: 1.4 !important;
+  line-height: 1.3 !important;
 `;
 
 interface MobileFixedBottomProps {
@@ -288,11 +267,11 @@ const MobileFixedBottom = styled.div<MobileFixedBottomProps>`
     left: 0;
     right: 0;
     background: white;
-    padding: 22px 20px;
+    padding: 16px 16px;
     box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.05);
     z-index: 999;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     transform: translateY(${props => props.$show ? '0' : '100%'});
     transition: transform 0.3s ease-in-out;
   }
@@ -300,19 +279,22 @@ const MobileFixedBottom = styled.div<MobileFixedBottomProps>`
 
 const MobileFixedBottomContent = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   
   button {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-bottom: 5px !important;
+    width: 70% !important;
+    max-width: 250px !important;
+    margin-bottom: 6px !important;
+    padding: 10px 24px !important;
+    min-height: 44px !important;
   }
 `;
 
 const MobileGuaranteeText = styled(Typography)`
-  font-size: 0.75rem !important;
+  font-size: 0.7rem !important;
   color: ${props => props.theme.palette.text.secondary} !important;
   text-align: center;
 `;
@@ -351,7 +333,51 @@ const AlreadyPurchasedMessage = styled(Typography)`
   color: ${props => props.theme.palette.success.main};
   font-weight: bold !important;
   text-align: center;
-  margin-bottom: 24px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    margin-top: 6px;
+    font-size: 0.85rem;
+  }
+`;
+
+// Custom styled button using theme's primary purple color
+const PurpleButton = styled(Button)`
+  && {
+    background-color: ${props => props.theme.palette.primary.main} !important;
+    color: white !important;
+    margin-top: 4px;
+    width: 60%;
+    max-width: 250px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px 24px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    height: auto;
+    min-height: 44px;
+    
+    &:hover {
+      background-color: ${props => props.theme.palette.primary.dark} !important;
+    }
+    
+    @media (max-width: 768px) {
+      width: 70%;
+      padding: 12px 24px;
+      font-size: 1.05rem;
+    }
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 12px;
 `;
 
 interface CoursePurchaseCardProps {
@@ -391,7 +417,6 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const { items: cartItems, addItem } = useCart();
   const [showVideoPopup, setShowVideoPopup] = useState(false);
   const [showCartPopup, setShowCartPopup] = useState(false);
-  const [activeTab, setActiveTab] = useState<'personal' | 'enterprise'>('personal');
   const [showFixedBar, setShowFixedBar] = useState(false);
   const { formatPrice } = useCurrency();
 
@@ -443,6 +468,10 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
     navigate('cart');
   };
 
+  const handleStartLearning = () => {
+    navigate(`/dashboard/user/learning/${courseId}`);
+  };
+
   return (
     <>
       <Card>
@@ -473,22 +502,7 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
           </MobileDescription>
         </MobileContent>
 
-        <TabsContainer>
-          <Tab 
-            active={activeTab === 'personal'} 
-            onClick={() => setActiveTab('personal')}
-          >
-            {t('course.purchase.personal')}
-          </Tab>
-          <Tab 
-            active={activeTab === 'enterprise'} 
-            onClick={() => setActiveTab('enterprise')}
-          >
-            {t('course.purchase.enterprise')}
-          </Tab>
-        </TabsContainer>
-
-          <Content>
+        <Content>
           {!hasPurchased && (
             <PriceContainer>
               <Price>{formatPrice(price)}</Price>
@@ -500,89 +514,100 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
               )}
             </PriceContainer>
           )}
-            {!isTrainerOrAdmin && (
-              <>
+          {!isTrainerOrAdmin && (
+            <>
               <ActionButtons>
-            {hasPurchased ? (
-              <AlreadyPurchasedMessage>
-                {t('course.purchase.already_purchased')}
-              </AlreadyPurchasedMessage>
-            ) : isInCart ? (
-              <AlreadyInCartMessage>
-                <AlreadyInCartMessageText>
-                  {t('course.purchase.already_in_cart')}
-                </AlreadyInCartMessageText>
-                <CartLink 
-                  to="/cart"
-                >
-                  {t('course.purchase.check_cart')}
-                </CartLink>
-              </AlreadyInCartMessage>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  fullWidth 
-                  onClick={handleAddToCart}
-                >
-                  {t('course.purchase.add_to_cart')}
-                </Button>
-                <WishlistButton onClick={onToggleWishlist} $isSaved={isSaved}>
-                  <HeartIcon />
-                </WishlistButton>
-              </>
-            )}
+                {hasPurchased ? (
+                  <>
+                    <PurpleButton
+                      variant="contained"
+                      fullWidth
+                      onClick={handleStartLearning}
+                    >
+                      Start Learning
+                    </PurpleButton>
+                    <AlreadyPurchasedMessage>
+                      {t('course.purchase.already_purchased')}
+                    </AlreadyPurchasedMessage>
+                  </>
+                ) : isInCart ? (
+                  <AlreadyInCartMessage>
+                    <AlreadyInCartMessageText>
+                      {t('course.purchase.already_in_cart')}
+                    </AlreadyInCartMessageText>
+                    <CartLink 
+                      to="/cart"
+                    >
+                      {t('course.purchase.check_cart')}
+                    </CartLink>
+                  </AlreadyInCartMessage>
+                ) : (
+                  <>
+                    <ButtonContainer>
+                      <Button
+                        variant="contained"
+                        fullWidth 
+                        onClick={handleAddToCart}
+                      >
+                        {t('course.purchase.add_to_cart')}
+                      </Button>
+                      <WishlistButton onClick={onToggleWishlist} $isSaved={isSaved}>
+                        <HeartIcon />
+                      </WishlistButton>
+                    </ButtonContainer>
+                  </>
+                )}
               </ActionButtons>
             
-            {!hasPurchased && (
-              <>
-                <GuaranteeText variant="body2">
-                  {t('course.purchase.guarantee')}
-                </GuaranteeText>
-                <GuaranteeText variant="body2">
-                  {t('course.purchase.lifetime_access')}
-                </GuaranteeText>
+              {!hasPurchased && (
+                <>
+                  <GuaranteeText variant="body2">
+                    {t('course.purchase.guarantee')}
+                  </GuaranteeText>
+                  <GuaranteeText variant="body2">
+                    {t('course.purchase.lifetime_access')}
+                  </GuaranteeText>
 
-                <Divider>{t('common.or')}</Divider>
+                  <Divider>{t('common.or')}</Divider>
 
-                <Box mb={2}>
-                  <SubTitle gutterBottom>
-                    {t('course.purchase.access_to_all_courses')}
-                  </SubTitle>
-                  <Typography variant="body2" color="textSecondary" gutterBottom>
-                    {t('course.purchase.access_to_all_courses_description')}
-                    <StyledLink to="">{t('course.purchase.learn_more')}</StyledLink>
-                  </Typography>
-                </Box>
+                  <Box mb={1}>
+                    <SubTitle gutterBottom>
+                      {t('course.purchase.access_to_all_courses')}
+                    </SubTitle>
+                    <Typography variant="body2" color="textSecondary" gutterBottom fontSize="0.85rem">
+                      {t('course.purchase.access_to_all_courses_description')}
+                      <StyledLink to="">{t('course.purchase.learn_more')}</StyledLink>
+                    </Typography>
+                  </Box>
 
-                <Button 
-                  variant="outlined" 
-                  fullWidth
-                  onClick={() => window.location.href = '/'}
-                  sx={{
-                    color: `${theme.palette.text.title} !important`,
-                    borderColor: `${theme.palette.text.title} !important`,
-                    width: '100%',
-                    padding: '8px',
-                    fontSize: '.85rem'
-                  }}
-                >
-                  {t('course.purchase.access_to_all_courses_button')}
-                </Button>
+                  <Button 
+                    variant="outlined" 
+                    fullWidth
+                    onClick={() => window.location.href = '/'}
+                    sx={{
+                      color: `${theme.palette.text.title} !important`,
+                      borderColor: `${theme.palette.text.title} !important`,
+                      width: '100%',
+                      padding: '6px',
+                      fontSize: '.8rem'
+                    }}
+                  >
+                    {t('course.purchase.access_to_all_courses_button')}
+                  </Button>
 
-                <Box mt={2}>
-                  <Typography variant="body2" color="textSecondary" align="center" fontSize="0.75rem">
-                    {t('course.purchase.starting_at')}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary" align="center" fontSize="0.75rem">
-                    {t('course.purchase.cancel_anytime')}
-                  </Typography>
-                </Box>
-              </>
-            )}
+                  <Box mt={1}>
+                    <Typography variant="body2" color="textSecondary" align="center" fontSize="0.7rem">
+                      {t('course.purchase.starting_at')}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" align="center" fontSize="0.7rem">
+                      {t('course.purchase.cancel_anytime')}
+                    </Typography>
+                  </Box>
+                </>
+              )}
             </>
           )}
-          </Content>
+        </Content>
       </Card>
 
       <MobileFixedBottom $show={showFixedBar && !isInCart && !hasPurchased}>
@@ -601,6 +626,20 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
         <MobileGuaranteeText>
           {t('course.purchase.guarantee')}. {t('course.purchase.lifetime_access')}
         </MobileGuaranteeText>
+      </MobileFixedBottom>
+
+      <MobileFixedBottom $show={Boolean(showFixedBar && hasPurchased)}>
+        <MobileFixedBottomContent>
+          <PurpleButton
+            variant="contained"
+            onClick={handleStartLearning}
+          >
+            Start Learning
+          </PurpleButton>
+          <AlreadyPurchasedMessage>
+            {t('course.purchase.already_purchased')}
+          </AlreadyPurchasedMessage>
+        </MobileFixedBottomContent>
       </MobileFixedBottom>
 
       {showCartPopup && (

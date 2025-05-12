@@ -80,13 +80,13 @@
       "courses": "الدورات",
       "business": "Adwin للأعمال",
       "teach": "علّم على Adwin",
-      "businessLink": "Adwin للأعمال",
-      "teachLink": "علّم على Adwin",
+      "businessLink": "أعمال",
+      "teachLink": "تدريس",
       "homeLink": "الرئيسية",
       "coursesLink": "الدورات",
       "categoriesLink": "التصنيفات",
       "becomeAMentor": "كن مرشدًا",
-      "mentorship": "الإرشاد",
+      "mentorship": "التوجيه",
       "searchPlaceholder": "ابحث عن أي شيء"
     },
     "languages": {
@@ -123,7 +123,9 @@
         "title": "{{pageName}}",
         "description": "هذه الصفحة قيد الإنشاء."
       }
-    }
+    },
+    "startLearning": "ابدأ التعلم",
+    "viewAll": "عرض الكل"
   },
   "auth": {
     "googleLoginFailed": "فشل تسجيل الدخول باستخدام Google. يرجى المحاولة مرة أخرى.",
