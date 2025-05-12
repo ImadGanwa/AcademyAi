@@ -21,6 +21,7 @@ import { authService } from '../../../services/authService';
 import { useLocalizedNavigate } from '../../../hooks/useLocalizedNavigate';
 // import config from '../../../config';
 import { CartIcon } from '../../common/CartIcon/CartIcon';
+import { useCart } from '../../../contexts/CartContext';
 
 const NavbarWrapper = styled(AppBar)`
   && {
@@ -454,6 +455,7 @@ export const Navbar: React.FC = () => {
   const localizedNavigate = useLocalizedNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const currentLanguage = i18n.language;
+  const { clearCart } = useCart();
 
   // Check if current page is cart or checkout
   const showCurrencySwitcher = location.pathname.includes('/cart') || location.pathname.includes('/checkout');
@@ -477,6 +479,7 @@ export const Navbar: React.FC = () => {
   const handleLogout = () => {
     dispatch(logout());
     authService.logout();
+    clearCart();
     setIsUserMenuOpen(false);
     localizedNavigate('/');
   };
