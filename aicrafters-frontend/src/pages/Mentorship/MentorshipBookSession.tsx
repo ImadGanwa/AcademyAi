@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, Typography, Grid } from '@mui/material';
+import { Container, Typography, Grid } from '@mui/material';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout/Layout';
