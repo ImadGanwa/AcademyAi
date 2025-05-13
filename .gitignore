@@ -82,3 +82,6 @@ debug.log
 .Trashes
 ehthumbs.db
 Thumbs.db 
+
+*.tex
+perfreport.text

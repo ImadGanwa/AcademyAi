@@ -1082,7 +1082,8 @@
     "send": "Envoyer",
     "selectConversation": "Sélectionner une conversation",
     "searchUsers": "Rechercher des utilisateurs...",
-    "messagePlaceholder": "Entrez votre message ici..."
+    "messagePlaceholder": "Entrez votre message ici...",
+    "noConversations": "Aucune conversation trouvée"
   },
   "notifications": {
     "title": "Notifications",

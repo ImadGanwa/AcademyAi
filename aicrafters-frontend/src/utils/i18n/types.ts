@@ -1076,6 +1076,7 @@ export interface Translations {
     selectConversation: string;
     searchUsers: string;
     messagePlaceholder: string;
+    noConversations: string;
   };
   notifications: {
     title: string;

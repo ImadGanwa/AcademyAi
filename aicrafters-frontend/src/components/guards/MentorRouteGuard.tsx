@@ -13,15 +13,10 @@ export const MentorRouteGuard: React.FC<MentorRouteGuardProps> = ({ children }) 
   const location = useLocation();
   const currentLang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
 
-  // For development - allow access regardless of role
-  // TODO: Remove this and uncomment the check below before production
-  return <>{children}</>;
-
-  /* Uncomment this before production
+  // Role check: Uncommented and active
   if (user?.role !== 'mentor') {
     return <Navigate to={`/${currentLang}`} replace />;
   }
 
   return <>{children}</>;
-  */
 }; 

@@ -1114,7 +1114,8 @@
     "send": "Send",
     "selectConversation": "Select Conversation",
     "searchUsers": "Search users...",
-    "messagePlaceholder": "Type a message..."
+    "messagePlaceholder": "Type a message...",
+    "noConversations": "No conversations found"
   },
   "notifications": {
     "title": "Notifications",

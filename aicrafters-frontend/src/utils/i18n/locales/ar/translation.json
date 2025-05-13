@@ -1055,7 +1055,8 @@
     "send": "إرسال",
     "selectConversation": "اختر المحادثة",
     "searchUsers": "بحث في المستخدمين...",
-    "messagePlaceholder": "أدخل رسالتك هنا..."
+    "messagePlaceholder": "أدخل رسالتك هنا...",
+    "noConversations": "لا توجد محادثات"
   },
   "notifications": {
     "title": "الإشعارات",
