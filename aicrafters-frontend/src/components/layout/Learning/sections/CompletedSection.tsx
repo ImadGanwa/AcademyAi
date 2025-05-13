@@ -39,7 +39,6 @@ export const CompletedSection: React.FC<CompletedSectionProps> = ({ courses }) =
           image={course.imageId}
           instructor={{ fullName: course.instructor }}
           onShare={() => handleShare(course)}
-          onMore={() => {}}
           showCertificate={true}
           onButtonClick={() => handleDownloadCertificate(course.id)}
           buttonText="Download Certificate"

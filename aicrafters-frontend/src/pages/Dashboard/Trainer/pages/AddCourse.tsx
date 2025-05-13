@@ -33,6 +33,7 @@ import { CourseContentType, CourseSection, ContentSection, LessonContent, QuizCo
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 interface QuizOption {
   id: string;
@@ -931,17 +932,6 @@ export const AddCourse: React.FC = () => {
         <Typography variant="h4" color="text.title" fontWeight={600}>
           {courseId ? t('trainer.createCourse.editCourse') : t('trainer.createCourse.createCourse')}
         </Typography>
-        {/* {courseId && (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={recalculateVideoDurations}
-            disabled={isRecalculating}
-            startIcon={isRecalculating ? <CircularProgress size={20} /> : null}
-          >
-            {isRecalculating ? 'Recalculating...' : 'Recalculate Video Durations'}
-          </Button>
-        )} */}
       </Box>
 
       {/* Course Info Section */}

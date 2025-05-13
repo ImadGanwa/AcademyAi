@@ -40,7 +40,6 @@ export const InProgressSection: React.FC<InProgressSectionProps> = ({ courses })
           instructor={{ fullName: course.instructor }}
           progress={course.progress}
           onShare={() => handleShare(course)}
-          onMore={() => {}}
           showCertificate={false}
           onButtonClick={() => handleCardClick(course.id)}
           buttonText="Continue Learning"

@@ -54,7 +54,6 @@ export const SavedSection: React.FC<SavedSectionProps> = ({ courses }) => {
             image={imageUrl}
             instructor={{ fullName: course.instructor }}
             onShare={() => handleShare(course)}
-            onMore={() => {}}
             showCertificate={false}
             isSaved={true}
             previewButtonText="Preview Course"

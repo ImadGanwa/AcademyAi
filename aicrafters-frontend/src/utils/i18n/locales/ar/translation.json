@@ -862,6 +862,10 @@
       "users": "المستخدمين",
       "rating": "التقييم",
       "previewCourse": "عرض الدورة",
+      "uploadCertificateTemplate": "رفع قالب الشهادة",
+      "certificateTemplateDescription": "قم برفع قالب شهادة خاص بهذه الدورة. إذا لم يتم توفير أي قالب، سيتم استخدام قالب الشهادة العام.",
+      "certificateTemplateDropText": "انقر أو اسحب وأفلت لرفع قالب الشهادة",
+      "certificateTemplateFormat": "تنسيق PNG، الحد الأقصى 1.5 ميجابايت",
       "approveAndPublishCourse": "موافقة ونشر الدورة",
       "areYouSureYouWantToApproveAndPublishThisCourse": "هل أنت متأكد أنك تريد موافقة ونشر هذه الدورة؟",
       "rejectCourse": "رفض الدورة",
@@ -929,7 +933,8 @@
       "failedToDeleteOrganization": "فشل حذف المؤسسة",
       "failedToCheckExistingAccounts": "فشل تحقيق الحسابات الموجودة",
       "failedToCreateUserAccounts": "فشل إنشاء حسابات المستخدمين",
-      "failedToFetchCourses": "فشل تحميل الدورات"
+      "failedToFetchCourses": "فشل تحميل الدورات",
+      "failedToUploadCertificateTemplate": "فشل رفع قالب الشهادة"
     },
     "success": {
       "coursesUpdatedSuccessfully": "تم تحديث الدورات بنجاح",
@@ -954,7 +959,8 @@
       "coursesSaved": "تم حفظ الدورات بنجاح",
       "organizationUpdatedSuccessfully": "تم تحديث المؤسسة بنجاح",
       "organizationCreatedSuccessfully": "تم إنشاء المؤسسة بنجاح",
-      "organizationDeletedSuccessfully": "تم حذف المؤسسة بنجاح"
+      "organizationDeletedSuccessfully": "تم حذف المؤسسة بنجاح",
+      "certificateTemplateUploaded": "تم رفع قالب الشهادة بنجاح"
     },
     "settings": {
       "certificate": {

@@ -142,6 +142,15 @@ export interface ICourse extends Document {
     name: string;
     colorKey: 'primary' | 'secondary';
   };
+  certificateTemplateUrl?: string;
+  certificateTemplateConfig?: {
+    showUserName: boolean;
+    showCourseName: boolean;
+    showCertificateId: boolean;
+    namePosition?: { x: number; y: number };
+    coursePosition?: { x: number; y: number };
+    idPosition?: { x: number; y: number };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -237,6 +246,62 @@ const courseSchema = new Schema({
     colorKey: {
       type: String,
       enum: ['primary', 'secondary']
+    }
+  },
+  certificateTemplateUrl: {
+    type: String,
+    default: undefined,
+    description: 'URL of the course-specific certificate template image in Cloudinary'
+  },
+  certificateTemplateConfig: {
+    showUserName: {
+      type: Boolean,
+      default: true
+    },
+    showCourseName: {
+      type: Boolean,
+      default: false,
+      description: 'Set to false if the course name is pre-printed on the template'
+    },
+    showCertificateId: {
+      type: Boolean,
+      default: true
+    },
+    namePosition: {
+      x: {
+        type: Number,
+        default: 0.5,
+        description: 'X position of the name as a percentage of page width (0-1)'
+      },
+      y: {
+        type: Number,
+        default: 0.52,
+        description: 'Y position of the name as a percentage of page height (0-1)'
+      }
+    },
+    coursePosition: {
+      x: {
+        type: Number,
+        default: 0.5,
+        description: 'X position of the course name as a percentage of page width (0-1)'
+      },
+      y: {
+        type: Number,
+        default: 0.72,
+        description: 'Y position of the course name as a percentage of page height (0-1)'
+      }
+    },
+    idPosition: {
+      x: {
+        type: Number,
+        default: 0.5,
+        description: 'X position of the certificate ID as a percentage of page width (0-1)'
+      },
+      y: {
+        type: Number,
+        default: 0.95,
+        description: 'Y position of the certificate ID as a percentage of page height (0-1)'
+      }
     }
   }
 }, {

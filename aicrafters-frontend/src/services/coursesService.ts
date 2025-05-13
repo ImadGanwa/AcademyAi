@@ -26,6 +26,7 @@ export interface Course {
   duration: number;
   createdAt: Date;
   updatedAt: Date;
+  certificateTemplateUrl?: string;
   courseContent?: {
     sections: Array<{
       id: string;

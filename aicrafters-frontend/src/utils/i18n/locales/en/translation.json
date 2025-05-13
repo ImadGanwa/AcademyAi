@@ -809,7 +809,12 @@
       "addOption": "Add Option",
       "cancel": "Cancel",
       "saveQuestion": "Save Question",
-      "context": "Context (Optional)"
+      "context": "Context (Optional)",
+      "certificateTemplate": "Certificate Template",
+      "certificateTemplateDesc": "Upload a certificate template specific to this course. If no template is provided, the global certificate template will be used.",
+      "certificateTemplateDrop": "Click or drag to upload certificate template",
+      "certificateTemplateHint": "PNG format, max 1.5MB",
+      "uploadCertificateTemplate": "Upload Certificate Template"
     },
     "coursePreview": {
       "coursePreview": "Course Preview",
@@ -926,6 +931,10 @@
       "users": "Users",
       "rating": "Rating",
       "previewCourse": "Preview Course",
+      "uploadCertificateTemplate": "Upload Certificate Template",
+      "certificateTemplateDescription": "Upload a certificate template specific to this course. If no template is provided, the global certificate template will be used.",
+      "certificateTemplateDropText": "Click or drag to upload certificate template",
+      "certificateTemplateFormat": "PNG format, max 1.5MB",
       "approveAndPublishCourse": "Approve & Publish Course",
       "areYouSureYouWantToApproveAndPublishThisCourse": "Are you sure you want to approve and publish this course?",
       "rejectCourse": "Reject Course",
@@ -973,7 +982,8 @@
       "failedToDeleteOrganization": "Failed to delete organization",
       "failedToCheckExistingAccounts": "Failed to check existing accounts",
       "failedToCreateUserAccounts": "Failed to create user accounts",
-      "failedToFetchCourses": "Failed to fetch courses"
+      "failedToFetchCourses": "Failed to fetch courses",
+      "failedToUploadCertificateTemplate": "Failed to upload certificate template"
     },
     "success": {
       "coursesUpdatedSuccessfully": "Courses updated successfully",
@@ -998,7 +1008,8 @@
       "coursesSaved": "Courses saved successfully",
       "organizationUpdatedSuccessfully": "Organization updated successfully",
       "organizationCreatedSuccessfully": "Organization created successfully",
-      "organizationDeletedSuccessfully": "Organization deleted successfully"
+      "organizationDeletedSuccessfully": "Organization deleted successfully",
+      "certificateTemplateUploaded": "Certificate template uploaded successfully"
     },
     "settings": {
       "certificate": {

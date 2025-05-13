@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Typography, IconButton as MuiIconButton, Divider, Button, Link } from '@mui/material';
 import { ReactComponent as ShareIcon } from '../../../assets/icons/share.svg';
-import { ReactComponent as MoreIcon } from '../../../assets/icons/more.svg';
 import { ReactComponent as CheckCircleIcon } from '../../../assets/icons/CheckMark.svg';
 import { ReactComponent as DownloadIcon } from '../../../assets/icons/Download.svg';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +20,6 @@ interface LearningCardProps {
     completedLessons: string[];
   };
   onShare: () => void;
-  onMore: () => void;
   showCertificate: boolean;
   isSaved?: boolean;
   buttonText?: string;
@@ -441,7 +439,6 @@ export const LearningCard: React.FC<LearningCardProps> = ({
   instructor,
   progress,
   onShare,
-  onMore,
   showCertificate,
   isSaved,
   previewButtonText = 'Preview Course',
@@ -523,13 +520,6 @@ export const LearningCard: React.FC<LearningCardProps> = ({
               </ProgressSection>
               
               <ActionsSection>
-                <IconButton 
-                  className="action-button" 
-                  onClick={onMore} 
-                  aria-label="More"
-                >
-                  <MoreIcon />
-                </IconButton>
                 <ShareButton 
                   className="share-button" 
                   onClick={onShare}

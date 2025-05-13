@@ -92,6 +92,7 @@ export interface Course {
   status: 'draft' | 'review' | 'published' | 'archived';
   thumbnail: string;
   duration?: number;
+  certificateTemplateUrl?: string;
   lessons: Array<{
     id: string;
     title: string;

@@ -889,6 +889,10 @@
       "users": "Utilisateurs",
       "rating": "Note",
       "previewCourse": "Aperçu du cours",
+      "uploadCertificateTemplate": "Télécharger le modèle de certificat",
+      "certificateTemplateDescription": "Téléchargez un modèle de certificat spécifique à ce cours. Si aucun modèle n'est fourni, le modèle de certificat global sera utilisé.",
+      "certificateTemplateDropText": "Cliquez ou faites glisser pour télécharger le modèle de certificat",
+      "certificateTemplateFormat": "Format PNG, max 1.5MB",
       "approveAndPublishCourse": "Approuver et publier le cours",
       "areYouSureYouWantToApproveAndPublishThisCourse": "Êtes-vous sûr de vouloir approuver et publier ce cours?",
       "rejectCourse": "Rejeter le cours",
@@ -956,7 +960,8 @@
       "failedToDeleteOrganization": "Erreur lors de la suppression de l'organisation",
       "failedToCheckExistingAccounts": "Erreur lors de la vérification des comptes existants",
       "failedToCreateUserAccounts": "Erreur lors de la création des comptes utilisateurs",
-      "failedToFetchCourses": "Erreur lors de la récupération des cours"
+      "failedToFetchCourses": "Erreur lors de la récupération des cours",
+      "failedToUploadCertificateTemplate": "Erreur lors du téléchargement du modèle de certificat"
     },
     "success": {
       "coursesUpdatedSuccessfully": "Cours mis à jour avec succès",
@@ -981,7 +986,8 @@
       "coursesSaved": "Cours enregistrés avec succès",
       "organizationUpdatedSuccessfully": "Organisation mise à jour avec succès",
       "organizationCreatedSuccessfully": "Organisation créée avec succès",
-      "organizationDeletedSuccessfully": "Organisation supprimée avec succès"
+      "organizationDeletedSuccessfully": "Organisation supprimée avec succès",
+      "certificateTemplateUploaded": "Modèle de certificat téléchargé avec succès"
     },
     "settings": {
       "certificate": {

@@ -2,6 +2,7 @@ import express from 'express';
 import { courseController } from '../controllers/courseController';
 import { authMiddleware } from '../middleware/auth';
 import multer from 'multer';
+import { coursesController } from '../controllers/coursesController';
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -45,5 +46,28 @@ router.post('/:id/invite', authMiddleware, courseController.inviteUser);
 router.post('/:courseId/lessons/:lessonId/complete', authMiddleware, courseController.markLessonComplete);
 router.post('/:id/save', authMiddleware, courseController.saveCourse);
 router.post('/:id/reviews', authMiddleware, courseController.addReview);
+
+// Add certificate template routes
+router.post('/:courseId/certificate-template', authMiddleware, upload.single('template'), (req, res) => {
+  coursesController.updateCertificateTemplate(req, res);
+});
+
+// Endpoint to update just the certificate configuration
+router.put('/:courseId/certificate-template/config', authMiddleware, (req, res) => {
+  coursesController.updateCertificateTemplateConfig(req, res);
+});
+
+router.get('/:courseId/certificate-template', authMiddleware, (req, res) => {
+  coursesController.getCourseTemplate(req, res);
+});
+
+router.delete('/:courseId/certificate-template', authMiddleware, (req, res) => {
+  coursesController.deleteCertificateTemplate(req, res);
+});
+
+// Add test certificate generation endpoint
+router.post('/:courseId/certificate/test', authMiddleware, (req, res) => {
+  coursesController.generateTestCertificate(req, res);
+});
 
 export default router;

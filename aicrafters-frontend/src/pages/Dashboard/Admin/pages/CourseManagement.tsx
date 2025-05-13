@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import { 
   CircularProgress, 
@@ -8,7 +8,8 @@ import {
   Snackbar, 
   Alert,
   Button,
-  Box
+  Box,
+  IconButton
 } from '@mui/material';
 import { ReactComponent as SearchIcon } from '../../../../assets/icons/Search.svg';
 import { ReactComponent as FilterIcon } from '../../../../assets/icons/Filter.svg';
@@ -17,11 +18,16 @@ import { api } from '../../../../services/api';
 import debounce from 'lodash/debounce';
 import { CoursePreview } from '../../Trainer/components/course/Preview';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Typography, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
+import { Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import CertificateTemplateDialog from '../../Admin/components/CertificateTemplateDialog';
 
 const PageContainer = styled.div`
   display: flex;
@@ -201,6 +207,7 @@ interface AdminCourse {
   rating: number;
   createdAt: string;
   updatedAt: string;
+  certificateTemplateUrl?: string;
   courseContent?: {
     sections: Array<{
       id: string;
@@ -251,6 +258,42 @@ const FilterOption = styled.div<{ $active: boolean }>`
   }
 `;
 
+const ErrorMessage = styled.div`
+  color: ${props => props.theme.palette.error.main};
+  text-align: center;
+  padding: 24px;
+  font-size: 1.1rem;
+`;
+
+const MoreButton = styled.button`
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    path {
+      fill: ${props => props.theme.palette.text.secondary};
+    }
+  }
+
+  &:hover {
+    background: #ffffff;
+    transform: scale(1.05);
+  }
+`;
+
 export const CourseManagement: React.FC = () => {
   const { t } = useTranslation();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
@@ -282,6 +325,12 @@ export const CourseManagement: React.FC = () => {
     message: '',
     action: () => {}
   });
+  const [certificateDialogOpen, setCertificateDialogOpen] = useState(false);
+  const [certificateTemplate, setCertificateTemplate] = useState<File | null>(null);
+  const [certificateTemplatePreview, setCertificateTemplatePreview] = useState<string>('');
+  const [uploadingCertificate, setUploadingCertificate] = useState(false);
+  const certificateInputRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGE_SIZE = 1.5 * 1024 * 1024; // 1.5MB in bytes
 
   const handleCloseSnackbar = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
@@ -315,7 +364,7 @@ export const CourseManagement: React.FC = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching courses:', err);
-      setError(t('admin.errors.failedToLoadCourses'));
+      setError('Failed to load courses');
     } finally {
       setLoading(false);
     }
@@ -350,7 +399,11 @@ export const CourseManagement: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedCourse(null);
+    
+    // Don't clear selectedCourse if certificate dialog is open
+    if (!certificateDialogOpen) {
+      setSelectedCourse(null);
+    }
   };
 
   const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -368,24 +421,41 @@ export const CourseManagement: React.FC = () => {
       handleMenuClose();
       showSuccessMessage(
         newStatus === 'published' 
-          ? t('admin.success.coursePublishedSuccessfully')
+          ? 'Course published successfully'
           : newStatus === 'draft'
-          ? t('admin.success.courseMovedToDraft')
-          : t('admin.success.courseMovedToReview')
+          ? 'Course moved to draft'
+          : 'Course moved to review'
       );
     } catch (error) {
       console.error('Error updating course status:', error);
-      showErrorMessage(t('admin.errors.failedToUpdateCourses'));
+      showErrorMessage('Failed to update courses');
     }
   };
 
   const fetchCourseDetails = async (courseId: string) => {
     try {
       const response = await api.get(`/courses/${courseId}`);
+      
+      // Try to fetch the certificate template if it's not already in the response
+      if (!response.data?.certificateTemplateUrl) {
+        try {
+          const templateResponse = await api.get(`/courses/${courseId}/certificate-template`);
+          if (templateResponse.data?.certificateTemplateUrl) {
+            console.log('Found certificate template URL:', templateResponse.data.certificateTemplateUrl);
+            response.data.certificateTemplateUrl = templateResponse.data.certificateTemplateUrl;
+          }
+        } catch (templateError) {
+          console.error('Error fetching certificate template:', templateError);
+          // Continue without template - this is not a critical error
+        }
+      } else {
+        console.log('Found existing certificate template URL in course data:', response.data.certificateTemplateUrl);
+      }
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching course details:', error);
-      showErrorMessage(t('admin.errors.failedToLoadCourseDetails'));
+      toast.error('Failed to load course details');
       return null;
     }
   };
@@ -402,7 +472,7 @@ export const CourseManagement: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading course preview:', error);
-      showErrorMessage(t('admin.errors.failedToLoadCoursePreview'));
+      showErrorMessage('Failed to load course preview');
     }
   };
 
@@ -413,6 +483,202 @@ export const CourseManagement: React.FC = () => {
       message,
       action
     });
+  };
+
+  const handleConfigureCertificateTemplate = (course: AdminCourse) => {
+    setSelectedCourse(course);
+    setCertificateDialogOpen(true);
+  };
+
+  const handleCertificateTemplateUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error('Image size must be less than 1.5MB');
+      if (event.target) event.target.value = '';
+      return;
+    }
+
+    // Create a preview URL for the uploaded image
+    const imageUrl = URL.createObjectURL(file);
+    
+    // Set the file and preview
+    setCertificateTemplate(file);
+    setCertificateTemplatePreview(imageUrl);
+    
+    console.log('Certificate template set:', file.name);
+  };
+
+  const handleRemoveCertificateTemplate = async () => {
+    if (!selectedCourse?.id) {
+      console.log('Cannot remove certificate template: missing course ID');
+      return;
+    }
+    
+    // If the preview is a local URL (not yet uploaded to server), just clear it locally
+    if (certificateTemplatePreview && !certificateTemplatePreview.startsWith('http')) {
+      console.log('Removing local certificate template preview');
+      URL.revokeObjectURL(certificateTemplatePreview);
+      setCertificateTemplate(null);
+      setCertificateTemplatePreview('');
+      if (certificateInputRef.current) {
+        certificateInputRef.current.value = '';
+      }
+      return;
+    }
+    
+    // If this is a server URL, delete it from the server
+    try {
+      console.log('Deleting certificate template from server for course:', selectedCourse.id);
+      const response = await api.delete(`/courses/${selectedCourse.id}/certificate-template`);
+      console.log('Delete response:', response.data);
+      
+      if (response.status === 200) {
+        setCertificateTemplate(null);
+        setCertificateTemplatePreview('');
+        
+        // Update the selected course object to remove the template URL
+        setSelectedCourse({
+          ...selectedCourse,
+          certificateTemplateUrl: undefined
+        });
+        
+        // Also update the course in the courses list
+        setCourses(prevCourses => prevCourses.map(course => 
+          course.id === selectedCourse.id 
+            ? { ...course, certificateTemplateUrl: undefined } 
+            : course
+        ));
+        
+        toast.success("Certificate template removed successfully");
+      }
+    } catch (error) {
+      console.error('Error deleting certificate template:', error);
+      toast.error("Failed to remove certificate template");
+    }
+    
+    if (certificateInputRef.current) {
+      certificateInputRef.current.value = '';
+    }
+  };
+
+  const handleSaveCertificateTemplate = async () => {
+    if (!selectedCourse?.id || !certificateTemplate) {
+      console.log('Cannot save certificate template: missing course ID or template file');
+      return;
+    }
+
+    try {
+      setUploadingCertificate(true);
+      const formData = new FormData();
+      formData.append('template', certificateTemplate);
+
+      console.log('Uploading certificate template for course:', selectedCourse.id);
+      console.log('FormData contains file:', certificateTemplate.name);
+      
+      const response = await api.post(
+        `/courses/${selectedCourse.id}/certificate-template`, 
+        formData, 
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        }
+      );
+
+      console.log('Upload response:', response.data);
+
+      if (response.data?.certificateTemplateUrl) {
+        console.log('Upload successful, new URL:', response.data.certificateTemplateUrl);
+        setCertificateTemplatePreview(response.data.certificateTemplateUrl);
+        setCertificateTemplate(null);
+        
+        const templateUrl = response.data.certificateTemplateUrl;
+        
+        // Update the selected course with the new certificate template URL
+        setSelectedCourse({
+          ...selectedCourse,
+          certificateTemplateUrl: templateUrl
+        });
+        
+        // Also update the course in the courses list
+        setCourses(prevCourses => prevCourses.map(course => 
+          course.id === selectedCourse.id 
+            ? { ...course, certificateTemplateUrl: templateUrl } 
+            : course
+        ));
+        
+        toast.success("Certificate template uploaded successfully");
+        setCertificateDialogOpen(false);
+      }
+    } catch (error) {
+      console.error('Error uploading certificate template:', error);
+      toast.error("Failed to upload certificate template");
+    } finally {
+      setUploadingCertificate(false);
+    }
+  };
+
+  const openCertificateDialog = async () => {
+    if (!selectedCourse) {
+      console.log('Cannot open certificate dialog: no course selected');
+      return;
+    }
+    
+    console.log('Opening certificate dialog for course:', selectedCourse.id, selectedCourse.title);
+    
+    // Reset certificate template state
+    setCertificateTemplate(null);
+    
+    try {
+      // Check if course already has a certificate template
+      if (selectedCourse.certificateTemplateUrl) {
+        console.log('Using existing certificate template URL:', selectedCourse.certificateTemplateUrl);
+        setCertificateTemplatePreview(selectedCourse.certificateTemplateUrl);
+      } else {
+        // Try to fetch the template URL if not already available
+        console.log('Fetching certificate template for course:', selectedCourse.id);
+        try {
+          const templateResponse = await api.get(`/courses/${selectedCourse.id}/certificate-template`);
+          console.log('Certificate template API response:', templateResponse.data);
+          
+          if (templateResponse.data?.certificateTemplateUrl) {
+            console.log('Found certificate template URL from API:', templateResponse.data.certificateTemplateUrl);
+            setCertificateTemplatePreview(templateResponse.data.certificateTemplateUrl);
+            // Update the selected course object with the template URL
+            setSelectedCourse({
+              ...selectedCourse,
+              certificateTemplateUrl: templateResponse.data.certificateTemplateUrl
+            });
+          } else {
+            console.log('No certificate template found for this course');
+            setCertificateTemplatePreview('');
+          }
+        } catch (error) {
+          console.error('Error fetching certificate template:', error);
+          setCertificateTemplatePreview('');
+        }
+      }
+    } catch (error) {
+      console.error('Error in openCertificateDialog:', error);
+      setCertificateTemplatePreview('');
+    }
+    
+    // Reset input field
+    if (certificateInputRef.current) {
+      certificateInputRef.current.value = '';
+    }
+    
+    setCertificateDialogOpen(true);
+    
+    // Don't call handleMenuClose() here as it will set selectedCourse to null
+    // We need to keep the selectedCourse while the dialog is open
+    if (anchorEl) {
+      setAnchorEl(null); // Just close the menu without clearing the selectedCourse
+    }
+    
+    console.log('Certificate dialog opened for course:', selectedCourse.id);
   };
 
   if (error) {
@@ -501,7 +767,7 @@ export const CourseManagement: React.FC = () => {
               <CourseStatus $status={course.status}>
                 {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
               </CourseStatus>
-              <MoreButton onClick={(e) => handleMenuOpen(e, course)}>
+              <MoreButton onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleMenuOpen(e, course)}>
                 <MoreIcon />
               </MoreButton>
             </CourseImage>
@@ -536,31 +802,39 @@ export const CourseManagement: React.FC = () => {
           <VisibilityIcon fontSize="small" sx={{ mr: 1 }} />
           {t('admin.courseManagement.previewCourse')}
         </MenuItem>
+        {selectedCourse && (
+          <MenuItem onClick={() => handleConfigureCertificateTemplate(selectedCourse)}>
+            <Box display="flex" alignItems="center">
+              <CloudUploadIcon sx={{ mr: 1, fontSize: 20 }} />
+              Configure Certificate Template
+            </Box>
+          </MenuItem>
+        )}
         {selectedCourse?.status === 'review' && (
           <>
             <MenuItem onClick={() => {
               if (selectedCourse) {
                 handleConfirmAction(
-                  t('admin.courseManagement.approveAndPublishCourse'),
-                  t('admin.courseManagement.areYouSureYouWantToApproveAndPublishThisCourse'),
+                  'Approve and Publish Course',
+                  'Are you sure you want to approve and publish this course?',
                   () => handleStatusChange(selectedCourse, 'published')
                 );
               }
             }}>
               <CheckCircleIcon fontSize="small" sx={{ mr: 1, color: 'success.main' }} />
-              {t('admin.courseManagement.approveAndPublishCourse')}
+              Approve and Publish Course
             </MenuItem>
             <MenuItem onClick={() => {
               if (selectedCourse) {
                 handleConfirmAction(
-                  t('admin.courseManagement.rejectCourse'),
-                  t('admin.courseManagement.areYouSureYouWantToRejectThisCourseAndMoveItToDraft'),
+                  'Reject Course',
+                  'Are you sure you want to reject this course and move it to draft?',
                   () => handleStatusChange(selectedCourse, 'draft')
                 );
               }
             }}>
               <CancelIcon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
-              {t('admin.courseManagement.rejectCourse')}
+              Reject Course
             </MenuItem>
           </>
         )}
@@ -568,14 +842,14 @@ export const CourseManagement: React.FC = () => {
           <MenuItem onClick={() => {
             if (selectedCourse) {
               handleConfirmAction(
-                t('admin.courseManagement.moveCourseToDraft'),
-                t('admin.courseManagement.areYouSureYouWantToMoveThisCourseToDraft'),
+                'Move Course to Draft',
+                'Are you sure you want to move this course to draft?',
                 () => handleStatusChange(selectedCourse, 'draft')
               );
             }
           }}>
             <EditIcon fontSize="small" sx={{ mr: 1, color: 'warning.main' }} />
-            {t('admin.courseManagement.moveCourseToDraft')}
+            Move Course to Draft
           </MenuItem>
         )}
       </Menu>
@@ -627,6 +901,14 @@ export const CourseManagement: React.FC = () => {
         </Alert>
       </Snackbar>
 
+      {/* Certificate Template Configuration Dialog */}
+      <CertificateTemplateDialog
+        open={certificateDialogOpen}
+        onClose={() => setCertificateDialogOpen(false)}
+        selectedCourse={selectedCourse}
+        certificateTemplatePreview={selectedCourse?.certificateTemplateUrl}
+      />
+
       {selectedCourse && previewOpen && (
         <CoursePreview
           open={previewOpen}
@@ -652,39 +934,3 @@ const LoadingContainer = styled.div`
   align-items: center;
   height: 400px;
 `;
-
-const ErrorMessage = styled.div`
-  color: ${props => props.theme.palette.error.main};
-  text-align: center;
-  padding: 24px;
-  font-size: 1.1rem;
-`;
-
-const MoreButton = styled.button`
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-
-  svg {
-    width: 20px;
-    height: 20px;
-    path {
-      fill: ${props => props.theme.palette.text.secondary};
-    }
-  }
-
-  &:hover {
-    background: #ffffff;
-    transform: scale(1.05);
-  }
-`; 

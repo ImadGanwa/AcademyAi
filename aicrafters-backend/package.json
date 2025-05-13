@@ -10,7 +10,8 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate-certificates": "ts-node src/scripts/migrate-certificate-positions.ts"
   },
   "keywords": [],
   "author": "",

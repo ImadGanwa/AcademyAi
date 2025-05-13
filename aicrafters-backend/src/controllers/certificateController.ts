@@ -41,7 +41,8 @@ export const certificateController = {
       const certificateData = await certificateService.generateCertificateData(user, course);
 
       // Always generate both PDF and image if image doesn't exist
-      const { pdfBuffer, imageUrl } = await certificateService.generateAndUploadCertificate(certificateData);
+      // Pass courseId to use course-specific template if available
+      const { pdfBuffer, imageUrl } = await certificateService.generateAndUploadCertificate(certificateData, courseId);
 
       // Update user's course with the certificate image URL if it doesn't exist
       if (!userCourse.certificateImageUrl) {
@@ -98,8 +99,8 @@ export const certificateController = {
         // Generate certificate data
         const certificateData = await certificateService.generateCertificateData(user, course);
 
-        // Generate and upload certificate
-        const { imageUrl } = await certificateService.generateAndUploadCertificate(certificateData);
+        // Generate and upload certificate - pass courseId for course-specific template
+        const { imageUrl } = await certificateService.generateAndUploadCertificate(certificateData, courseId);
 
         // Update user's course with the certificate image URL
         await User.updateOne(
