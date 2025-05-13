@@ -33,6 +33,7 @@
     "react-spring": "^9.7.5"
   },
   "devDependencies": {
+    "@types/ioredis": "^5.0.0",
     "concurrently": "^8.2.2"
   }
 }

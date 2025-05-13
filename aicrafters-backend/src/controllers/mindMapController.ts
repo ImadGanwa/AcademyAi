@@ -5,6 +5,10 @@ import { TranscriptionService } from '../services/transcriptionService';
 import { VideoTranscription } from '../models/VideoTranscription';
 import { AppError } from '../utils/AppError';
 import logger from '../config/logger';
+import redis from '../config/redis';
+
+// Cache TTL for the final markdown response
+const MIND_MAP_RESPONSE_CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
 
 /**
  * Generate Mind Map for a specific video based on its transcription.
@@ -47,6 +51,15 @@ const generateMindMapForVideo = async (req: Request, res: Response, next: NextFu
 
     try {
         logger.info(`Mind map generation request received for course ${courseId}, video: ${processedVideoUrl}`);
+
+        // Check if we have a cached final result first
+        const cacheKey = `mindmap:response:${courseId}:${encodeURIComponent(processedVideoUrl)}`;
+        const cachedResponse = await redis.get<string>(cacheKey);
+        
+        if (cachedResponse) {
+            logger.info(`Retrieved mind map response from cache for key: ${cacheKey}`);
+            return res.status(200).type('text/markdown').send(cachedResponse);
+        }
 
         // First check if the transcription exists and is complete
         let transcriptionDoc = await VideoTranscription.findOne({
@@ -105,11 +118,17 @@ const generateMindMapForVideo = async (req: Request, res: Response, next: NextFu
             return next(new AppError('Transcription text is empty', 404));
         }
 
-        // 2. Structure the transcription using the service
-        const structuredData = await MindMapService.structureTranscription(transcriptionText);
+        // 2. Structure the transcription using the service with caching
+        // Pass courseId and videoUrl for cache key generation
+        const structuredData = await MindMapService.structureTranscription(transcriptionText, courseId, processedVideoUrl);
 
-        // 3. Convert structured data to Markmap format
-        const markmapMarkdown = await MindMapService.convertToMarkmap(structuredData);
+        // 3. Convert structured data to Markmap format with caching
+        // Pass courseId and videoUrl for cache key generation
+        const markmapMarkdown = await MindMapService.convertToMarkmap(structuredData, courseId, processedVideoUrl);
+
+        // Cache the final response
+        await redis.setEx(cacheKey, MIND_MAP_RESPONSE_CACHE_TTL, markmapMarkdown);
+        logger.info(`Cached final mind map response with key: ${cacheKey}`);
 
         logger.info(`Successfully generated mind map for course ${courseId}, video: ${processedVideoUrl}`);
 

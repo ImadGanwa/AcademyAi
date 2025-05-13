@@ -2,8 +2,14 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { AppError } from '../utils/AppError'; // Assuming AppError exists for consistent error handling
 import logger from '../config/logger'; // Assuming a logger exists
+import redis from '../config/redis';
 
 dotenv.config();
+
+// Cache TTL settings
+const MIND_MAP_STRUCTURE_CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
+const MIND_MAP_MARKDOWN_CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
+const MAX_TRANSCRIPTION_SIZE = 15000; // Limit for transcription length to avoid AI context issues
 
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -33,21 +39,42 @@ export interface MindmapData {
 
 /**
  * Process transcription text and structure it into deeply nested hierarchical data
+ * Uses Redis caching to improve performance
  */
-async function structureTranscription(transcriptionText: string): Promise<MindmapData> {
+async function structureTranscription(transcriptionText: string, courseId?: string, videoUrl?: string): Promise<MindmapData> {
   if (!transcriptionText || transcriptionText.trim().length === 0) {
     logger.warn('Attempted to structure empty transcription text.');
-    // Return a default empty structure or throw specific error?
-    // Returning empty structure for now:
     return {
         title: "Empty Transcription",
         summary: "The provided transcription was empty.",
         nodes: []
     };
-    // Or: throw new AppError('Transcription text cannot be empty', 400);
   }
 
-  const prompt = `
+  try {
+    // Generate a cache key based on the content
+    const cacheKey = `mindmap:structure:${Buffer.from(transcriptionText.substring(0, 50)).toString('base64')}`;
+    
+    // If courseId and videoUrl are provided, use a more specific cache key
+    const specificCacheKey = courseId && videoUrl 
+      ? `mindmap:structure:${courseId}:${encodeURIComponent(videoUrl)}` 
+      : cacheKey;
+
+    // Try to get from cache first
+    const cachedStructure = await redis.get<MindmapData>(specificCacheKey);
+    if (cachedStructure) {
+      logger.info(`Retrieved mind map structure from cache for key: ${specificCacheKey}`);
+      return cachedStructure;
+    }
+
+    // Trim transcription if it's too long to avoid AI context limits
+    let processedTranscription = transcriptionText;
+    if (transcriptionText.length > MAX_TRANSCRIPTION_SIZE) {
+      logger.warn(`Transcription exceeds max size (${transcriptionText.length} chars). Trimming to ${MAX_TRANSCRIPTION_SIZE} chars.`);
+      processedTranscription = transcriptionText.substring(0, MAX_TRANSCRIPTION_SIZE);
+    }
+
+    const prompt = `
     You are an expert in organizing educational content into extremely deep, hierarchical course outlines.
     Your MOST IMPORTANT task is to extract the DEEPEST POSSIBLE hierarchical structure from the content.
 
@@ -120,11 +147,10 @@ async function structureTranscription(transcriptionText: string): Promise<Mindma
     Remember: The PRIMARY GOAL is to create the DEEPEST POSSIBLE hierarchical structure.
 
     Transcription text:
-    ${transcriptionText}
+    ${processedTranscription}
   `;
 
-  try {
-    logger.info(`Sending transcription to Gemini for structuring (length: ${transcriptionText.length})`);
+    logger.info(`Sending transcription to Gemini for structuring (length: ${processedTranscription.length})`);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
@@ -136,8 +162,14 @@ async function structureTranscription(transcriptionText: string): Promise<Mindma
       throw new AppError('Failed to parse mind map structure from AI response', 500);
     }
 
+    const structuredData = JSON.parse(jsonMatch[0]) as MindmapData;
     logger.info('Successfully structured transcription using Gemini.');
-    return JSON.parse(jsonMatch[0]) as MindmapData;
+    
+    // Cache the result
+    await redis.setEx(specificCacheKey, MIND_MAP_STRUCTURE_CACHE_TTL, structuredData);
+    logger.info(`Cached mind map structure with key: ${specificCacheKey}`);
+    
+    return structuredData;
   } catch (error: any) {
     logger.error('Error calling Gemini API for structuring:', { message: error.message, stack: error.stack });
     // Consider more specific error checking (e.g., rate limits, API key errors)
@@ -147,15 +179,33 @@ async function structureTranscription(transcriptionText: string): Promise<Mindma
 
 /**
  * Convert deeply nested hierarchical data to markmap compatible markdown
+ * Uses Redis caching to improve performance
  */
-async function convertToMarkmap(structuredData: MindmapData): Promise<string> {
+async function convertToMarkmap(structuredData: MindmapData, courseId?: string, videoUrl?: string): Promise<string> {
   // Basic check for empty data
   if (!structuredData || !structuredData.title || !structuredData.nodes || structuredData.nodes.length === 0) {
       logger.warn('Attempted to convert empty or invalid structured data to markmap.');
       return `# ${structuredData?.title || 'Empty Mind Map'}\n\nNo content available.`;
   }
 
-  const prompt = `
+  try {
+    // Generate a cache key
+    const dataHash = Buffer.from(JSON.stringify(structuredData).substring(0, 100)).toString('base64');
+    const cacheKey = `mindmap:markdown:${dataHash}`;
+    
+    // If courseId and videoUrl are provided, use a more specific cache key
+    const specificCacheKey = courseId && videoUrl 
+      ? `mindmap:markdown:${courseId}:${encodeURIComponent(videoUrl)}` 
+      : cacheKey;
+
+    // Try to get from cache first
+    const cachedMarkdown = await redis.get<string>(specificCacheKey);
+    if (cachedMarkdown) {
+      logger.info(`Retrieved markdown from cache for key: ${specificCacheKey}`);
+      return cachedMarkdown;
+    }
+
+    const prompt = `
     Convert the following deeply nested hierarchical course data into markdown format compatible with markmap.js.org.
 
     The markdown should create the DEEPEST POSSIBLE hierarchical visualization using heading levels.
@@ -185,12 +235,16 @@ async function convertToMarkmap(structuredData: MindmapData): Promise<string> {
     Output only the markdown content, nothing else.
   `;
 
-  try {
     logger.info(`Sending structured data to Gemini for markmap conversion (title: ${structuredData.title})`);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const markdownText = response.text();
     logger.info(`Successfully converted structured data to markmap format for: ${structuredData.title}`);
+    
+    // Cache the result
+    await redis.setEx(specificCacheKey, MIND_MAP_MARKDOWN_CACHE_TTL, markdownText);
+    logger.info(`Cached markdown with key: ${specificCacheKey}`);
+    
     return markdownText;
   } catch (error: any) {
     logger.error('Error calling Gemini API for markmap conversion:', { message: error.message, stack: error.stack });
