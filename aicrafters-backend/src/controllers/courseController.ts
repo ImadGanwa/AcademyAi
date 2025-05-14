@@ -940,7 +940,8 @@ export const courseController = {
               await sendCourseSubmissionEmail(
                 admin.email,
                 admin.fullName,
-                course.title
+                course.title,
+                admin.preferredLanguage || 'en'
               );
 
               // Create notification for admin
@@ -1874,7 +1875,8 @@ export const courseController = {
           user.email,
           course.title,
           course._id.toString(),
-          course.instructor.fullName
+          course.instructor.fullName,
+          user.preferredLanguage || 'en'
         );
       } catch (error) {
         console.error('Error sending invitation email:', error);

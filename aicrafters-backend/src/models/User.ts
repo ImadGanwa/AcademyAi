@@ -46,6 +46,7 @@ export interface IUser extends Document {
   organizations: Array<mongoose.Types.ObjectId>;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
+  preferredLanguage: string;
 }
 
 interface IUserModel extends Model<IUser> {
@@ -77,6 +78,7 @@ export interface SafeUser {
     rating?: number;
     comment?: string;
   }>;
+  preferredLanguage: string;
 }
 
 const userSchema = new Schema({
@@ -238,6 +240,11 @@ const userSchema = new Schema({
   }],
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+  preferredLanguage: {
+    type: String,
+    default: 'en',
+    enum: ['en', 'fr', 'ar'],
+  },
 }, {
   timestamps: true, // Adds createdAt and updatedAt automatically
 });
@@ -245,6 +252,7 @@ const userSchema = new Schema({
 // Indexes for common queries
 userSchema.index({ email: 1, status: 1 });
 userSchema.index({ role: 1, status: 1 });
+userSchema.index({ fullName: 'text' }); // Text index for fullName search
 
 // Update password hashing middleware
 userSchema.pre('save', async function(next) {
@@ -290,7 +298,8 @@ userSchema.statics.getSafeUser = function(user: IUser): SafeUser {
     usersCount: user.usersCount,
     coursesCount: user.coursesCount,
     lastActive: user.lastActive,
-    courses: user.courses
+    courses: user.courses,
+    preferredLanguage: user.preferredLanguage,
   };
 };
 

@@ -70,7 +70,7 @@ const verifyRecaptcha = async (token: string): Promise<boolean> => {
 export const authController = {
   register: async (req: Request, res: Response) => {
     try {
-      const { email, password, fullName, marketingConsent, recaptchaToken } = req.body;
+      const { email, password, fullName, marketingConsent, recaptchaToken, preferredLanguage } = req.body;
 
 
       // Validate input
@@ -102,14 +102,15 @@ export const authController = {
         isEmailVerified: false,
         status: 'pending',
         verificationToken,
-        lastActive: new Date()
+        lastActive: new Date(),
+        preferredLanguage: preferredLanguage || 'en',
       });
 
       await user.save();
 
       // Send verification email
       try {
-        await sendVerificationEmail(email, fullName, verificationToken);
+        await sendVerificationEmail(email, fullName, verificationToken, user.preferredLanguage);
       } catch (error) {
         console.error('Error sending verification email:', error);
         // Don't fail registration if email fails, but log it
@@ -126,7 +127,8 @@ export const authController = {
             admin.email,
             admin.fullName,
             fullName,
-            email
+            email,
+            admin.preferredLanguage || 'en'
           );
 
           // Create notification for admin
@@ -157,7 +159,7 @@ export const authController = {
 
   login: async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, preferredLanguage } = req.body;
       
       const user = await User.findOne({ email }).select('+password +role +courses');
       if (!user) {
@@ -188,8 +190,14 @@ export const authController = {
           return res.status(403).json(createError('Account status error. Please contact support.'));
       }
 
-      // Update last active timestamp
+      // Update last active timestamp and preferred language if provided
       user.lastActive = new Date();
+      
+      // Update preferredLanguage if provided in the request
+      if (preferredLanguage && ['en', 'fr', 'ar'].includes(preferredLanguage)) {
+        user.preferredLanguage = preferredLanguage;
+      }
+      
       await user.save();
 
       const payload: JWTPayload = {
@@ -244,7 +252,7 @@ export const authController = {
 
       // Send account activation confirmation email
       try {
-        await sendAccountActivationEmail(user.email, user.fullName);
+        await sendAccountActivationEmail(user.email, user.fullName, user.preferredLanguage);
       } catch (error) {
         console.error('Error sending account activation email:', error);
         // Don't fail verification if email fails, but log it
@@ -263,7 +271,7 @@ export const authController = {
   resendVerification: async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-
+      
       if (!email) {
         return res.status(400).json(createError('Email is required'));
       }
@@ -284,7 +292,7 @@ export const authController = {
 
       // Send new verification email
       try {
-        await sendVerificationEmail(email, user.fullName, verificationToken);
+        await sendVerificationEmail(email, user.fullName, verificationToken, user.preferredLanguage);
         res.json({ message: 'Verification email sent successfully' });
       } catch (error) {
         console.error('Error sending verification email:', error);
@@ -558,54 +566,65 @@ export const authController = {
   requestPasswordReset: async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-
+      
       if (!email) {
         return res.status(400).json(createError('Email is required'));
       }
 
       const user = await User.findOne({ email });
       if (!user) {
-        // For security reasons, we still return success even if the email doesn't exist
-        return res.json({ message: 'If an account exists with this email, you will receive a password reset link' });
+        // Don't reveal that email doesn't exist for security reasons
+        return res.json({ message: 'If your email exists in our system, you will receive a password reset link' });
       }
 
-      // Generate password reset token
+      // Generate reset token
       const resetToken = generatePasswordResetToken(email);
+      
+      // Save token and expiry time in user record
       user.resetPasswordToken = resetToken;
       user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
       await user.save();
 
       // Send password reset email
       try {
-        await sendPasswordResetEmail(email, user.fullName, resetToken);
-        res.json({ message: 'Password reset link sent successfully' });
+        await sendPasswordResetEmail(email, user.fullName, resetToken, user.preferredLanguage);
       } catch (error) {
         console.error('Error sending password reset email:', error);
-        res.status(500).json(createError('Error sending password reset email'));
+        // Don't fail request if email fails, but log it
       }
+
+      // Always return success for security (even if email fails)
+      res.json({ message: 'If your email exists in our system, you will receive a password reset link' });
     } catch (error) {
-      console.error('Request password reset error:', error);
+      console.error('Password reset request error:', error);
       res.status(500).json(createError('Error processing password reset request'));
     }
   },
 
   resetPassword: async (req: Request, res: Response) => {
     try {
-      const { token } = req.params;
-      const { password } = req.body;
-
-      if (!password) {
-        return res.status(400).json(createError('New password is required'));
+      const { token, password } = req.body;
+      
+      if (!token || !password) {
+        return res.status(400).json(createError('Token and password are required'));
       }
 
-      // Find user with valid reset token and token not expired
-      const user = await User.findOne({
+      if (password.length < 6) {
+        return res.status(400).json(createError('Password must be at least 6 characters'));
+      }
+
+      // Verify token to get email
+      const decoded = jwt.verify(token, JWT_SECRET) as { email: string };
+      
+      // Find user by email and token
+      const user = await User.findOne({ 
+        email: decoded.email,
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() }
       });
-
+      
       if (!user) {
-        return res.status(400).json(createError('Password reset token is invalid or has expired'));
+        return res.status(400).json(createError('Invalid or expired reset token'));
       }
 
       // Update password and clear reset token
@@ -614,18 +633,18 @@ export const authController = {
       user.resetPasswordExpires = undefined;
       await user.save();
 
-      // Send confirmation email
+      // Send password reset confirmation email
       try {
-        await sendPasswordResetConfirmationEmail(user.email, user.fullName);
+        await sendPasswordResetConfirmationEmail(user.email, user.fullName, user.preferredLanguage);
       } catch (error) {
         console.error('Error sending password reset confirmation email:', error);
-        // Don't block the password reset if email fails
+        // Don't fail reset if email fails, but log it
       }
 
-      res.json({ message: 'Password has been reset successfully' });
+      res.json({ message: 'Password reset successful. You can now log in with your new password.' });
     } catch (error) {
-      console.error('Reset password error:', error);
-      res.status(500).json(createError('Error resetting password'));
+      console.error('Password reset error:', error);
+      res.status(400).json(createError('Invalid or expired reset token'));
     }
   }
 };

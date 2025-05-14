@@ -24,6 +24,7 @@ interface PopulatedCourse extends Document {
     _id: mongoose.Types.ObjectId;
     fullName: string;
     email: string;
+    preferredLanguage?: string;
   };
 }
 
@@ -325,7 +326,7 @@ export const adminController = {
         return;
       }
 
-      const course = await Course.findById(id).populate('instructor', 'fullName email') as PopulatedCourse | null;
+      const course = await Course.findById(id).populate('instructor', 'fullName email preferredLanguage') as PopulatedCourse | null;
       if (!course) {
         res.status(404).json({ message: 'Course not found' });
         return;
@@ -353,7 +354,8 @@ export const adminController = {
             course.instructor.email,
             course.instructor.fullName,
             course.title,
-            course._id.toString()
+            course._id.toString(),
+            course.instructor.preferredLanguage || 'en'
           );
         } catch (error) {
           console.error('Error sending course approval notification:', error);
@@ -361,15 +363,16 @@ export const adminController = {
         }
       }
 
-      // Send notification and email to trainer if course is rejected (moved to draft)
+      // Send notification and email to trainer if course is rejected (moved from review to draft)
       if (status === 'draft' && previousStatus === 'review') {
         try {
           // Create notification
           await createNotification({
             recipient: course.instructor._id.toString(),
             type: 'course',
-            title: 'Course Rejected',
+            title: 'Course Needs Revision',
             message: `Your course "${course.title}" requires revisions before it can be published.`,
+            action: 'View Course',
             relatedId: course._id.toString()
           });
 
@@ -378,7 +381,8 @@ export const adminController = {
             course.instructor.email,
             course.instructor.fullName,
             course.title,
-            course._id.toString()
+            course._id.toString(),
+            course.instructor.preferredLanguage || 'en'
           );
         } catch (error) {
           console.error('Error sending course rejection notification:', error);
@@ -386,14 +390,17 @@ export const adminController = {
         }
       }
 
-      res.json({ message: 'Course status updated successfully', status });
+      res.json({
+        message: 'Course status updated successfully',
+        status
+      });
     } catch (error) {
       console.error('Update course status error:', error);
       if (error instanceof Error) {
         res.status(500).json({ message: error.message });
-        return;
+      } else {
+        res.status(500).json({ message: 'Error updating course status' });
       }
-      res.status(500).json({ message: 'Error updating course status' });
     }
   },
 
@@ -403,7 +410,7 @@ export const adminController = {
         return res.status(403).json({ message: 'Not authorized' });
       }
 
-      const { email, fullName, role, sendEmail = true } = req.body;
+      const { email, fullName, role, sendEmail = true, preferredLanguage = 'en' } = req.body;
 
       // Validate input
       if (!email || !fullName || !role) {
@@ -428,7 +435,8 @@ export const adminController = {
         role,
         isEmailVerified: true, // Since admin is creating the account
         status: 'active',
-        lastActive: new Date()
+        lastActive: new Date(),
+        preferredLanguage
       });
 
       await user.save();
@@ -439,7 +447,7 @@ export const adminController = {
 
       if (sendEmail) {
         try {
-          await sendWelcomeEmail(email, fullName, password);
+          await sendWelcomeEmail(email, fullName, password, user.preferredLanguage);
           emailSent = true;
         } catch (error) {
           console.error('Error sending welcome email:', error);
@@ -459,7 +467,8 @@ export const adminController = {
             .split(' ')
             .map(n => n[0])
             .join('')
-            .toUpperCase()
+            .toUpperCase(),
+          preferredLanguage: user.preferredLanguage
         },
         emailSent,
         emailError: emailError ? emailError.message : null
