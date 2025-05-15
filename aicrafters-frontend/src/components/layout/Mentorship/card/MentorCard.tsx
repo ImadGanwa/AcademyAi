@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Box, Typography, Button } from '@mui/material';
 import { VerifiedUser as VerifiedIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store';
+import { LoginPopup } from '../../../common/Popup/LoginPopup';
 
 // Types
 export interface MentorSkill {
@@ -231,7 +234,21 @@ const StyledLink = styled(Link)`
 
 export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
   const { lang } = useParams<{ lang: string }>();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   
+  const handleBookSession = () => {
+    if (isAuthenticated) {
+      // If user is logged in, proceed with the booking
+      window.location.href = `/${lang || 'en'}/mentorship/book/${mentor.id}`;
+    } else {
+      // Store the mentor ID in localStorage for redirection after login
+      localStorage.setItem('bookingMentorId', mentor.id);
+      // Show login popup
+      setShowLoginPopup(true);
+    }
+  };
+
   return (
     <CardContainer>
       <MentorImage imageUrl={mentor.profileImage} />
@@ -272,14 +289,19 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
                 ${mentor.hourlyRate}/hr
               </Typography>
             )}
-            <StyledLink to={`/${lang || 'en'}/mentorship/book/${mentor.id}`}>
-              <BookButton variant="contained">
-                Book a session
-              </BookButton>
-            </StyledLink>
+            <BookButton variant="contained" onClick={handleBookSession}>
+              Book a session
+            </BookButton>
           </Box>
         </ButtonContainer>
       </ContentContainer>
+
+      {showLoginPopup && (
+        <LoginPopup 
+          onClose={() => setShowLoginPopup(false)}
+          message="Please login to book a session with this mentor"
+        />
+      )}
     </CardContainer>
   );
 }; 

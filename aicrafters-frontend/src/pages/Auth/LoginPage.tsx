@@ -167,6 +167,16 @@ export const LoginPage: React.FC = () => {
           return;
         }
 
+        // Check if there's a mentor booking redirect
+        const bookingMentorId = localStorage.getItem('bookingMentorId');
+        if (bookingMentorId) {
+          localStorage.removeItem('bookingMentorId');
+          const currentLang = location.pathname.split('/')[1] || 'en';
+          navigate(`/mentorship/book/${bookingMentorId}`);
+          return;
+        }
+
+        // Normal dashboard redirect if no booking redirect
         let dashboardPath;
         switch (response.user.role) {
           case 'admin':
@@ -204,6 +214,15 @@ export const LoginPage: React.FC = () => {
       
       if (response.user) {
         toast.success(response.message || 'Successfully logged in with Google');
+        
+        // Check if there's a mentor booking redirect
+        const bookingMentorId = localStorage.getItem('bookingMentorId');
+        if (bookingMentorId) {
+          localStorage.removeItem('bookingMentorId');
+          const currentLang = location.pathname.split('/')[1] || 'en';
+          navigate(`/mentorship/book/${bookingMentorId}`);
+          return;
+        }
         
         // Determine dashboard path based on user role
         let dashboardPath;
@@ -251,6 +270,15 @@ export const LoginPage: React.FC = () => {
       
       if (response.user) {
         toast.success(t('auth.linkedinLoginSuccess'));
+        
+        // Check if there's a mentor booking redirect
+        const bookingMentorId = localStorage.getItem('bookingMentorId');
+        if (bookingMentorId) {
+          localStorage.removeItem('bookingMentorId');
+          const currentLang = location.pathname.split('/')[1] || 'en';
+          navigate(`/mentorship/book/${bookingMentorId}`);
+          return;
+        }
         
         // Determine dashboard path based on user role
         let dashboardPath;

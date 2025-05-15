@@ -3,6 +3,9 @@ import { Container, Typography, Grid, CircularProgress, Box, Alert, Button } fro
 import styled from 'styled-components';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout/Layout';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { LoginPopup } from '../../components/common/Popup/LoginPopup';
 
 // Import our components
 import { MentorInfoCard } from '../../components/layout/Mentorship/booking/Mentorbookingsuggestion';
@@ -53,17 +56,28 @@ const LoadingContainer = styled(Box)`
 const MentorshipBookSession: React.FC = () => {
   const { mentorId } = useParams<{ mentorId: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   
   // State for mentor data and loading status
   const [mentor, setMentor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   
   // Selected date and time state
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  
+  // Check authentication status on mount
+  useEffect(() => {
+    if (!isAuthenticated && mentorId) {
+      // Store mentorId for redirect after login
+      localStorage.setItem('bookingMentorId', mentorId);
+      setShowLoginPopup(true);
+    }
+  }, [isAuthenticated, mentorId]);
   
   // Fetch mentor profile on initial load
   useEffect(() => {
@@ -79,8 +93,8 @@ const MentorshipBookSession: React.FC = () => {
       
       try {
         const response = await getPublicMentorProfile(mentorId);
-        if (response && response.mentor) {
-          setMentor(response.mentor);
+        if (response && response.success && response.data) {
+          setMentor(response.data);
         } else {
           // Fallback to mock data for testing
           const mockMentor = mockMentors.find(m => m.id === mentorId);
@@ -144,6 +158,15 @@ const MentorshipBookSession: React.FC = () => {
   
   // Handler for booking submission
   const handleBookSession = (topic: string, message: string) => {
+    if (!isAuthenticated) {
+      // Store mentorId for redirect after login
+      if (mentorId) {
+        localStorage.setItem('bookingMentorId', mentorId);
+      }
+      setShowLoginPopup(true);
+      return;
+    }
+    
     if (!selectedDate || !selectedTime || !mentorId) return;
     
     // Format the start and end times
@@ -174,7 +197,7 @@ const MentorshipBookSession: React.FC = () => {
     navigate(`/mentorship/booking-confirmation`, {
       state: {
         mentorId,
-        mentorName: mentor?.name,
+        mentorName: mentor?.fullName,
         date: selectedDate.toISOString().split('T')[0],
         startTime,
         endTime,
@@ -182,6 +205,10 @@ const MentorshipBookSession: React.FC = () => {
         message
       }
     });
+  };
+  
+  const handleCloseLoginPopup = () => {
+    setShowLoginPopup(false);
   };
   
   if (loading) {
@@ -241,6 +268,13 @@ const MentorshipBookSession: React.FC = () => {
             />
           </SidePanel>
         </BookingContainer>
+        
+        {showLoginPopup && (
+          <LoginPopup 
+            onClose={handleCloseLoginPopup}
+            message="Please login to book a session with this mentor"
+          />
+        )}
       </PageContainer>
     </Layout>
   );
