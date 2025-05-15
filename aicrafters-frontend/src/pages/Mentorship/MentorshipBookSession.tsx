@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Grid, CircularProgress, Box, Alert, Button } from '@mui/material';
 import styled from 'styled-components';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { Layout } from '../../components/layout/Layout/Layout';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -70,12 +70,11 @@ const MentorshipBookSession: React.FC = () => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   
-  // Check authentication status on mount
+  // Store the mentorId for redirect after login when directly accessing the page
   useEffect(() => {
     if (!isAuthenticated && mentorId) {
       // Store mentorId for redirect after login
       localStorage.setItem('bookingMentorId', mentorId);
-      setShowLoginPopup(true);
     }
   }, [isAuthenticated, mentorId]);
   
@@ -158,15 +157,6 @@ const MentorshipBookSession: React.FC = () => {
   
   // Handler for booking submission
   const handleBookSession = (topic: string, message: string) => {
-    if (!isAuthenticated) {
-      // Store mentorId for redirect after login
-      if (mentorId) {
-        localStorage.setItem('bookingMentorId', mentorId);
-      }
-      setShowLoginPopup(true);
-      return;
-    }
-    
     if (!selectedDate || !selectedTime || !mentorId) return;
     
     // Format the start and end times
@@ -210,6 +200,12 @@ const MentorshipBookSession: React.FC = () => {
   const handleCloseLoginPopup = () => {
     setShowLoginPopup(false);
   };
+  
+  // If user is not authenticated, redirect to login page
+  if (!isAuthenticated) {
+    const currentLang = window.location.pathname.split('/')[1] || 'en';
+    return <Navigate to={`/${currentLang}/login`} replace />;
+  }
   
   if (loading) {
     return (
