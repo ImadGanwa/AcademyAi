@@ -27,6 +27,7 @@ import {
   useTheme,
   Tooltip,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import styled from 'styled-components';
 import InfoIcon from '@mui/icons-material/Info';
@@ -36,6 +37,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import { getMentorAvailability, updateMentorAvailability } from '../../../../api/mentor';
 
 const Container = styled(Paper)`
   padding: 24px;
@@ -258,6 +260,67 @@ const CellClickIndicator = styled(Box)`
   }
 `;
 
+// Modified AvailabilitySlot interface to include weekKey
+interface AvailabilitySlot {
+  day: number; // 0-6 (Sunday-Saturday)
+  startTime: string; // HH:MM format
+  endTime: string; // HH:MM format
+  weekKey?: string; // YYYY-MM-DD format to identify the week
+}
+
+// Day mapping for conversion between weekday names and numbers
+const dayNameToNumber: { [key: string]: number } = {
+  'Monday': 1,
+  'Tuesday': 2,
+  'Wednesday': 3,
+  'Thursday': 4,
+  'Friday': 5,
+  'Saturday': 6,
+  'Sunday': 0
+};
+
+const dayNumberToName: { [key: number]: string } = {
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday',
+  0: 'Sunday'
+};
+
+// Function to convert 12-hour format to 24-hour format
+const convert12To24Hour = (time12h: string): string => {
+  const [time, modifier] = time12h.split(' ');
+  let [hours, minutes] = time.split(':');
+  
+  if (hours === '12') {
+    hours = '00';
+  }
+  
+  if (modifier === 'PM') {
+    hours = (parseInt(hours, 10) + 12).toString();
+  }
+  
+  return `${hours.padStart(2, '0')}:${minutes}`;
+};
+
+// Function to convert 24-hour format to 12-hour format
+const convert24To12Hour = (time24h: string): string => {
+  const [hours, minutes] = time24h.split(':');
+  const hour = parseInt(hours, 10);
+  
+  if (hour === 0) {
+    return `12:${minutes} AM`;
+  } else if (hour < 12) {
+    return `${hour}:${minutes} AM`;
+  } else if (hour === 12) {
+    return `12:${minutes} PM`;
+  } else {
+    return `${hour - 12}:${minutes} PM`;
+  }
+};
+
 export const Availability: React.FC = () => {
   const theme = useTheme();
   const [timeZone, setTimeZone] = useState('Casablanca (GMT+1)');
@@ -276,6 +339,10 @@ export const Availability: React.FC = () => {
     smallGroup: false,
     officeHours: false,
   });
+  
+  // Loading states
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Drag and drop state
   const [isDragging, setIsDragging] = useState(false);
@@ -307,19 +374,29 @@ export const Availability: React.FC = () => {
     return firstDayOfWeek.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   };
 
+  // Get availability for a specific week
+  const getWeekAvailability = (weekKey: string): {[key: string]: boolean} => {
+    return availabilityByWeek[weekKey] || {};
+  };
+
   // Get current week's availability slots
   const getCurrentWeekAvailability = (): {[key: string]: boolean} => {
     const weekKey = getCurrentWeekKey();
-    return availabilityByWeek[weekKey] || {};
+    return getWeekAvailability(weekKey);
+  };
+
+  // Update availability for a specific week
+  const updateWeekAvailability = (weekKey: string, newSlots: {[key: string]: boolean}) => {
+    setAvailabilityByWeek(prev => ({
+      ...prev,
+      [weekKey]: newSlots
+    }));
   };
 
   // Update current week's availability
   const updateCurrentWeekAvailability = (newSlots: {[key: string]: boolean}) => {
     const weekKey = getCurrentWeekKey();
-    setAvailabilityByWeek(prev => ({
-      ...prev,
-      [weekKey]: newSlots
-    }));
+    updateWeekAvailability(weekKey, newSlots);
   };
 
   // Handle time zone change
@@ -591,12 +668,252 @@ export const Availability: React.FC = () => {
     setSnackbarOpen(false);
   };
 
-  // Save availability handler
-  const handleSaveAvailability = () => {
-    // In a real app, you would save to the backend here
-    setSnackbarMessage('Availability saved successfully!');
-    setSnackbarSeverity('success');
-    setSnackbarOpen(true);
+  // Get availability from backend on component mount
+  useEffect(() => {
+    fetchMentorAvailability();
+  }, []);
+
+  // Fetch mentor availability from backend
+  const fetchMentorAvailability = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getMentorAvailability();
+      
+      console.log('Fetched availability response:', response);
+      
+      // Extract availability data from the response structure
+      const availabilityData = response?.data?.availability || [];
+      
+      if (Array.isArray(availabilityData)) {
+        // Create a map to store availability by week
+        const allWeeksAvailability: {[weekKey: string]: {[slotKey: string]: boolean}} = {};
+        
+        availabilityData.forEach((slot: AvailabilitySlot) => {
+          const day = dayNumberToName[slot.day];
+          if (!day) {
+            console.warn('Unknown day number:', slot.day);
+            return;
+          }
+          
+          // Convert time format
+          const startTime12h = convert24To12Hour(slot.startTime);
+          const endTime12h = convert24To12Hour(slot.endTime);
+          
+          console.log(`Converting slot: Day ${slot.day} (${day}), Start: ${slot.startTime} (${startTime12h}), End: ${slot.endTime} (${endTime12h}), Week: ${slot.weekKey || 'current'}`);
+          
+          // Find all timeslots between start and end time
+          const startIndex = timeSlots.indexOf(startTime12h);
+          const endIndex = timeSlots.indexOf(endTime12h);
+          
+          console.log(`Start index: ${startIndex}, End index: ${endIndex}`);
+          
+          if (startIndex !== -1 && endIndex !== -1) {
+            // Determine which week this slot belongs to
+            let weekKey = slot.weekKey || getCurrentWeekKey();
+            
+            // Initialize the week if not already in the map
+            if (!allWeeksAvailability[weekKey]) {
+              allWeeksAvailability[weekKey] = {};
+            }
+            
+            // Add all individual time slots to that week
+            for (let i = startIndex; i < endIndex; i++) {
+              const key = `${day}-${timeSlots[i]}`;
+              allWeeksAvailability[weekKey][key] = true;
+            }
+          }
+        });
+        
+        console.log('Created availability map by weeks:', allWeeksAvailability);
+        
+        // Update the state with all weeks' availability
+        setAvailabilityByWeek(allWeeksAvailability);
+      } else {
+        console.warn('Received non-array availability data:', availabilityData);
+      }
+    } catch (error) {
+      console.error('Error fetching mentor availability:', error);
+      setSnackbarMessage('Failed to fetch availability. Please try again.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Save availability to backend
+  const handleSaveAvailability = async () => {
+    try {
+      setIsSaving(true);
+      
+      // Get the current week key
+      const weekKey = getCurrentWeekKey();
+      
+      // Convert our frontend format to backend format for current week
+      const currentAvailability = getCurrentWeekAvailability();
+      let availabilitySlots: AvailabilitySlot[] = [];
+      
+      // Create a map to group slots by day
+      const slotsByDay: { [key: string]: { times: string[] } } = {};
+      
+      // Group slots by day
+      Object.keys(currentAvailability).forEach(key => {
+        if (currentAvailability[key]) {
+          const [day, time] = key.split('-');
+          if (!slotsByDay[day]) {
+            slotsByDay[day] = { times: [] };
+          }
+          slotsByDay[day].times.push(time);
+        }
+      });
+      
+      // Process each day to create continuous slots
+      Object.keys(slotsByDay).forEach(day => {
+        const { times } = slotsByDay[day];
+        
+        // Sort times
+        times.sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
+        
+        let startSlot: string | null = null;
+        let prevSlotIndex = -1;
+        
+        times.forEach(time => {
+          const currentSlotIndex = timeSlots.indexOf(time);
+          
+          // Start a new slot if we don't have one or if there's a gap
+          if (startSlot === null || currentSlotIndex !== prevSlotIndex + 1) {
+            // If we had a slot, save it
+            if (startSlot !== null) {
+              // The end time is the next time slot after the last included slot
+              const endTimeIndex = prevSlotIndex + 1;
+              const endTime = endTimeIndex < timeSlots.length ? timeSlots[endTimeIndex] : null;
+              
+              if (endTime) {
+                availabilitySlots.push({
+                  day: dayNameToNumber[day],
+                  startTime: convert12To24Hour(startSlot),
+                  endTime: convert12To24Hour(endTime),
+                  weekKey: weekKey // Store the week key
+                });
+              }
+            }
+            
+            // Start a new slot
+            startSlot = time;
+          }
+          
+          prevSlotIndex = currentSlotIndex;
+        });
+        
+        // Handle the last slot if there is one
+        if (startSlot !== null) {
+          const endTimeIndex = prevSlotIndex + 1;
+          const endTime = endTimeIndex < timeSlots.length ? timeSlots[endTimeIndex] : null;
+          
+          if (endTime) {
+            availabilitySlots.push({
+              day: dayNameToNumber[day],
+              startTime: convert12To24Hour(startSlot),
+              endTime: convert12To24Hour(endTime),
+              weekKey: weekKey // Store the week key
+            });
+          }
+        }
+      });
+      
+      // Include availability from other weeks as well
+      Object.keys(availabilityByWeek).forEach(otherWeekKey => {
+        // Skip current week as we already processed it
+        if (otherWeekKey === weekKey) return;
+        
+        const weekAvailability = availabilityByWeek[otherWeekKey];
+        if (!weekAvailability || Object.keys(weekAvailability).length === 0) return;
+        
+        // Create a map to group slots by day for this week
+        const otherWeekSlotsByDay: { [key: string]: { times: string[] } } = {};
+        
+        // Group slots by day
+        Object.keys(weekAvailability).forEach(key => {
+          if (weekAvailability[key]) {
+            const [day, time] = key.split('-');
+            if (!otherWeekSlotsByDay[day]) {
+              otherWeekSlotsByDay[day] = { times: [] };
+            }
+            otherWeekSlotsByDay[day].times.push(time);
+          }
+        });
+        
+        // Process each day for this week
+        Object.keys(otherWeekSlotsByDay).forEach(day => {
+          const { times } = otherWeekSlotsByDay[day];
+          
+          // Sort times
+          times.sort((a, b) => timeSlots.indexOf(a) - timeSlots.indexOf(b));
+          
+          let startSlot: string | null = null;
+          let prevSlotIndex = -1;
+          
+          times.forEach(time => {
+            const currentSlotIndex = timeSlots.indexOf(time);
+            
+            // Start a new slot if we don't have one or if there's a gap
+            if (startSlot === null || currentSlotIndex !== prevSlotIndex + 1) {
+              // If we had a slot, save it
+              if (startSlot !== null) {
+                // The end time is the next time slot after the last included slot
+                const endTimeIndex = prevSlotIndex + 1;
+                const endTime = endTimeIndex < timeSlots.length ? timeSlots[endTimeIndex] : null;
+                
+                if (endTime) {
+                  availabilitySlots.push({
+                    day: dayNameToNumber[day],
+                    startTime: convert12To24Hour(startSlot),
+                    endTime: convert12To24Hour(endTime),
+                    weekKey: otherWeekKey // Store the week key
+                  });
+                }
+              }
+              
+              // Start a new slot
+              startSlot = time;
+            }
+            
+            prevSlotIndex = currentSlotIndex;
+          });
+          
+          // Handle the last slot if there is one
+          if (startSlot !== null) {
+            const endTimeIndex = prevSlotIndex + 1;
+            const endTime = endTimeIndex < timeSlots.length ? timeSlots[endTimeIndex] : null;
+            
+            if (endTime) {
+              availabilitySlots.push({
+                day: dayNameToNumber[day],
+                startTime: convert12To24Hour(startSlot),
+                endTime: convert12To24Hour(endTime),
+                weekKey: otherWeekKey // Store the week key
+              });
+            }
+          }
+        });
+      });
+      
+      console.log('Saving availability slots with week information:', availabilitySlots);
+      
+      // Call API to update availability - pass exactly what the backend expects
+      await updateMentorAvailability({ availability: availabilitySlots });
+      
+      setSnackbarMessage('Availability saved successfully!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Error saving mentor availability:', error);
+      setSnackbarMessage('Failed to save availability. Please try again.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Format date for display
@@ -660,271 +977,290 @@ export const Availability: React.FC = () => {
 
   return (
     <Box>
-      <Container>
-        <SectionTitle variant="h5">
-          Set Your Availability
-        </SectionTitle>
-        <SectionDescription variant="body1">
-          Define when you're available for mentorship sessions. You can adjust these settings anytime.
-        </SectionDescription>
-
-        <FormRow>
-          <FormLabel>Time Zone:</FormLabel>
-          <FormControl sx={{ minWidth: 240 }}>
-            <Select
-              value={timeZone}
-              onChange={handleTimeZoneChange}
-              displayEmpty
-              size="small"
-            >
-              <MenuItem value="Casablanca (GMT+1)">Casablanca (GMT+1)</MenuItem>
-              <MenuItem value="London (GMT+0)">London (GMT+0)</MenuItem>
-              <MenuItem value="New York (GMT-5)">New York (GMT-5)</MenuItem>
-              <MenuItem value="Los Angeles (GMT-8)">Los Angeles (GMT-8)</MenuItem>
-              <MenuItem value="Tokyo (GMT+9)">Tokyo (GMT+9)</MenuItem>
-            </Select>
-          </FormControl>
-        </FormRow>
-
-        <SectionTitle variant="h6">
-          Session Duration
-        </SectionTitle>
-        
-        <FormRow>
-          <FormLabel>Default session length:</FormLabel>
-          <FormControl sx={{ minWidth: 240 }}>
-            <Select
-              value={sessionDuration}
-              onChange={handleSessionDurationChange}
-              displayEmpty
-              size="small"
-            >
-              <MenuItem value="15 minutes">15 minutes</MenuItem>
-              <MenuItem value="30 minutes">30 minutes</MenuItem>
-              <MenuItem value="45 minutes">45 minutes</MenuItem>
-              <MenuItem value="60 minutes">1 hour</MenuItem>
-              <MenuItem value="90 minutes">1.5 hours</MenuItem>
-            </Select>
-          </FormControl>
-        </FormRow>
-
-        <SectionTitle variant="h6">
-          Weekly Schedule Configuration
-        </SectionTitle>
-        
-        {/* Week Selector */}
-        <WeekSelectorContainer>
-          <Tooltip title="Previous Week">
-            <WeekNavigationButton onClick={handlePreviousWeek}>
-              <ArrowBackIosNewIcon fontSize="small" />
-            </WeekNavigationButton>
-          </Tooltip>
-          
-          <WeekDisplay variant="body1">
-            <CalendarTodayIcon fontSize="small" />
-            {formatDateRange(currentWeek)}
-          </WeekDisplay>
-          
-          <Tooltip title="Next Week">
-            <WeekNavigationButton onClick={handleNextWeek}>
-              <ArrowForwardIosIcon fontSize="small" />
-            </WeekNavigationButton>
-          </Tooltip>
-          
-          <Button 
-            size="small" 
-            onClick={handleCurrentWeek} 
-            sx={{ ml: 2, fontSize: '0.8rem' }}
-          >
-            Current Week
-          </Button>
-        </WeekSelectorContainer>
-        
-        <TimeRangeContainer>
-          <FormLabel>Start Time:</FormLabel>
-          <FormControl sx={{ width: 140 }}>
-            <Select
-              value={startTime}
-              onChange={handleStartTimeChange}
-              displayEmpty
-              size="small"
-            >
-              {timeSlots.map((time) => (
-                <MenuItem key={time} value={time}>{time}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
-          <FormLabel>End Time:</FormLabel>
-          <FormControl sx={{ width: 140 }}>
-            <Select
-              value={endTime}
-              onChange={handleEndTimeChange}
-              displayEmpty
-              size="small"
-            >
-              {timeSlots.map((time) => (
-                <MenuItem key={time} value={time}>{time}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          
-          {updateRangeSuccess ? (
-            <UpdateButtonSuccess variant="contained">
-              Updated!
-            </UpdateButtonSuccess>
-          ) : (
-            <UpdateButton 
-              variant="contained" 
-              onClick={handleUpdateTimeRange}
-            >
-              Update Time Range
-            </UpdateButton>
-          )}
-        </TimeRangeContainer>
-        
-        <Box display="flex" alignItems="center" mb={3}>
-          <RadioGroup 
-            row 
-            value={weekdayOption} 
-            onChange={handleWeekdayOptionChange}
-          >
-            <RadioOption>
-              <Radio value="weekdays" />
-              <Typography variant="body2">Apply to all weekdays (Mon-Fri)</Typography>
-            </RadioOption>
-            <RadioOption>
-              <Radio value="alldays" />
-              <Typography variant="body2">Apply to entire week (Mon-Sun)</Typography>
-            </RadioOption>
-          </RadioGroup>
-          
-          <ClearButton 
-            variant="text" 
-            color="error" 
-            onClick={handleClearAllSlots}
-          >
-            Clear All Slots
-          </ClearButton>
-        </Box>
-        
-        <LegendContainer>
-          <LegendItem>
-            <ColorBox $color="rgba(63, 81, 181, 0.35)" />
-            <Typography variant="body2">Available</Typography>
-          </LegendItem>
-          <LegendItem>
-            <ColorBox $color="transparent" />
-            <Typography variant="body2">Unavailable</Typography>
-          </LegendItem>
-          <LegendItem>
-            <DragIndicatorIcon fontSize="small" color="action" />
-            <Typography variant="body2">Drag to select multiple slots</Typography>
-          </LegendItem>
-        </LegendContainer>
-        
-        <TableContainer sx={{ position: 'relative' }}>
-          {clickedCell && clickAnimating && (
-            <CellClickIndicator 
-              className={clickAnimating ? 'animate' : ''}
-              sx={{ 
-                top: getCellPosition(clickedCell)?.top, 
-                left: getCellPosition(clickedCell)?.left 
-              }}
-            />
-          )}
-          
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ border: 'none', width: '100px' }}></TableCell>
-                {weekdays.map((day) => (
-                  <WeekdayCell key={day}>{day}</WeekdayCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {timeSlots.map((time) => (
-                <TableRow key={time}>
-                  <TimeCell>{time}</TimeCell>
-                  {weekdays.map((day) => {
-                    const cellKey = `${day}-${time}`;
-                    const isSelected = currentlyDraggedCells.includes(cellKey);
-                    
-                    return (
-                      <ScheduleCell 
-                        id={`cell-${cellKey}`}
-                        key={cellKey}
-                        $available={currentWeekAvailability[cellKey]}
-                        $selecting={isSelected && selectingState === true}
-                        $dragging={isSelected && selectingState === false}
-                        onClick={(e) => handleCellClick(day, time, e as React.MouseEvent)}
-                        onMouseDown={(e) => handleMouseDown(day, time, e as React.MouseEvent)}
-                        onMouseEnter={() => handleMouseEnter(day, time)}
-                      />
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        
-        <InfoCircle>
-          <InfoIcon fontSize="small" />
-          <Typography variant="body2">
-            Click on a slot to toggle availability, or click and drag to select multiple slots at once.
+      {isLoading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+          <CircularProgress />
+          <Typography variant="body1" sx={{ ml: 2 }}>
+            Loading your availability...
           </Typography>
-        </InfoCircle>
-      </Container>
+        </Box>
+      ) : (
+        <>
+          <Container>
+            <SectionTitle variant="h5">
+              Set Your Availability
+            </SectionTitle>
+            <SectionDescription variant="body1">
+              Define when you're available for mentorship sessions. You can adjust these settings anytime.
+            </SectionDescription>
 
-      <Container>
-        <SectionTitle variant="h6">
-          What mentorship format do you accept?
-        </SectionTitle>
-        
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={mentorshipFormats.oneOnOne}
-                onChange={() => handleMentorshipFormatChange('oneOnOne')}
-              />
-            }
-            label="1-on-1 Sessions"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={mentorshipFormats.smallGroup}
-                onChange={() => handleMentorshipFormatChange('smallGroup')}
-              />
-            }
-            label="Small Group (2-3 mentees)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox 
-                checked={mentorshipFormats.officeHours}
-                onChange={() => handleMentorshipFormatChange('officeHours')}
-              />
-            }
-            label="Office Hours (Drop-in)"
-          />
-        </FormGroup>
-      </Container>
+            <FormRow>
+              <FormLabel>Time Zone:</FormLabel>
+              <FormControl sx={{ minWidth: 240 }}>
+                <Select
+                  value={timeZone}
+                  onChange={handleTimeZoneChange}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="Casablanca (GMT+1)">Casablanca (GMT+1)</MenuItem>
+                  <MenuItem value="London (GMT+0)">London (GMT+0)</MenuItem>
+                  <MenuItem value="New York (GMT-5)">New York (GMT-5)</MenuItem>
+                  <MenuItem value="Los Angeles (GMT-8)">Los Angeles (GMT-8)</MenuItem>
+                  <MenuItem value="Tokyo (GMT+9)">Tokyo (GMT+9)</MenuItem>
+                </Select>
+              </FormControl>
+            </FormRow>
 
-      <ButtonContainer>
-        <CancelButton variant="outlined">
-          Cancel
-        </CancelButton>
-        <SaveButton 
-          variant="contained"
-          onClick={handleSaveAvailability}
-        >
-          Save Availability
-        </SaveButton>
-      </ButtonContainer>
+            <SectionTitle variant="h6">
+              Session Duration
+            </SectionTitle>
+            
+            <FormRow>
+              <FormLabel>Default session length:</FormLabel>
+              <FormControl sx={{ minWidth: 240 }}>
+                <Select
+                  value={sessionDuration}
+                  onChange={handleSessionDurationChange}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="15 minutes">15 minutes</MenuItem>
+                  <MenuItem value="30 minutes">30 minutes</MenuItem>
+                  <MenuItem value="45 minutes">45 minutes</MenuItem>
+                  <MenuItem value="60 minutes">1 hour</MenuItem>
+                  <MenuItem value="90 minutes">1.5 hours</MenuItem>
+                </Select>
+              </FormControl>
+            </FormRow>
+
+            <SectionTitle variant="h6">
+              Weekly Schedule Configuration
+            </SectionTitle>
+            
+            {/* Week Selector */}
+            <WeekSelectorContainer>
+              <Tooltip title="Previous Week">
+                <WeekNavigationButton onClick={handlePreviousWeek}>
+                  <ArrowBackIosNewIcon fontSize="small" />
+                </WeekNavigationButton>
+              </Tooltip>
+              
+              <WeekDisplay variant="body1">
+                <CalendarTodayIcon fontSize="small" />
+                {formatDateRange(currentWeek)}
+              </WeekDisplay>
+              
+              <Tooltip title="Next Week">
+                <WeekNavigationButton onClick={handleNextWeek}>
+                  <ArrowForwardIosIcon fontSize="small" />
+                </WeekNavigationButton>
+              </Tooltip>
+              
+              <Button 
+                size="small" 
+                onClick={handleCurrentWeek} 
+                sx={{ ml: 2, fontSize: '0.8rem' }}
+              >
+                Current Week
+              </Button>
+            </WeekSelectorContainer>
+            
+            <TimeRangeContainer>
+              <FormLabel>Start Time:</FormLabel>
+              <FormControl sx={{ width: 140 }}>
+                <Select
+                  value={startTime}
+                  onChange={handleStartTimeChange}
+                  displayEmpty
+                  size="small"
+                >
+                  {timeSlots.map((time) => (
+                    <MenuItem key={time} value={time}>{time}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              
+              <FormLabel>End Time:</FormLabel>
+              <FormControl sx={{ width: 140 }}>
+                <Select
+                  value={endTime}
+                  onChange={handleEndTimeChange}
+                  displayEmpty
+                  size="small"
+                >
+                  {timeSlots.map((time) => (
+                    <MenuItem key={time} value={time}>{time}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              
+              {updateRangeSuccess ? (
+                <UpdateButtonSuccess variant="contained">
+                  Updated!
+                </UpdateButtonSuccess>
+              ) : (
+                <UpdateButton 
+                  variant="contained" 
+                  onClick={handleUpdateTimeRange}
+                >
+                  Update Time Range
+                </UpdateButton>
+              )}
+            </TimeRangeContainer>
+            
+            <Box display="flex" alignItems="center" mb={3}>
+              <RadioGroup 
+                row 
+                value={weekdayOption} 
+                onChange={handleWeekdayOptionChange}
+              >
+                <RadioOption>
+                  <Radio value="weekdays" />
+                  <Typography variant="body2">Apply to all weekdays (Mon-Fri)</Typography>
+                </RadioOption>
+                <RadioOption>
+                  <Radio value="alldays" />
+                  <Typography variant="body2">Apply to entire week (Mon-Sun)</Typography>
+                </RadioOption>
+              </RadioGroup>
+              
+              <ClearButton 
+                variant="text" 
+                color="error" 
+                onClick={handleClearAllSlots}
+              >
+                Clear All Slots
+              </ClearButton>
+            </Box>
+            
+            <LegendContainer>
+              <LegendItem>
+                <ColorBox $color="rgba(63, 81, 181, 0.35)" />
+                <Typography variant="body2">Available</Typography>
+              </LegendItem>
+              <LegendItem>
+                <ColorBox $color="transparent" />
+                <Typography variant="body2">Unavailable</Typography>
+              </LegendItem>
+              <LegendItem>
+                <DragIndicatorIcon fontSize="small" color="action" />
+                <Typography variant="body2">Drag to select multiple slots</Typography>
+              </LegendItem>
+            </LegendContainer>
+            
+            <TableContainer sx={{ position: 'relative' }}>
+              {clickedCell && clickAnimating && (
+                <CellClickIndicator 
+                  className={clickAnimating ? 'animate' : ''}
+                  sx={{ 
+                    top: getCellPosition(clickedCell)?.top, 
+                    left: getCellPosition(clickedCell)?.left 
+                  }}
+                />
+              )}
+              
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ border: 'none', width: '100px' }}></TableCell>
+                    {weekdays.map((day) => (
+                      <WeekdayCell key={day}>{day}</WeekdayCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {timeSlots.map((time) => (
+                    <TableRow key={time}>
+                      <TimeCell>{time}</TimeCell>
+                      {weekdays.map((day) => {
+                        const cellKey = `${day}-${time}`;
+                        const isSelected = currentlyDraggedCells.includes(cellKey);
+                        
+                        return (
+                          <ScheduleCell 
+                            id={`cell-${cellKey}`}
+                            key={cellKey}
+                            $available={currentWeekAvailability[cellKey]}
+                            $selecting={isSelected && selectingState === true}
+                            $dragging={isSelected && selectingState === false}
+                            onClick={(e) => handleCellClick(day, time, e as React.MouseEvent)}
+                            onMouseDown={(e) => handleMouseDown(day, time, e as React.MouseEvent)}
+                            onMouseEnter={() => handleMouseEnter(day, time)}
+                          />
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            
+            <InfoCircle>
+              <InfoIcon fontSize="small" />
+              <Typography variant="body2">
+                Click on a slot to toggle availability, or click and drag to select multiple slots at once.
+              </Typography>
+            </InfoCircle>
+          </Container>
+
+          <Container>
+            <SectionTitle variant="h6">
+              What mentorship format do you accept?
+            </SectionTitle>
+            
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={mentorshipFormats.oneOnOne}
+                    onChange={() => handleMentorshipFormatChange('oneOnOne')}
+                  />
+                }
+                label="1-on-1 Sessions"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={mentorshipFormats.smallGroup}
+                    onChange={() => handleMentorshipFormatChange('smallGroup')}
+                  />
+                }
+                label="Small Group (2-3 mentees)"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox 
+                    checked={mentorshipFormats.officeHours}
+                    onChange={() => handleMentorshipFormatChange('officeHours')}
+                  />
+                }
+                label="Office Hours (Drop-in)"
+              />
+            </FormGroup>
+          </Container>
+
+          <ButtonContainer>
+            <CancelButton variant="outlined">
+              Cancel
+            </CancelButton>
+            <SaveButton 
+              variant="contained"
+              onClick={handleSaveAvailability}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                  Saving...
+                </>
+              ) : (
+                'Save Availability'
+              )}
+            </SaveButton>
+          </ButtonContainer>
+        </>
+      )}
 
       <Snackbar
         open={snackbarOpen}

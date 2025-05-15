@@ -9,23 +9,34 @@ import { useParams } from 'react-router-dom';
 export interface MentorSkill {
   id: string;
   name: string;
+  _id?: string; // Backend includes this in response
 }
 
 export interface MentorLanguage {
   id: string;
   name: string;
+  _id?: string; // Backend includes this in response
+}
+
+export interface MentorStats {
+  rating: number;
+  reviewsCount: number;
+  menteesCount: number;
+  sessionsCount: number;
 }
 
 export interface Mentor {
   id: string;
-  name: string;
+  fullName: string; // Changed from name to fullName to match API
+  profileImage: string | null; // Changed from imageUrl to profileImage to match API
   title: string;
-  description: string;
-  imageUrl: string;
-  isVerified: boolean;
-  countryFlag: string;
+  bio: string; // Changed from description to bio to match API
+  hourlyRate: number; // Added from API response
   skills: MentorSkill[];
   languages: MentorLanguage[];
+  stats?: MentorStats; // Added from API response
+  isVerified?: boolean; // Made optional as it might not be in API
+  countryFlag?: string; // Made optional as it might not be in API
 }
 
 const CardContainer = styled(Box)`
@@ -45,10 +56,10 @@ const CardContainer = styled(Box)`
   }
 `;
 
-const MentorImage = styled(Box)<{ imageUrl: string }>`
+const MentorImage = styled(Box)<{ imageUrl: string | null }>`
   width: 220px;
   height: 220px;
-  background-image: url(${props => props.imageUrl});
+  background-image: url(${props => props.imageUrl || '/avatars/default-avatar.png'});
   background-size: cover;
   background-position: center;
   border-radius: 12px;
@@ -223,43 +234,50 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
   
   return (
     <CardContainer>
-      <MentorImage imageUrl={mentor.imageUrl} />
+      <MentorImage imageUrl={mentor.profileImage} />
       <ContentContainer>
         <HeaderSection>
           <NameContainer>
             <Name variant="body1">
-              {mentor.name}
+              {mentor.fullName}
               {mentor.isVerified && <VerifiedBadge />}
-              <CountryFlag src={mentor.countryFlag} alt="Country flag" />
+              {mentor.countryFlag && <CountryFlag src={mentor.countryFlag} alt="Country flag" />}
             </Name>
           </NameContainer>
           <Title>{mentor.title}</Title>
           
           <SkillsContainer>
             {mentor.skills.map(skill => (
-              <SkillTag key={skill.id}>
+              <SkillTag key={skill.id || skill._id}>
                 {skill.name}
               </SkillTag>
             ))}
           </SkillsContainer>
           
           <Description>
-            {mentor.description}
+            {mentor.bio}
           </Description>
         </HeaderSection>
         <Box sx={{ padding: '10px 0' }} />
         
         <ButtonContainer>
           <LanguagesContainer>
-            {mentor.languages.map(language => (
-              <Language key={language.id}>{language.name}</Language>
+            {mentor.languages?.map(language => (
+              <Language key={language.id || language._id}>{language.name}</Language>
             ))}
           </LanguagesContainer>
-          <StyledLink to={`/${lang || 'en'}/mentorship/book/${mentor.id}`}>
-            <BookButton variant="contained">
-              Book a session
-            </BookButton>
-          </StyledLink>
+          <Box display="flex" alignItems="center" gap={2}>
+            {mentor.hourlyRate && (
+              <Typography variant="h6" fontWeight="bold" color="primary">
+                ${mentor.hourlyRate}/hr
+              </Typography>
+            )}
+            <StyledLink to={`/${lang || 'en'}/mentorship/book/${mentor.id}`}>
+              <BookButton variant="contained">
+                Book a session
+              </BookButton>
+            </StyledLink>
+          </Box>
         </ButtonContainer>
       </ContentContainer>
     </CardContainer>

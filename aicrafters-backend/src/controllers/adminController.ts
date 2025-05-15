@@ -1,11 +1,13 @@
+import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import { User } from '../models/User';
 import { Course, ICourse } from '../models/Course';
 import { Category } from '../models/Category';
-import { sendWelcomeEmail, sendCourseApprovalEmail, sendCourseRejectionEmail } from '../utils/email';
+import { MentorApplication } from '../models/MentorApplication';
+import { sendWelcomeEmail, sendCourseApprovalEmail, sendCourseRejectionEmail, sendMentorApprovalEmail, sendMentorRejectionEmail, sendMentorWelcomeEmail } from '../utils/email';
 import { parseExcelUsers } from '../utils/excelParser';
 import { createNotification } from './notificationController';
-import mongoose, { Document } from 'mongoose';
+import { Document } from 'mongoose';
 import bcryptjs from 'bcryptjs';
 import { Organization } from '../models/Organization';
 import { generateRandomPassword } from '../utils/passwordGenerator';
@@ -884,6 +886,200 @@ export const adminController = {
     } catch (error) {
       console.error('Remove course from category error:', error);
       res.status(500).json({ message: 'Error removing course from category' });
+    }
+  },
+
+  /**
+   * Get all mentor applications
+   * @route GET /api/admin/mentor-applications
+   */
+  getMentorApplications: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const applications = await MentorApplication.find().sort({ appliedAt: -1 });
+      
+      res.status(200).json({
+        success: true,
+        data: {
+          applications,
+          count: applications.length
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching mentor applications:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'An error occurred while fetching mentor applications'
+      });
+    }
+  },
+
+  /**
+   * Update mentor application status
+   * @route PUT /api/admin/mentor-applications/:id
+   */
+  updateMentorApplicationStatus: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { status, adminNotes } = req.body;
+      
+      // Validate status
+      if (!status || !['approved', 'rejected'].includes(status)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid status. Status must be either "approved" or "rejected"'
+        });
+        return;
+      }
+      
+      // Find and update the application
+      const application = await MentorApplication.findByIdAndUpdate(
+        id,
+        { 
+          status,
+          ...(adminNotes && { adminNotes }),
+          reviewedAt: new Date()
+        },
+        { new: true }
+      );
+      
+      if (!application) {
+        res.status(404).json({
+          success: false,
+          error: 'Mentor application not found'
+        });
+        return;
+      }
+      
+      // If application is approved, create or update the user account
+      if (status === 'approved') {
+        try {
+          // Check if a user already exists with this email
+          let user = await User.findOne({ email: application.email });
+          let generatedPassword = null;
+          
+          if (user) {
+            // Update existing user to add mentor role and profile
+            user.role = 'mentor';
+            
+            // Initialize mentor profile with application data
+            user.mentorProfile = {
+              title: application.professionalInfo?.role || 'Professional Mentor',
+              bio: application.bio,
+              hourlyRate: application.hourlyRate,
+              skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
+              languages: application.languages.map(name => ({ id: String(Math.random()), name })),
+              education: [],
+              experience: [],
+              availability: [],
+              socialLinks: {
+                linkedin: application.professionalInfo?.linkedIn || '',
+              },
+              isVerified: true,
+              menteesCount: 0,
+              sessionsCount: 0,
+              mentorRating: 0,
+              mentorReviewsCount: 0,
+              appliedAt: application.appliedAt,
+              approvedAt: new Date()
+            };
+            
+            await user.save();
+            console.log('Updated existing user to mentor role:', user.email);
+            
+            // Send approval email to existing user
+            await sendMentorApprovalEmail(application.email, application.fullName);
+          } else {
+            // Create a new user with the mentor role
+            generatedPassword = generateRandomPassword();
+            console.log('Generated password for new mentor:', generatedPassword); // For debugging only, remove in production
+            
+            // We'll create the user directly without using bcrypt here
+            // The pre-save middleware will handle the hashing
+            user = new User({
+              email: application.email,
+              fullName: application.fullName,
+              password: generatedPassword, // Plain text password, will be hashed by pre-save middleware
+              role: 'mentor',
+              isEmailVerified: true, // Auto-verify the email since it came through the application
+              status: 'active',
+              lastActive: new Date(),
+              mentorProfile: {
+                title: application.professionalInfo?.role || 'Professional Mentor',
+                bio: application.bio,
+                hourlyRate: application.hourlyRate,
+                skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
+                languages: application.languages.map(name => ({ id: String(Math.random()), name })),
+                education: [],
+                experience: [],
+                availability: [],
+                socialLinks: {
+                  linkedin: application.professionalInfo?.linkedIn || '',
+                },
+                isVerified: true,
+                menteesCount: 0,
+                sessionsCount: 0,
+                mentorRating: 0,
+                mentorReviewsCount: 0,
+                appliedAt: application.appliedAt,
+                approvedAt: new Date()
+              }
+            });
+            
+            // Check if the password is correctly set in the user object
+            console.log('Password field set in user object:', !!user.password); // For debugging only, remove in production
+            
+            try {
+              await user.save();
+              console.log('Created new user with mentor role:', user.email);
+              
+              // Verify the user was saved with a password
+              const savedUser = await User.findOne({ email: application.email }).select('+password');
+              console.log('Saved user has password:', !!savedUser?.password); // For debugging only, remove in production
+
+              // Test the login flow with the new password
+              if (savedUser) {
+                const passwordValid = await savedUser.comparePassword(generatedPassword);
+                console.log('Password validation test:', passwordValid ? 'SUCCESS' : 'FAILED');
+              }
+
+              // Send welcome email with account credentials
+              await sendMentorWelcomeEmail(application.email, application.fullName, generatedPassword);
+            } catch (saveError) {
+              console.error('Error saving new mentor user:', saveError);
+              throw saveError;
+            }
+          }
+          
+          // Log approval info
+          console.log('Sent mentor approval email to:', application.email);
+        } catch (emailError) {
+          console.error('Error in mentor approval process:', emailError);
+          // Continue with the response even if there's an email error
+        }
+      } else if (status === 'rejected') {
+        // Send rejection email
+        try {
+          await sendMentorRejectionEmail(application.email, application.fullName, adminNotes);
+          console.log('Sent mentor rejection email to:', application.email);
+        } catch (emailError) {
+          console.error('Error sending rejection email:', emailError);
+          // Continue with the response even if there's an email error
+        }
+      }
+      
+      res.status(200).json({
+        success: true,
+        message: `Mentor application ${status === 'approved' ? 'approved' : 'rejected'} successfully`,
+        data: {
+          application
+        }
+      });
+    } catch (error: any) {
+      console.error('Error updating mentor application status:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'An error occurred while updating mentor application status'
+      });
     }
   }
 }; 

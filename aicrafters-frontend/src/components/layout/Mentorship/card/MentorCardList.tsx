@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Container, Typography, Skeleton, CircularProgress } from '@mui/material';
 import { MentorCard, Mentor } from './MentorCard';
 import { mockMentors } from './mentorsMock';
 
@@ -28,11 +28,61 @@ const NoResultsMessage = styled(Typography)`
   margin: 40px 0;
 `;
 
+const LoadingContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 0;
+`;
+
+const SkeletonCard = styled(Box)`
+  width: 90%;
+  max-width: 1200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 20px;
+`;
+
 interface MentorCardListProps {
   mentors?: Mentor[];
+  loading?: boolean;
 }
 
-export const MentorCardList: React.FC<MentorCardListProps> = ({ mentors = mockMentors }) => {
+export const MentorCardList: React.FC<MentorCardListProps> = ({ 
+  mentors = [], 
+  loading = false 
+}) => {
+  if (loading) {
+    return (
+      <ListContainer>
+        <LoadingContainer>
+          {[1, 2, 3].map((item) => (
+            <SkeletonCard key={item}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Skeleton variant="circular" width={80} height={80} sx={{ mr: 2 }} />
+                <Box sx={{ width: '100%' }}>
+                  <Skeleton variant="text" width="40%" height={32} />
+                  <Skeleton variant="text" width="60%" height={24} />
+                </Box>
+              </Box>
+              <Skeleton variant="text" width="100%" height={20} sx={{ mt: 2 }} />
+              <Skeleton variant="text" width="100%" height={20} />
+              <Skeleton variant="text" width="80%" height={20} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                <Skeleton variant="rectangular" width={120} height={40} sx={{ borderRadius: 2 }} />
+                <Skeleton variant="rectangular" width={120} height={40} sx={{ borderRadius: 2 }} />
+              </Box>
+            </SkeletonCard>
+          ))}
+        </LoadingContainer>
+      </ListContainer>
+    );
+  }
+
   if (mentors.length === 0) {
     return (
       <ListContainer>

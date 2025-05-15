@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, TextField, Grid, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { Box, Container, TextField, Grid, MenuItem, Select, FormControl, InputLabel, CircularProgress, Typography, Alert } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { MentorCardList } from './card/MentorCardList';
-import { mockMentors } from './card/mentorsMock';
 import { Mentor } from './card/MentorCard';
 import { KeyboardArrowDown as ArrowDownIcon } from '@mui/icons-material';
-import { CustomPagination } from './Pagination';  
+import { CustomPagination } from './Pagination';
+import { getPublicMentorList } from '../../../api/mentor';
+// Import mockMentors for fallback only
+import { mockMentors } from './card/mentorsMock';
 
 const SearchAndFiltersWrapper = styled.div`
   background-color: ${props => props.theme.palette.background.default};
@@ -184,44 +186,157 @@ export const MentorsList: React.FC = () => {
   const [skill, setSkill] = useState('');
   const [country, setCountry] = useState('');
   const [language, setLanguage] = useState('');
-  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>(mockMentors);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Pagination state
   const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [displayedMentors, setDisplayedMentors] = useState<Mentor[]>([]);
   const mentorsPerPage = 5;
-  const totalPages = Math.ceil(filteredMentors.length / mentorsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
   
-  // Update displayed mentors when filtered mentors or page changes
+  // Fetch mentors from API
   useEffect(() => {
-    const startIndex = (page - 1) * mentorsPerPage;
-    const endIndex = startIndex + mentorsPerPage;
-    setDisplayedMentors(filteredMentors.slice(startIndex, endIndex));
-  }, [filteredMentors, page]);
-  
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setPage(1);
-  }, [searchTerm, category, skill, country, language]);
+    const fetchMentors = async () => {
+      setLoading(true);
+      setError(null);
+      
+      console.log('Fetching mentors with filters:', {
+        searchTerm,
+        category,
+        skill,
+        country,
+        language,
+        page,
+        limit: mentorsPerPage
+      });
+      
+      try {
+        const filters = {
+          search: searchTerm,
+          category,
+          skill,
+          country,
+          language,
+          page,
+          limit: mentorsPerPage
+        };
+        
+        console.log('Calling getPublicMentorList API with filters:', filters);
+        const response = await getPublicMentorList(filters);
+        console.log('API response from getPublicMentorList:', response);
+        
+        if (response && response.success && response.data) {
+          // Extract mentors from API response
+          const { mentors, pagination } = response.data;
+          console.log('Mentors received from API:', mentors);
+          console.log('Pagination data:', pagination);
+          
+          if (mentors && mentors.length > 0) {
+            setMentors(mentors);
+            setFilteredMentors(mentors);
+            setDisplayedMentors(mentors);
+            
+            // Check if pagination data exists
+            if (pagination) {
+              setTotalItems(pagination.total || mentors.length);
+              setTotalPages(pagination.pages || Math.ceil(mentors.length / mentorsPerPage));
+              console.log(`Setting pagination: ${pagination.total} total items, ${pagination.pages} pages`);
+            } else {
+              setTotalItems(mentors.length);
+              setTotalPages(Math.ceil(mentors.length / mentorsPerPage));
+              console.log(`No pagination data, calculated: ${mentors.length} total items, ${Math.ceil(mentors.length / mentorsPerPage)} pages`);
+            }
+            return; // Exit early if we have real data
+          } else {
+            console.log('API returned success but no mentors in the data');
+          }
+        } else {
+          console.error('API response invalid structure:', response);
+        }
+        
+        // Only use mock data during development
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Using mock data since API returned no mentors');
+          setMentors(mockMentors);
+          setFilteredMentors(mockMentors);
+          setDisplayedMentors(mockMentors.slice(0, mentorsPerPage));
+          setTotalItems(mockMentors.length);
+          setTotalPages(Math.ceil(mockMentors.length / mentorsPerPage));
+        } else {
+          // In production, show no results instead of mock data
+          console.log('No mentors found and in production environment, showing empty state');
+          setMentors([]);
+          setFilteredMentors([]);
+          setDisplayedMentors([]);
+          setTotalItems(0);
+          setTotalPages(0);
+          setError('No mentors found. Please try adjusting your filters.');
+        }
+      } catch (err: any) {
+        console.error('Error fetching mentors:', err);
+        console.error('Error details:', err.response?.data || err.message);
+        setError(err.response?.data?.message || 'Failed to load mentors. Please try again later.');
+        
+        // Only use mock data in development
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Using mock data due to API error');
+          setMentors(mockMentors);
+          setFilteredMentors(mockMentors);
+          setDisplayedMentors(mockMentors.slice(0, mentorsPerPage));
+          setTotalItems(mockMentors.length);
+          setTotalPages(Math.ceil(mockMentors.length / mentorsPerPage));
+        } else {
+          // In production, show empty state
+          console.log('API error in production environment, showing empty state');
+          setMentors([]);
+          setFilteredMentors([]);
+          setDisplayedMentors([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMentors();
+  }, [searchTerm, category, skill, country, language, page]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value;
+    console.log('Search term changed to:', term);
     setSearchTerm(term);
-    
-    if (term.trim() === '') {
-      setFilteredMentors(mockMentors);
-    } else {
-      const filtered = mockMentors.filter(mentor => 
-        mentor.name.toLowerCase().includes(term.toLowerCase()) ||
-        mentor.title.toLowerCase().includes(term.toLowerCase()) ||
-        mentor.description.toLowerCase().includes(term.toLowerCase()) ||
-        mentor.skills.some(skill => skill.name.toLowerCase().includes(term.toLowerCase()))
-      );
-      setFilteredMentors(filtered);
-    }
+    setPage(1); // Reset to page 1 when search term changes
+  };
+  
+  const handleCategoryChange = (event: any) => {
+    console.log('Category changed to:', event.target.value);
+    setCategory(event.target.value);
+    setPage(1);
+  };
+  
+  const handleSkillChange = (event: any) => {
+    console.log('Skill changed to:', event.target.value);
+    setSkill(event.target.value);
+    setPage(1);
+  };
+  
+  const handleCountryChange = (event: any) => {
+    console.log('Country changed to:', event.target.value);
+    setCountry(event.target.value);
+    setPage(1);
+  };
+  
+  const handleLanguageChange = (event: any) => {
+    console.log('Language changed to:', event.target.value);
+    setLanguage(event.target.value);
+    setPage(1);
   };
   
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    console.log('Page changed to:', value);
     setPage(value);
     // Scroll to top of the list
     window.scrollTo({ top: document.getElementById('list-wrapper')?.offsetTop || 0, behavior: 'smooth' });
@@ -249,83 +364,115 @@ export const MentorsList: React.FC = () => {
             </SearchContainer>
             
             <FiltersRow>
-              <FilterSelect variant="outlined" size="small">
+              <FilterSelect variant="outlined" fullWidth>
+                <InputLabel>Category</InputLabel>
                 <Select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as string)}
+                  onChange={handleCategoryChange}
+                  label="Category"
                   IconComponent={ArrowDownIcon}
-                  displayEmpty
-                  renderValue={(value) => value === '' ? 'Categories' : value}
                 >
-                  <MenuItem value="">Categories</MenuItem>
+                  <MenuItem value="">All Categories</MenuItem>
+                  <MenuItem value="webdev">Web Development</MenuItem>
+                  <MenuItem value="mobiledev">Mobile Development</MenuItem>
                   <MenuItem value="ai">Artificial Intelligence</MenuItem>
-                  <MenuItem value="programming">Programming</MenuItem>
-                  <MenuItem value="data-science">Data Science</MenuItem>
+                  <MenuItem value="datascience">Data Science</MenuItem>
+                  <MenuItem value="devops">DevOps</MenuItem>
                 </Select>
               </FilterSelect>
               
-              <FilterSelect variant="outlined" size="small">
+              <FilterSelect variant="outlined" fullWidth>
+                <InputLabel>Skill</InputLabel>
                 <Select
                   value={skill}
-                  onChange={(e) => setSkill(e.target.value as string)}
+                  onChange={handleSkillChange}
+                  label="Skill"
                   IconComponent={ArrowDownIcon}
-                  displayEmpty
-                  renderValue={(value) => value === '' ? 'Skills' : value}
                 >
-                  <MenuItem value="">Skills</MenuItem>
+                  <MenuItem value="">All Skills</MenuItem>
                   <MenuItem value="javascript">JavaScript</MenuItem>
                   <MenuItem value="python">Python</MenuItem>
-                  <MenuItem value="machine-learning">Machine Learning</MenuItem>
+                  <MenuItem value="react">React</MenuItem>
+                  <MenuItem value="nodejs">Node.js</MenuItem>
+                  <MenuItem value="machinelearning">Machine Learning</MenuItem>
                 </Select>
               </FilterSelect>
               
-              <FilterSelect variant="outlined" size="small">
+              <FilterSelect variant="outlined" fullWidth>
+                <InputLabel>Country</InputLabel>
                 <Select
                   value={country}
-                  onChange={(e) => setCountry(e.target.value as string)}
+                  onChange={handleCountryChange}
+                  label="Country"
                   IconComponent={ArrowDownIcon}
-                  displayEmpty
-                  renderValue={(value) => value === '' ? 'Countries' : value}
                 >
-                  <MenuItem value="">Countries</MenuItem>
+                  <MenuItem value="">All Countries</MenuItem>
                   <MenuItem value="us">United States</MenuItem>
                   <MenuItem value="uk">United Kingdom</MenuItem>
                   <MenuItem value="ca">Canada</MenuItem>
+                  <MenuItem value="au">Australia</MenuItem>
+                  <MenuItem value="in">India</MenuItem>
                 </Select>
               </FilterSelect>
               
-              <FilterSelect variant="outlined" size="small">
+              <FilterSelect variant="outlined" fullWidth>
+                <InputLabel>Language</InputLabel>
                 <Select
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value as string)}
+                  onChange={handleLanguageChange}
+                  label="Language"
                   IconComponent={ArrowDownIcon}
-                  displayEmpty
-                  renderValue={(value) => value === '' ? 'Languages' : value}
                 >
-                  <MenuItem value="">Languages</MenuItem>
+                  <MenuItem value="">All Languages</MenuItem>
                   <MenuItem value="en">English</MenuItem>
                   <MenuItem value="es">Spanish</MenuItem>
                   <MenuItem value="fr">French</MenuItem>
+                  <MenuItem value="de">German</MenuItem>
+                  <MenuItem value="zh">Chinese</MenuItem>
                 </Select>
               </FilterSelect>
             </FiltersRow>
           </FilterContainer>
         </Container>
       </SearchAndFiltersWrapper>
-
+      
       <ListWrapper id="list-wrapper">
         <ListSection>
-          <MentorCardList mentors={displayedMentors} />
+          {loading ? (
+            <Box display="flex" flexDirection="column" alignItems="center" py={4}>
+              <CircularProgress size={40} />
+              <Typography mt={2} color="text.secondary">
+                Loading mentors...
+              </Typography>
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
+              {error}
+            </Alert>
+          ) : displayedMentors.length === 0 ? (
+            <Box textAlign="center" py={4}>
+              <Typography variant="h6" color="text.secondary">
+                No mentors found matching your criteria
+              </Typography>
+              <Typography color="text.secondary" mt={1}>
+                Try adjusting your filters or search terms
+              </Typography>
+            </Box>
+          ) : (
+            <MentorCardList mentors={displayedMentors} loading={loading} />
+          )}
+          
+          {totalPages > 1 && (
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+              <CustomPagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+              />
+            </Box>
+          )}
         </ListSection>
       </ListWrapper>
-      
-      {filteredMentors.length > mentorsPerPage && (
-        <CustomPagination 
-          count={totalPages} 
-          page={page} 
-          onChange={handlePageChange} 
-        />
-      )}
     </>
   );
 }; 

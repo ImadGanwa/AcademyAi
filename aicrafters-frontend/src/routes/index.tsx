@@ -81,9 +81,12 @@ const TrainerDashboardRoutes = () => (
 
 // Mentor dashboard routes
 const MentorDashboardRoutes = () => (
-  <Routes>
-    <Route path="/*" element={<MentorDashboard />} />
-  </Routes>
+  <MentorRouteGuard>
+    <Routes>
+      <Route path="/" element={<Navigate to="mentees" replace />} />
+      <Route path="/*" element={<MentorDashboard />} />
+    </Routes>
+  </MentorRouteGuard>
 );
 
 // Admin dashboard routes
@@ -132,7 +135,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="teach" element={<TeachPage />} />
         <Route path="mentorship" element={<MentorshipPage />} />
         <Route path="mentorship/book/:mentorId" element={<MentorshipBookSession />} />
-        <Route path="mentorship/confirmation/:mentorId" element={<MentorshipConfirmation />} />
+        <Route path="mentorship/booking-confirmation" element={<MentorshipConfirmation />} />
         <Route path="mentorship/become-mentor" element={<BecomeMentor />} />
         <Route path="mentorship/application-confirmation" element={<MentorApplicationConfirmation />} />
         <Route path="app" element={<PlaceholderPage pageName={t('placeholder.titles.app')} />} />

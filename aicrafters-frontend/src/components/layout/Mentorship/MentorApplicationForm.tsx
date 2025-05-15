@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Typography, TextField, Button, Box, Chip, FormControl, FormControlLabel,  Checkbox, useTheme, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Typography, TextField, Button, Box, Chip, FormControl, FormControlLabel,  Checkbox, useTheme, MenuItem, Select, SelectChangeEvent, CircularProgress, Alert, Snackbar } from '@mui/material';
 import styled from 'styled-components';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { applyToBecomeMentor } from '../../../api/mentor';
 
 // Styled components
 const FormSection = styled.div`
@@ -142,6 +143,8 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['English']);
   const [newLanguage, setNewLanguage] = useState('');
   const [newInterest, setNewInterest] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -156,6 +159,17 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       internationalExperience: false,
       fundingAgency: false,
       internationalOrganization: false
+    },
+    bio: '',
+    expertise: [] as string[],
+    experience: '',
+    hourlyRate: 50,
+    availability: {
+      weekdays: true,
+      weekends: false,
+      mornings: true,
+      afternoons: false,
+      evenings: false
     }
   });
   
@@ -228,16 +242,58 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
   
-  const handleSubmit = () => {
-    // Submit form data to backend
-    console.log('Form submitted:', { ...formData, languages: selectedLanguages });
+  const handleSubmit = async () => {
+    // Transform form data to match API expectations
+    const applicationData = {
+      fullName: formData.fullName,
+      email: formData.email,
+      bio: formData.bio || `${formData.fullName} is a ${formData.professionalRole} with expertise in ${formData.areasOfInterest.join(', ')}.`,
+      expertise: formData.areasOfInterest,
+      experience: formData.experience || formData.academicBackground,
+      hourlyRate: Number(formData.hourlyRate),
+      availability: {
+        weekdays: formData.availability.weekdays,
+        weekends: formData.availability.weekends,
+        mornings: formData.availability.mornings,
+        afternoons: formData.availability.afternoons,
+        evenings: formData.availability.evenings
+      },
+      languages: selectedLanguages,
+      professionalInfo: {
+        role: formData.professionalRole,
+        linkedIn: formData.linkedinUrl,
+        academicBackground: formData.academicBackground
+      },
+      preferences: {
+        sessionDuration: formData.desiredDuration,
+        ...formData.mentorPreferences
+      },
+      countries: [formData.country]
+    };
     
-    // Navigate to confirmation page with correct language prefix
-    navigate(`/${langPrefix}/mentorship/application-confirmation`);
+    setSubmitting(true);
+    setError(null);
     
-    // Call onSubmitSuccess callback if provided
-    if (onSubmitSuccess) {
-      onSubmitSuccess();
+    try {
+      // Submit form data to backend
+      const response = await applyToBecomeMentor(applicationData);
+      console.log('Application submitted successfully:', response);
+      
+      // Extract the language prefix from the current URL
+      const langPrefix = location.pathname.split('/')[1];
+      
+      // Navigate to confirmation page with correct language prefix
+      navigate(`/${langPrefix}/mentorship/application-confirmation`);
+      
+      // Call onSubmitSuccess callback if provided
+      if (onSubmitSuccess) {
+        onSubmitSuccess();
+      }
+    } catch (err) {
+      console.error('Error submitting application:', err);
+      setError('Failed to submit your application. Please try again later.');
+    } finally {
+      setSubmitting(false);
     }
   };
   
@@ -536,15 +592,24 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             <BackButton 
               startIcon={<ArrowBackIcon />}
               onClick={handleBack}
+              disabled={submitting}
             >
-              Previous
+              Back
             </BackButton>
             <SubmitButton 
+              endIcon={submitting ? <CircularProgress size={20} color="inherit" /> : undefined} 
               onClick={handleSubmit}
+              disabled={submitting}
             >
-              Submit Request
+              {submitting ? 'Submitting...' : 'Submit Application'}
             </SubmitButton>
           </ButtonContainer>
+          
+          {error && (
+            <Box mt={2}>
+              <Alert severity="error">{error}</Alert>
+            </Box>
+          )}
         </form>
       )}
     </FormSection>

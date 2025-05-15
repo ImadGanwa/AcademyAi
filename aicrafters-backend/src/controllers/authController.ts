@@ -159,18 +159,31 @@ export const authController = {
     try {
       const { email, password } = req.body;
       
+      console.log(`Login attempt for: ${email}`);
+      
       const user = await User.findOne({ email }).select('+password +role +courses');
       if (!user) {
+        console.log(`Login failed: No user found with email ${email}`);
+        return res.status(401).json(createError('Invalid credentials'));
+      }
+
+      // Check if password exists in user object
+      if (!user.password) {
+        console.error(`Login failed: User ${email} has no password set`);
         return res.status(401).json(createError('Invalid credentials'));
       }
 
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
+        console.log(`Login failed: Invalid password for ${email}`);
         return res.status(401).json(createError('Invalid credentials'));
       }
 
+      console.log(`Password validation successful for ${email}`);
+
       // Check if email is verified
       if (!user.isEmailVerified) {
+        console.log(`Login failed: Email not verified for ${email}`);
         return res.status(403).json(createError('Please verify your email address before logging in.'));
       }
 

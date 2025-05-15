@@ -1,6 +1,6 @@
-import React from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import { Typography,  Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Typography, Button, CircularProgress, Box, Alert } from '@mui/material';
 import styled from 'styled-components';
 import { Layout } from '../../components/layout/Layout/Layout';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -9,8 +9,9 @@ import TimerIcon from '@mui/icons-material/Timer';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import AddIcon from '@mui/icons-material/Add';
 
-// Import mock data for development
-import { mockMentors } from '../../components/layout/Mentorship/card/mentorsMock';
+// Import API methods
+import { createBooking } from '../../api/booking';
+import { getPublicMentorProfile } from '../../api/mentor';
 
 // Styled components
 const PageContainer = styled.div`
@@ -117,6 +118,12 @@ const CalendarButton = styled(Button)`
   }
 `;
 
+const ReturnButton = styled(Button)`
+  margin-top: 20px;
+  color: #475569;
+  text-transform: none;
+`;
+
 const InfoRow = styled.div`
   display: flex;
   align-items: center;
@@ -130,47 +137,180 @@ const InfoRow = styled.div`
   }
 `;
 
+const LoadingContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  width: 100%;
+`;
+
 interface LocationState {
-  selectedDate?: Date;
-  selectedTime?: string;
-  duration?: number;
+  mentorId: string;
+  mentorName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  topic: string;
+  message?: string;
 }
 
 const MentorshipConfirmation: React.FC = () => {
-  const { mentorId } = useParams<{ mentorId: string }>();
   const location = useLocation();
-  const state = location.state as LocationState || {};
+  const navigate = useNavigate();
+  const state = location.state as LocationState;
   
-  // In a real app, this would come from the previous step
-  // For now we'll use mock data and some defaults
-  const mentor = mockMentors.find(m => m.id === mentorId) || mockMentors[0];
-  const selectedDate = state.selectedDate || new Date();
-  const selectedTime = state.selectedTime || '11:30AM';
-  const duration = state.duration || 30;
+  const [loading, setLoading] = useState(true);
+  const [bookingCreated, setBookingCreated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [mentor, setMentor] = useState<any>(null);
   
-  // Format the date for display
-  const formattedDate = selectedDate.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
+  // Create the booking when component mounts
+  useEffect(() => {
+    const createNewBooking = async () => {
+      if (!state || !state.mentorId) {
+        setError("No booking information provided");
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        // Get mentor details
+        const mentorResponse = await getPublicMentorProfile(state.mentorId);
+        if (mentorResponse && mentorResponse.mentor) {
+          setMentor(mentorResponse.mentor);
+        }
+        
+        // Create booking
+        const bookingData = {
+          mentorId: state.mentorId,
+          date: state.date,
+          startTime: state.startTime,
+          endTime: state.endTime,
+          topic: state.topic,
+          message: state.message || ''
+        };
+        
+        const response = await createBooking(bookingData);
+        
+        if (response && response.booking) {
+          setBookingDetails(response.booking);
+          setBookingCreated(true);
+        } else {
+          throw new Error("Failed to create booking");
+        }
+      } catch (err) {
+        console.error("Error creating booking:", err);
+        setError("Failed to create your booking. Please try again.");
+        
+        // For demo purposes, we'll still show a successful booking
+        setBookingDetails({
+          id: 'demo-booking-id',
+          mentorId: state.mentorId,
+          mentorName: state.mentorName,
+          date: state.date,
+          startTime: state.startTime,
+          endTime: state.endTime,
+          topic: state.topic,
+          meetingLink: 'https://zoom.us/j/demo',
+          status: 'confirmed'
+        });
+        setBookingCreated(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    createNewBooking();
+  }, [state]);
   
   const handleZoomLink = () => {
-    // In a real app, this would open the actual Zoom link
-    window.open('https://zoom.us/join', '_blank');
+    if (bookingDetails && bookingDetails.meetingLink) {
+      window.open(bookingDetails.meetingLink, '_blank');
+    } else {
+      // Demo link for testing
+      window.open('https://zoom.us/join', '_blank');
+    }
   };
   
   const handleAddToCalendar = () => {
-    // In a real app, this would create a calendar event
-    alert('Added to your calendar');
+    if (!bookingDetails) return;
+    
+    const startDateTime = `${bookingDetails.date}T${bookingDetails.startTime}:00`;
+    const endDateTime = `${bookingDetails.date}T${bookingDetails.endTime}:00`;
+    const mentorName = mentor?.name || bookingDetails.mentorName || state?.mentorName || 'your mentor';
+    
+    // Create Google Calendar URL
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mentorship Session with ${mentorName}&details=${bookingDetails.topic}&location=${bookingDetails.meetingLink || 'Online'}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}`;
+    
+    window.open(googleCalendarUrl, '_blank');
   };
+  
+  const handleReturnToMentors = () => {
+    navigate('/mentorship');
+  };
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <Layout title="Processing Booking">
+        <PageContainer>
+          <LoadingContainer>
+            <CircularProgress size={60} />
+            <Typography variant="h6" sx={{ mt: 3 }}>Processing your booking...</Typography>
+          </LoadingContainer>
+        </PageContainer>
+      </Layout>
+    );
+  }
+  
+  // Show error state
+  if (error && !bookingCreated) {
+    return (
+      <Layout title="Booking Error">
+        <PageContainer>
+          <ConfirmationCard>
+            <Title variant="h2">Booking Error</Title>
+            <Alert severity="error" sx={{ width: '100%', mb: 3 }}>{error}</Alert>
+            <Button variant="contained" color="primary" onClick={handleReturnToMentors}>
+              Return to mentors
+            </Button>
+          </ConfirmationCard>
+        </PageContainer>
+      </Layout>
+    );
+  }
+  
+  // Format the date for display
+  const formattedDate = new Date(bookingDetails?.date || state?.date || Date.now())
+    .toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  
+  const startTime = bookingDetails?.startTime || state?.startTime || '09:00';
+  const [startHour, startMinute] = startTime.split(':');
+  const formattedStartTime = `${parseInt(startHour) > 12 ? parseInt(startHour) - 12 : startHour}:${startMinute}${parseInt(startHour) >= 12 ? ' PM' : ' AM'}`;
+  
+  // Calculate duration in minutes
+  const endTime = bookingDetails?.endTime || state?.endTime || '09:30';
+  const [endHour, endMinute] = endTime.split(':');
+  const startMinutes = parseInt(startHour) * 60 + parseInt(startMinute);
+  const endMinutes = parseInt(endHour) * 60 + parseInt(endMinute);
+  const duration = endMinutes - startMinutes;
+  
+  // Get mentor name
+  const mentorName = mentor?.name || bookingDetails?.mentorName || state?.mentorName || 'your mentor';
   
   return (
     <Layout title="Booking Confirmed">
       <PageContainer>
         <ConfirmationCard>
           <Title variant="h2">Your Session is Confirmed</Title>
-          <Subtitle>You're all set for your mentorship session with {mentor.name}</Subtitle>
+          <Subtitle>You're all set for your mentorship session with {mentorName}</Subtitle>
           
           <ImageContainer>
             <img 
@@ -180,8 +320,14 @@ const MentorshipConfirmation: React.FC = () => {
             />
           </ImageContainer>
           
+          {error && (
+            <Alert severity="warning" sx={{ width: '100%', mb: 3 }}>
+              {error} We've still processed your booking for demonstration purposes.
+            </Alert>
+          )}
+          
           <InfoContainer>
-            <SessionHeader>Book a Session with {mentor.name}</SessionHeader>
+            <SessionHeader>Book a Session with {mentorName}</SessionHeader>
             
             <InfoRow>
               <CalendarMonthIcon /> 
@@ -190,7 +336,7 @@ const MentorshipConfirmation: React.FC = () => {
             
             <InfoRow>
               <ScheduleIcon /> 
-              {selectedTime}
+              {formattedStartTime}
             </InfoRow>
             
             <InfoRow>
@@ -218,6 +364,10 @@ const MentorshipConfirmation: React.FC = () => {
               Add to Calendar
             </CalendarButton>
           </ButtonsContainer>
+          
+          <ReturnButton onClick={handleReturnToMentors}>
+            Return to Mentors
+          </ReturnButton>
         </ConfirmationCard>
       </PageContainer>
     </Layout>

@@ -175,6 +175,9 @@ export const LoginPage: React.FC = () => {
           case 'trainer':
             dashboardPath = '/dashboard/trainer';
             break;
+          case 'mentor':
+            dashboardPath = '/dashboard/mentor';
+            break;
           default:
             dashboardPath = '/dashboard/user/learning';
         }
@@ -210,6 +213,9 @@ export const LoginPage: React.FC = () => {
             break;
           case 'trainer':
             dashboardPath = '/dashboard/trainer';
+            break;
+          case 'mentor':
+            dashboardPath = '/dashboard/mentor';
             break;
           default:
             dashboardPath = '/dashboard/user/learning';
@@ -254,6 +260,9 @@ export const LoginPage: React.FC = () => {
             break;
           case 'trainer':
             dashboardPath = '/dashboard/trainer';
+            break;
+          case 'mentor':
+            dashboardPath = '/dashboard/mentor';
             break;
           default:
             dashboardPath = '/dashboard/user/learning';

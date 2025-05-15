@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { adminController } from '../controllers/adminController';
 import { authMiddleware } from '../middleware/authMiddleware';
+import { adminMiddleware } from '../middleware/adminMiddleware';
 
 const router = express.Router();
 
@@ -56,5 +57,20 @@ router.delete('/categories/:id', adminController.deleteCategory);
 router.get('/courses/available', adminController.getAvailableCourses);
 router.post('/categories/:categoryId/courses', adminController.addCourseToCategory);
 router.delete('/categories/:categoryId/courses/:courseId', adminController.removeCourseFromCategory);
+
+// Add mentor application routes
+/**
+ * @route GET /api/admin/mentor-applications
+ * @desc Get all mentor applications
+ * @access Private (Admin only)
+ */
+router.get('/mentor-applications', authMiddleware, adminMiddleware, adminController.getMentorApplications);
+
+/**
+ * @route PUT /api/admin/mentor-applications/:id
+ * @desc Update mentor application status
+ * @access Private (Admin only)
+ */
+router.put('/mentor-applications/:id', authMiddleware, adminMiddleware, adminController.updateMentorApplicationStatus);
 
 export default router; 

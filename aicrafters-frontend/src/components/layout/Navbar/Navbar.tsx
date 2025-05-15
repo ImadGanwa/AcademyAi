@@ -555,6 +555,19 @@ export const Navbar: React.FC = () => {
       );
     }
 
+    if (user?.role === 'mentor') {
+      return (
+        <UserDropdown ref={dropdownRef} $isOpen={isUserMenuOpen}>
+          <DropdownItem to={`/${currentLanguage}/dashboard/mentor`} onClick={handleDropdownItemClick} style={{fontWeight: 'bold'}}>
+            {t('mentor.navbar.dashboard', 'Mentor Dashboard')}
+          </DropdownItem>
+          <DropdownItem to="#" onClick={handleLogout}>
+            {t('mentor.navbar.logout', 'Logout')}
+          </DropdownItem>
+        </UserDropdown>
+      );
+    }
+
     return (
       <UserDropdown ref={dropdownRef} $isOpen={isUserMenuOpen}>
         <DropdownItem to={`/${currentLanguage}/dashboard/user/learning`} onClick={handleDropdownItemClick} style={{fontWeight: 'bold'}}>

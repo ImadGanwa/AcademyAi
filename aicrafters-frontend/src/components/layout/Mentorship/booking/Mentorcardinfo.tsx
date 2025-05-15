@@ -189,14 +189,14 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
   return (
     <HeaderContainer>
       <MentorAvatar 
-        src={mentor.imageUrl || 'https://placehold.co/80x80/E0E0E0/BDBDBD?text=Mentor'} 
-        alt={`${mentor.name}'s avatar`} 
+        src={mentor.profileImage || 'https://placehold.co/80x80/E0E0E0/BDBDBD?text=Mentor'} 
+        alt={`${mentor.fullName}'s avatar`} 
         onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80/E0E0E0/BDBDBD?text=Mentor')}
       />
       <MainContentWrapper>
         <MentorNameSection>
           <MentorName variant="h4"> {/* Changed to h1 for semantic, styled for visual */}
-            {mentor.name}
+            {mentor.fullName}
             {mentor.isVerified !== false && <VerifiedBadge />} {/* Show badge if true or undefined */}
             {mentor.countryFlag && (
               <CountryFlag 
@@ -209,10 +209,10 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
           <MentorTitle>{mentor.title}</MentorTitle>
         </MentorNameSection>
 
-        {mentor.description && (
+        {mentor.bio && (
           <>
             <SectionTitle>About Me</SectionTitle>
-            <AboutText>{mentor.description}</AboutText>
+            <AboutText>{mentor.bio}</AboutText>
           </>
         )}
         

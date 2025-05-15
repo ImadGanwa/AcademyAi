@@ -209,6 +209,8 @@ export const SignUpPage: React.FC = () => {
             dashboardPath = '/dashboard/admin';
           } else if (response.user.role === 'trainer') {
             dashboardPath = '/dashboard/trainer';
+          } else if (response.user.role === 'mentor') {
+            dashboardPath = '/dashboard/mentor';
           }
 
           const lang = location.pathname.split('/')[1] || 'en';
@@ -348,6 +350,9 @@ export const SignUpPage: React.FC = () => {
             break;
           case 'trainer':
             dashboardPath = '/dashboard/trainer';
+            break;
+          case 'mentor':
+            dashboardPath = '/dashboard/mentor';
             break;
           default:
             dashboardPath = '/dashboard/user/learning';

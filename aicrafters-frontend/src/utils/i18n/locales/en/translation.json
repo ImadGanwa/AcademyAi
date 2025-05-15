@@ -824,6 +824,22 @@
       "courseContent": "Course Content"
     }
   },
+  "mentor": {
+    "navbar": {
+      "dashboard": "Mentor Dashboard",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "title": "Mentor Dashboard",
+      "mentees": "Mentees",
+      "messages": "Messages",
+      "schedule": "Schedule",
+      "availability": "Availability",
+      "bookings": "Bookings",
+      "profile": "Profile",
+      "settings": "Settings"
+    }
+  },
   "admin": {
     "navbar": {
       "adminDashboard": "Admin Dashboard",

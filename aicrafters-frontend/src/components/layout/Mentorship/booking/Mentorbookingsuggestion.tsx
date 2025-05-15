@@ -63,7 +63,7 @@ export const MentorInfoCard: React.FC<MentorInfoCardProps> = ({ mentor }) => {
   return (
     <CardContainer>
       <BookingSection>
-        <BookingTitle>Book a Session with {mentor.name}</BookingTitle>
+        <BookingTitle>Book a Session with {mentor.fullName}</BookingTitle>
         <BookingDescription>
           Choose a date and time that works for you. Once confirmed, your mentor will receive the request and you'll both get a calendar invite.
         </BookingDescription>

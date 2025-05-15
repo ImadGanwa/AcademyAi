@@ -775,6 +775,22 @@
       "courseContent": "محتوى الدورة"
     }
   },
+  "mentor": {
+    "navbar": {
+      "dashboard": "لوحة تحكم المرشد",
+      "logout": "تسجيل الخروج"
+    },
+    "sidebar": {
+      "title": "لوحة تحكم المرشد",
+      "mentees": "المتدربين",
+      "messages": "الرسائل",
+      "schedule": "الجدول الزمني",
+      "availability": "التوفر",
+      "bookings": "الحجوزات",
+      "profile": "الملف الشخصي",
+      "settings": "الإعدادات"
+    }
+  },
   "admin": {
     "navbar": {
       "adminDashboard": "لوحة التحكم الإدارية",

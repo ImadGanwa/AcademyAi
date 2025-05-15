@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import {
   IconButton,
@@ -24,6 +24,7 @@ import {
   Typography,
   Divider,
   useTheme,
+  CircularProgress
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -33,7 +34,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useTranslation } from 'react-i18next';
-import { mockMentorRequests, MentorRequest } from './mentorRequestsMock';
+import { getMentorApplications, updateMentorApplicationStatus } from '../../../../api/mentor';
 
 // Styled components
 const PageContainer = styled.div`
@@ -72,15 +73,79 @@ const TableActionButton = styled(IconButton)`
   }
 `;
 
-const statusColors = {
+// Status color mapping properly typed
+const statusColors: Record<string, string> = {
   pending: '#FD7E14',
   accepted: '#40C057',
   denied: '#FA5252'
 };
 
+interface MentorApplication {
+  _id: string;
+  fullName: string;
+  email: string;
+  bio: string;
+  expertise: string[];
+  experience: string;
+  hourlyRate: number;
+  languages: string[];
+  countries: string[];
+  availability: any;
+  professionalInfo: {
+    role?: string;
+    linkedIn?: string;
+    academicBackground?: string;
+    [key: string]: any;
+  };
+  preferences: {
+    sessionDuration?: string;
+    [key: string]: any;
+  };
+  appliedAt: string;
+  reviewedAt?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  adminNotes?: string;
+}
+
+// Transform API data to the format expected by the component
+const transformApplicationToRequest = (application: MentorApplication) => {
+  return {
+    id: application._id,
+    fullName: application.fullName,
+    email: application.email,
+    linkedinUrl: application.professionalInfo?.linkedIn || 'Not provided',
+    country: application.countries?.[0] || 'Not provided',
+    professionalRole: application.professionalInfo?.role || 'Not provided',
+    academicBackground: application.professionalInfo?.academicBackground || application.experience || 'Not provided',
+    hasInternationalExperience: Boolean(application.preferences?.internationalExperience),
+    desiredDuration: application.preferences?.sessionDuration || '1h',
+    areasOfInterest: application.expertise || [],
+    languages: application.languages || [],
+    submittedAt: application.appliedAt,
+    status: application.status === 'approved' ? 'accepted' : (application.status === 'rejected' ? 'denied' : 'pending')
+  };
+};
+
+// Create a proper type for the transformed request data
+interface MentorRequestData {
+  id: string;
+  fullName: string;
+  email: string;
+  linkedinUrl: string;
+  country: string;
+  professionalRole: string;
+  academicBackground: string;
+  hasInternationalExperience: boolean;
+  desiredDuration: string;
+  areasOfInterest: string[];
+  languages: string[];
+  submittedAt: string;
+  status: 'pending' | 'accepted' | 'denied';
+}
+
 interface ViewDialogProps {
   open: boolean;
-  request: MentorRequest | null;
+  request: MentorRequestData | null;
   onClose: () => void;
   onAccept: () => void;
   onDeny: () => void;
@@ -90,6 +155,9 @@ interface ViewDialogProps {
 const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, onAccept, onDeny }) => {
   const theme = useTheme();
   if (!request) return null;
+  
+  // Get the status color safely
+  const requestStatus = request.status as keyof typeof statusColors;
   
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -103,10 +171,10 @@ const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, 
       }}>
         <Typography variant="h5" fontWeight={600}>Mentor Request Details</Typography>
         <Chip 
-          label={request.status.charAt(0).toUpperCase() + request.status.slice(1)} 
+          label={String(requestStatus).charAt(0).toUpperCase() + String(requestStatus).slice(1)} 
           sx={{ 
-            bgcolor: `${statusColors[request.status]}20`,
-            color: statusColors[request.status],
+            bgcolor: `${statusColors[requestStatus]}20`,
+            color: statusColors[requestStatus],
             fontWeight: 500,
             fontSize: '0.875rem',
             height: 32
@@ -184,7 +252,7 @@ const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, 
               <Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>Languages</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {request.languages.map((lang) => (
+                  {request.languages.map((lang: string, index: number) => (
                     <Chip 
                       key={lang} 
                       label={lang} 
@@ -201,7 +269,7 @@ const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, 
               <Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>Areas of Interest</Typography>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {request.areasOfInterest.map((area) => (
+                  {request.areasOfInterest.map((area: string) => (
                     <Chip 
                       key={area} 
                       label={area} 
@@ -277,8 +345,8 @@ export const MentorRequests: React.FC = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [mentorRequests, setMentorRequests] = useState<MentorRequest[]>(mockMentorRequests);
-  const [loading, setLoading] = useState(false);
+  const [mentorRequests, setMentorRequests] = useState<MentorRequestData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
     message: '',
@@ -287,11 +355,44 @@ export const MentorRequests: React.FC = () => {
   
   // Dialog states
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<MentorRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<MentorRequestData | null>(null);
   
   // Menu states
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuRequest, setMenuRequest] = useState<MentorRequest | null>(null);
+  const [menuRequest, setMenuRequest] = useState<MentorRequestData | null>(null);
+  
+  // Fetch mentor applications from the backend
+  const fetchMentorApplications = async () => {
+    setLoading(true);
+    try {
+      const response = await getMentorApplications();
+      if (response.success) {
+        const transformedData = response.data.applications.map(transformApplicationToRequest);
+        setMentorRequests(transformedData);
+      } else {
+        console.error('Failed to fetch mentor applications:', response.error);
+        setSnackbar({
+          open: true,
+          message: 'Failed to load mentor applications',
+          severity: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching mentor applications:', error);
+      setSnackbar({
+        open: true,
+        message: 'An error occurred while loading mentor applications',
+        severity: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Load mentor applications on component mount
+  useEffect(() => {
+    fetchMentorApplications();
+  }, []);
   
   // Filtered data
   const filteredData = mentorRequests.filter((request) => {
@@ -299,7 +400,7 @@ export const MentorRequests: React.FC = () => {
     const searchMatch = 
       request.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.professionalRole.toLowerCase().includes(searchTerm.toLowerCase());
+      (request.professionalRole && request.professionalRole.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Apply status filter
     const statusMatch = statusFilter === 'all' || request.status === statusFilter;
@@ -316,12 +417,12 @@ export const MentorRequests: React.FC = () => {
     setStatusFilter(event.target.value);
   };
   
-  const handleViewClick = (request: MentorRequest) => {
+  const handleViewClick = (request: any) => {
     setSelectedRequest(request);
     setViewDialogOpen(true);
   };
   
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, request: MentorRequest) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, request: any) => {
     setMenuAnchorEl(event.currentTarget);
     setMenuRequest(request);
   };
@@ -331,75 +432,155 @@ export const MentorRequests: React.FC = () => {
     setMenuRequest(null);
   };
   
-  const handleAcceptRequest = () => {
+  const handleAcceptRequest = async () => {
     if (selectedRequest) {
-      setMentorRequests(prev => 
-        prev.map(req => 
-          req.id === selectedRequest.id 
-            ? { ...req, status: 'accepted' } 
-            : req
-        )
-      );
-      setSnackbar({
-        open: true,
-        message: 'Mentor request accepted successfully',
-        severity: 'success',
-      });
-      setViewDialogOpen(false);
+      try {
+        setLoading(true);
+        const response = await updateMentorApplicationStatus(
+          selectedRequest.id, 
+          'approved'
+        );
+        
+        if (response.success) {
+          await fetchMentorApplications(); // Refresh the data
+          setSnackbar({
+            open: true,
+            message: 'Mentor application approved successfully',
+            severity: 'success',
+          });
+        } else {
+          console.error('Failed to approve mentor application:', response.error);
+          setSnackbar({
+            open: true,
+            message: 'Failed to approve mentor application',
+            severity: 'error',
+          });
+        }
+      } catch (error) {
+        console.error('Error approving mentor application:', error);
+        setSnackbar({
+          open: true,
+          message: 'An error occurred while approving mentor application',
+          severity: 'error',
+        });
+      } finally {
+        setLoading(false);
+        setViewDialogOpen(false);
+      }
     }
   };
   
-  const handleDenyRequest = () => {
+  const handleDenyRequest = async () => {
     if (selectedRequest) {
-      setMentorRequests(prev => 
-        prev.map(req => 
-          req.id === selectedRequest.id 
-            ? { ...req, status: 'denied' } 
-            : req
-        )
-      );
-      setSnackbar({
-        open: true,
-        message: 'Mentor request denied',
-        severity: 'success',
-      });
-      setViewDialogOpen(false);
+      try {
+        setLoading(true);
+        const response = await updateMentorApplicationStatus(
+          selectedRequest.id, 
+          'rejected'
+        );
+        
+        if (response.success) {
+          await fetchMentorApplications(); // Refresh the data
+          setSnackbar({
+            open: true,
+            message: 'Mentor application rejected',
+            severity: 'success',
+          });
+        } else {
+          console.error('Failed to reject mentor application:', response.error);
+          setSnackbar({
+            open: true,
+            message: 'Failed to reject mentor application',
+            severity: 'error',
+          });
+        }
+      } catch (error) {
+        console.error('Error rejecting mentor application:', error);
+        setSnackbar({
+          open: true,
+          message: 'An error occurred while rejecting mentor application',
+          severity: 'error',
+        });
+      } finally {
+        setLoading(false);
+        setViewDialogOpen(false);
+      }
     }
   };
   
-  const handleAcceptFromMenu = () => {
+  const handleAcceptFromMenu = async () => {
     if (menuRequest) {
-      setMentorRequests(prev => 
-        prev.map(req => 
-          req.id === menuRequest.id 
-            ? { ...req, status: 'accepted' } 
-            : req
-        )
-      );
-      setSnackbar({
-        open: true,
-        message: 'Mentor request accepted successfully',
-        severity: 'success',
-      });
-      handleMenuClose();
+      try {
+        setLoading(true);
+        const response = await updateMentorApplicationStatus(
+          menuRequest.id, 
+          'approved'
+        );
+        
+        if (response.success) {
+          await fetchMentorApplications(); // Refresh the data
+          setSnackbar({
+            open: true,
+            message: 'Mentor application approved successfully',
+            severity: 'success',
+          });
+        } else {
+          console.error('Failed to approve mentor application:', response.error);
+          setSnackbar({
+            open: true,
+            message: 'Failed to approve mentor application',
+            severity: 'error',
+          });
+        }
+      } catch (error) {
+        console.error('Error approving mentor application:', error);
+        setSnackbar({
+          open: true,
+          message: 'An error occurred while approving mentor application',
+          severity: 'error',
+        });
+      } finally {
+        setLoading(false);
+        handleMenuClose();
+      }
     }
   };
   
-  const handleDenyFromMenu = () => {
+  const handleDenyFromMenu = async () => {
     if (menuRequest) {
-      setMentorRequests(prev => 
-        prev.map(req => 
-          req.id === menuRequest.id 
-            ? { ...req, status: 'denied' } 
-            : req
-        )
-      );
-      setSnackbar({
-        open: true,
-        message: 'Mentor request denied',
-        severity: 'success',
-      });
-      handleMenuClose();
+      try {
+        setLoading(true);
+        const response = await updateMentorApplicationStatus(
+          menuRequest.id, 
+          'rejected'
+        );
+        
+        if (response.success) {
+          await fetchMentorApplications(); // Refresh the data
+          setSnackbar({
+            open: true,
+            message: 'Mentor application rejected',
+            severity: 'success',
+          });
+        } else {
+          console.error('Failed to reject mentor application:', response.error);
+          setSnackbar({
+            open: true,
+            message: 'Failed to reject mentor application',
+            severity: 'error',
+          });
+        }
+      } catch (error) {
+        console.error('Error rejecting mentor application:', error);
+        setSnackbar({
+          open: true,
+          message: 'An error occurred while rejecting mentor application',
+          severity: 'error',
+        });
+      } finally {
+        setLoading(false);
+        handleMenuClose();
+      }
     }
   };
   
@@ -434,7 +615,7 @@ export const MentorRequests: React.FC = () => {
       minWidth: 150,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          {params.value.map((lang: string, index: number) => (
+          {(params.value as string[]).map((lang: string, index: number) => (
             index < 2 ? (
               <Chip 
                 key={lang} 
@@ -450,7 +631,7 @@ export const MentorRequests: React.FC = () => {
             ) : index === 2 ? (
               <Chip 
                 key="more" 
-                label={`+${params.value.length - 2}`} 
+                label={`+${(params.value as string[]).length - 2}`} 
                 size="small"
                 sx={{ 
                   fontSize: '0.75rem',
@@ -477,10 +658,10 @@ export const MentorRequests: React.FC = () => {
       headerName: 'Status', 
       minWidth: 120,
       renderCell: (params) => {
-        const status = params.value as 'pending' | 'accepted' | 'denied';
+        const status = params.value as keyof typeof statusColors;
         return (
           <Chip 
-            label={status.charAt(0).toUpperCase() + status.slice(1)} 
+            label={String(status).charAt(0).toUpperCase() + String(status).slice(1)} 
             size="small"
             sx={{ 
               bgcolor: `${statusColors[status]}20`,
@@ -499,12 +680,12 @@ export const MentorRequests: React.FC = () => {
       renderCell: (params) => (
         <Box sx={{ display: 'flex' }}>
           <Tooltip title="View Details">
-            <TableActionButton onClick={() => handleViewClick(params.row)}>
+            <TableActionButton onClick={() => handleViewClick(params.row as MentorRequestData)}>
               <VisibilityIcon fontSize="small" />
             </TableActionButton>
           </Tooltip>
           <Tooltip title="More Options">
-            <TableActionButton onClick={(e) => handleMenuOpen(e, params.row)}>
+            <TableActionButton onClick={(e) => handleMenuOpen(e, params.row as MentorRequestData)}>
               <MoreVertIcon fontSize="small" />
             </TableActionButton>
           </Tooltip>

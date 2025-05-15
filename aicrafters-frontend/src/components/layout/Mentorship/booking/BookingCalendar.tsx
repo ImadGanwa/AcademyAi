@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import styled from 'styled-components';
 import { KeyboardArrowLeft as ArrowLeftIcon, KeyboardArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -187,18 +187,35 @@ const BookButton = styled(Button)`
   }
 `;
 
+const FormField = styled(Box)`
+  margin-bottom: 16px;
+`;
+
+const FieldLabel = styled(Typography)`
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+`;
+
 interface BookingCalendarProps {
   onDateSelect: (date: Date | null) => void;
   onTimeSelect: (time: string | null) => void;
   selectedDate: Date | null;
   selectedTime: string | null;
+  availableTimeSlots?: string[];
+  loadingTimeSlots?: boolean;
+  onBookSession?: (topic: string, message: string) => void;
 }
 
 export const BookingCalendar: React.FC<BookingCalendarProps> = ({ 
   onDateSelect, 
   onTimeSelect,
   selectedDate,
-  selectedTime
+  selectedTime,
+  availableTimeSlots = [],
+  loadingTimeSlots = false,
+  onBookSession
 }) => {
   const navigate = useNavigate();
   const { mentorId } = useParams<{ mentorId: string }>();
@@ -206,11 +223,16 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   // Current display month/year
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
-  // Time slot options
-  const timeSlots = [
-    '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
-    '12:00 PM', '12:30 PM', '1:00 PM'
-  ];
+  // Form state for booking
+  const [topic, setTopic] = useState('');
+  const [message, setMessage] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Validate form when inputs change
+  React.useEffect(() => {
+    setIsFormValid(!!selectedDate && !!selectedTime && !!topic.trim());
+  }, [selectedDate, selectedTime, topic]);
   
   // Format month and year for display
   const formatMonthYear = (date: Date) => {
@@ -248,9 +270,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       { length: firstDayOfMonth },
       (_, i) => ({
         day: daysInPrevMonth - firstDayOfMonth + i + 1,
+        isCurrentMonth: false,
         isPrevMonth: true,
-        isNextMonth: false,
-        isCurrentMonth: false
+        isNextMonth: false
       })
     );
     
@@ -259,30 +281,28 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       { length: daysInCurrentMonth },
       (_, i) => ({
         day: i + 1,
+        isCurrentMonth: true,
         isPrevMonth: false,
-        isNextMonth: false,
-        isCurrentMonth: true
+        isNextMonth: false
       })
     );
     
-    // Calculate how many days needed from next month
-    const totalDaysDisplayed = Math.ceil((firstDayOfMonth + daysInCurrentMonth) / 7) * 7;
+    // Calculate how many days from next month we need to fill the grid
+    const remainingCells = (6 * 7) - (prevMonthDays.length + currentMonthDays.length);
     const nextMonthDays = Array.from(
-      { length: totalDaysDisplayed - (prevMonthDays.length + currentMonthDays.length) },
+      { length: remainingCells },
       (_, i) => ({
         day: i + 1,
+        isCurrentMonth: false,
         isPrevMonth: false,
-        isNextMonth: true,
-        isCurrentMonth: false
+        isNextMonth: true
       })
     );
     
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
   
-  const calendarData = generateCalendarData();
-  
-  // Check if a date is today
+  // Check if a given date is today
   const isToday = (day: number, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return false;
     
@@ -294,7 +314,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     );
   };
   
-  // Check if a date is the selected date
+  // Check if a given date is selected
   const isSelectedDate = (day: number, isCurrentMonth: boolean) => {
     if (!selectedDate || !isCurrentMonth) return false;
     
@@ -309,39 +329,41 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   const handleDateSelect = (day: number, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return;
     
-    const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    onDateSelect(newDate);
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    onDateSelect(date);
+    onTimeSelect(null); // Reset time selection when date changes
   };
   
-  // Format selected date and time for display
+  // Format selected date & time for display
   const getFormattedSelectedDateTime = () => {
-    if (!selectedDate || !selectedTime) return null;
+    if (!selectedDate) return '';
     
-    const formattedDate = selectedDate.toLocaleDateString('en-US', {
+    const formattedDate = selectedDate.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
       day: 'numeric',
-      month: 'long',
       year: 'numeric'
     });
     
-    return `${formattedDate}, at ${selectedTime}`;
+    if (!selectedTime) return formattedDate;
+    
+    return `${formattedDate} at ${selectedTime}`;
   };
   
   // Handle booking submission
-  const handleBookSession = () => {
-    if (selectedDate && selectedTime) {
-      // Get the current language from the URL
-      const lang = window.location.pathname.split('/')[1] || 'en';
-      
-      // Navigate to confirmation page with proper language prefix and selected date and time
-      navigate(`/${lang}/mentorship/confirmation/${mentorId}`, {
-        state: {
-          selectedDate,
-          selectedTime,
-          duration: 30 // Default session duration
-        }
-      });
-    }
+  const handleSubmitBooking = () => {
+    if (!isFormValid || !onBookSession) return;
+    
+    setIsSubmitting(true);
+    
+    // Call the onBookSession prop with form data
+    onBookSession(topic, message);
+    
+    setIsSubmitting(false);
   };
+  
+  const calendarDays = generateCalendarData();
+  const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   
   return (
     <CalendarContainer>
@@ -357,60 +379,112 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       
       <CalendarWrapper>
         <WeekdaysRow>
-          {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+          {weekdays.map(day => (
             <Weekday key={day}>{day}</Weekday>
           ))}
         </WeekdaysRow>
         
         <DaysGrid>
-          {calendarData.map((dateObj, index) => (
+          {calendarDays.map((dateInfo, index) => (
             <DayCell
               key={index}
-              onClick={() => handleDateSelect(dateObj.day, dateObj.isCurrentMonth)}
-              isselected={isSelectedDate(dateObj.day, dateObj.isCurrentMonth) ? 'true' : 'false'}
-              istoday={isToday(dateObj.day, dateObj.isCurrentMonth) ? 'true' : 'false'}
-              iscurrentmonth={dateObj.isCurrentMonth ? 'true' : 'false'}
-              isprevmonth={dateObj.isPrevMonth ? 'true' : 'false'}
-              isnextmonth={dateObj.isNextMonth ? 'true' : 'false'}
-              disabled={!dateObj.isCurrentMonth}
+              isselected={isSelectedDate(dateInfo.day, dateInfo.isCurrentMonth).toString()}
+              istoday={isToday(dateInfo.day, dateInfo.isCurrentMonth).toString()}
+              iscurrentmonth={dateInfo.isCurrentMonth.toString()}
+              isprevmonth={dateInfo.isPrevMonth.toString()}
+              isnextmonth={dateInfo.isNextMonth.toString()}
+              onClick={() => handleDateSelect(dateInfo.day, dateInfo.isCurrentMonth)}
+              disabled={dateInfo.isPrevMonth || dateInfo.isNextMonth}
             >
-              {dateObj.day}
+              {dateInfo.day}
             </DayCell>
           ))}
         </DaysGrid>
       </CalendarWrapper>
       
+      {/* Time slot selection */}
       {selectedDate && (
         <TimeSlotSection>
           <TimeSlotTitle>Available Time Slots</TimeSlotTitle>
-          <TimeSlotList>
-            {timeSlots.map(time => (
-              <TimeSlot
-                key={time}
-                onClick={() => onTimeSelect(time)}
-                isselected={time === selectedTime ? 'true' : 'false'}
-              >
-                {time}
-              </TimeSlot>
-            ))}
-          </TimeSlotList>
+          
+          {loadingTimeSlots ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+              <CircularProgress size={30} />
+            </Box>
+          ) : availableTimeSlots.length > 0 ? (
+            <TimeSlotList>
+              {availableTimeSlots.map(time => (
+                <TimeSlot
+                  key={time}
+                  isselected={(selectedTime === time).toString()}
+                  onClick={() => onTimeSelect(time)}
+                >
+                  {time}
+                </TimeSlot>
+              ))}
+            </TimeSlotList>
+          ) : (
+            <Box sx={{ textAlign: 'center', py: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                No available time slots for this date.
+              </Typography>
+            </Box>
+          )}
         </TimeSlotSection>
       )}
       
+      {/* Selected date & time display */}
       {selectedDate && selectedTime && (
         <SelectedTimeBox>
-          <SelectedTimeLabel>Time Slot Selected</SelectedTimeLabel>
+          <SelectedTimeLabel>Selected Date & Time:</SelectedTimeLabel>
           <SelectedTimeValue>{getFormattedSelectedDateTime()}</SelectedTimeValue>
         </SelectedTimeBox>
       )}
       
-      <BookButton
-        fullWidth
-        disabled={!selectedDate || !selectedTime}
-        onClick={handleBookSession}
-      >
-        Book a session
-      </BookButton>
+      {/* Booking form */}
+      {selectedDate && selectedTime && (
+        <>
+          <TimeSlotTitle sx={{ mt: 3 }}>Booking Details</TimeSlotTitle>
+          
+          <FormField>
+            <FieldLabel>Topic*</FieldLabel>
+            <TextField
+              fullWidth
+              placeholder="Enter the topic you'd like to discuss"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              required
+              variant="outlined"
+              size="small"
+            />
+          </FormField>
+          
+          <FormField>
+            <FieldLabel>Message (Optional)</FieldLabel>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              placeholder="Provide additional details about what you'd like to discuss"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              variant="outlined"
+              size="small"
+            />
+          </FormField>
+          
+          <Box mt={3}>
+            <BookButton 
+              fullWidth 
+              disabled={!isFormValid || isSubmitting} 
+              onClick={handleSubmitBooking}
+              startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+            >
+              {isSubmitting ? 'Processing...' : 'Book Session'}
+            </BookButton>
+          </Box>
+        </>
+      )}
     </CalendarContainer>
   );
 }; 

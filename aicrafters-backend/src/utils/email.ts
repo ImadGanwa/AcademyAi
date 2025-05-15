@@ -16,8 +16,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://aicrafters.aicademy.com';
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret';
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Check if JWT_SECRET is defined
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
 
 export const generateVerificationToken = (email: string): string => {
   return jwt.sign({ email }, JWT_SECRET, { expiresIn: '24h' });
@@ -537,6 +542,178 @@ export const sendPasswordResetConfirmationEmail = async (email: string, fullName
 
   } catch (error) {
     console.error('Error sending password reset confirmation email:', error);
+    throw error;
+  }
+};
+
+export const sendMentorApprovalEmail = async (email: string, fullName: string) => {
+  try {
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: email,
+      subject: 'Your Mentor Application Has Been Approved!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Congratulations! You're Now a Mentor</h2>
+          <p>Hello ${fullName},</p>
+          <p>We are pleased to inform you that your application to become a mentor on AiCrafters has been approved!</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">What's Next:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Complete your mentor profile to attract more students</li>
+              <li>Set your availability schedule</li>
+              <li>Start connecting with students looking for mentorship</li>
+            </ul>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${FRONTEND_URL}/en/dashboard/mentor" 
+               style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              Go to Mentor Dashboard
+            </a>
+          </div>
+
+          <p>As a mentor, you'll be able to share your knowledge and experience with eager learners. You can guide them through their learning journey, provide career advice, and help them achieve their goals.</p>
+          
+          <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px;">
+            <p>If you have any questions about being a mentor or need assistance with your mentor profile, please contact our support team at <a href="mailto:aicrafters@aicademy.com">aicrafters@aicademy.com</a>.</p>
+          </div>
+
+          <p>Thank you for joining our community of mentors!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor approval email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed mentor approval email error:', {
+        message: error.message,
+        stack: error.stack,
+        email
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMentorRejectionEmail = async (email: string, fullName: string, reason?: string) => {
+  try {
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: email,
+      subject: 'Update on Your Mentor Application',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Mentor Application Update</h2>
+          <p>Hello ${fullName},</p>
+          <p>Thank you for your interest in becoming a mentor on AiCrafters. We've carefully reviewed your application, and unfortunately, we are unable to approve it at this time.</p>
+          
+          ${reason ? `
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Feedback:</h3>
+            <p>${reason}</p>
+          </div>
+          ` : ''}
+
+          <p>We encourage you to:</p>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>Review our mentor requirements and guidelines</li>
+            <li>Enhance your professional profile with additional experience or certifications</li>
+            <li>Apply again in the future when you feel your qualifications better align with our mentor criteria</li>
+          </ul>
+
+          <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px;">
+            <p>If you have any questions or would like more detailed feedback, please contact our support team at <a href="mailto:aicrafters@aicademy.com">aicrafters@aicademy.com</a>.</p>
+          </div>
+
+          <p>Thank you for your understanding.</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor rejection email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed mentor rejection email error:', {
+        message: error.message,
+        stack: error.stack,
+        email
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMentorWelcomeEmail = async (email: string, fullName: string, password: string) => {
+  try {
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: email,
+      subject: 'Welcome to AiCrafters Mentorship Program - Your Account Details',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Congratulations! You're Now an AiCrafters Mentor</h2>
+          <p>Hello ${fullName},</p>
+          <p>We are pleased to inform you that your application to become a mentor on AiCrafters has been approved! We've created an account for you with mentor privileges.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Your Account Details:</h3>
+            <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
+            <p style="margin: 10px 0 0;"><strong>Password:</strong> ${password}</p>
+          </div>
+          
+          <div style="background-color: #fff4e5; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #ffd699;">
+            <p style="color: #663c00; margin: 0; font-weight: 500;">For security reasons, we recommend changing your password after your first login.</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${FRONTEND_URL}/en/login" 
+               style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              Login to Your Mentor Dashboard
+            </a>
+          </div>
+
+          <p>As a mentor, you'll be able to:</p>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>Complete your profile to attract potential mentees</li>
+            <li>Set your availability schedule</li>
+            <li>Connect with students looking for mentorship</li>
+            <li>Track your mentorship sessions</li>
+            <li>Receive payments for your mentoring services</li>
+          </ul>
+          
+          <div style="border-top: 1px solid #eee; margin-top: 20px; padding-top: 20px;">
+            <p>If you have any questions about being a mentor or need assistance with your mentor profile, please contact our support team at <a href="mailto:aicrafters@aicademy.com">aicrafters@aicademy.com</a>.</p>
+          </div>
+
+          <p>Thank you for joining our community of mentors!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor welcome email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed mentor welcome email error:', {
+        message: error.message,
+        stack: error.stack,
+        email
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
     throw error;
   }
 }; 

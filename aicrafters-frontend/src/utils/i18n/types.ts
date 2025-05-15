@@ -808,6 +808,22 @@ export interface Translations {
       courseContent: string;
     };
   };
+  mentor: {
+    navbar: {
+      dashboard: string;
+      logout: string;
+    };
+    sidebar: {
+      title: string;
+      mentees: string;
+      messages: string;
+      schedule: string;
+      availability: string;
+      bookings: string;
+      profile: string;
+      settings: string;
+    };
+  };
   admin: {
     navbar: {
       adminDashboard: string;

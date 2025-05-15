@@ -801,6 +801,22 @@
       "courseContent": "Contenu du Cours"
     }
   },
+  "mentor": {
+    "navbar": {
+      "dashboard": "Tableau de Bord Mentor",
+      "logout": "Déconnexion"
+    },
+    "sidebar": {
+      "title": "Tableau de Bord Mentor",
+      "mentees": "Apprenants",
+      "messages": "Messages",
+      "schedule": "Emploi du temps",
+      "availability": "Disponibilité",
+      "bookings": "Réservations",
+      "profile": "Profil",
+      "settings": "Paramètres"
+    }
+  },
   "admin": {
     "navbar": {
       "adminDashboard": "Tableau de bord Administratif",
