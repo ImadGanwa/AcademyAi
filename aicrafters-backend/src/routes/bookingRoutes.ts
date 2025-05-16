@@ -20,25 +20,11 @@ router.post('/', authMiddleware, bookingController.createBooking);
 router.get('/', authMiddleware, bookingController.getUserBookings);
 
 /**
- * @route   GET /api/bookings/:id
- * @desc    Get details for a specific booking
- * @access  Private
+ * @route   GET /api/bookings/availability/:mentorId
+ * @desc    Get mentor's available time slots for a specific date
+ * @access  Public
  */
-router.get('/:id', authMiddleware, bookingController.getBookingDetails);
-
-/**
- * @route   POST /api/bookings/:id/cancel
- * @desc    Cancel a booking
- * @access  Private
- */
-router.post('/:id/cancel', authMiddleware, bookingController.cancelBooking);
-
-/**
- * @route   POST /api/bookings/:id/review
- * @desc    Rate and review a completed session
- * @access  Private
- */
-router.post('/:id/review', authMiddleware, bookingController.rateBooking);
+router.get('/availability/:mentorId', bookingController.getMentorPublicAvailability);
 
 /**
  * @route   GET /api/bookings/mentor
@@ -76,10 +62,24 @@ router.post('/mentor/:id/complete', authMiddleware, isApprovedMentor, bookingCon
 router.post('/mentor/:id/cancel', authMiddleware, isApprovedMentor, bookingController.cancelMentorBooking);
 
 /**
- * @route   GET /api/bookings/availability/:mentorId
- * @desc    Get mentor's available time slots for a specific date
- * @access  Public
+ * @route   GET /api/bookings/:id
+ * @desc    Get details for a specific booking
+ * @access  Private
  */
-router.get('/availability/:mentorId', bookingController.getMentorPublicAvailability);
+router.get('/:id', authMiddleware, bookingController.getBookingDetails);
+
+/**
+ * @route   POST /api/bookings/:id/cancel
+ * @desc    Cancel a booking
+ * @access  Private
+ */
+router.post('/:id/cancel', authMiddleware, bookingController.cancelBooking);
+
+/**
+ * @route   POST /api/bookings/:id/review
+ * @desc    Rate and review a completed session
+ * @access  Private
+ */
+router.post('/:id/review', authMiddleware, bookingController.rateBooking);
 
 export default router; 

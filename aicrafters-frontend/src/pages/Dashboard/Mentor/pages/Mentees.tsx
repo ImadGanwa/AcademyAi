@@ -23,6 +23,8 @@ import {
   useTheme,
   Paper,
   Tooltip,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import styled from 'styled-components';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -34,6 +36,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import DoneIcon from '@mui/icons-material/Done';
+import { getMentorBookings, updateBooking, cancelMentorBooking } from '../../../../api/booking';
 
 const PageContainer = styled(Box)`
   background: #ffffff;
@@ -244,6 +247,8 @@ interface Mentee {
   location: string;
   sessionTime: string;
   status: 'pending' | 'accepted' | 'rejected';
+  topic?: string;
+  bookingId?: string;
 }
 
 // Utility function to generate a placeholder avatar with the first letter of the name
@@ -271,90 +276,63 @@ export const Mentees: React.FC = () => {
     timeZone: 'UTC+1 (Casablanca)',
   });
   const [linkCopied, setLinkCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - would come from API in real application
-  const [allMentees, setAllMentees] = useState<Mentee[]>([
-    {
-      id: '1',
-      name: 'Amara Okafor',
-      avatar: 'https://randomuser.me/api/portraits/women/12.jpg',
-      location: 'Lagos, Nigeria',
-      sessionTime: '10:30 AM / 22-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '2',
-      name: 'David Chen',
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      location: 'Shanghai, China',
-      sessionTime: '4:00 PM / 23-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '3',
-      name: 'Sophie Martin',
-      avatar: 'https://randomuser.me/api/portraits/women/43.jpg',
-      location: 'Paris, France',
-      sessionTime: '3:30 PM / 24-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '4',
-      name: 'Miguel Rodriguez',
-      avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
-      location: 'Madrid, Spain',
-      sessionTime: '11:00 AM / 25-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '5',
-      name: 'Emma Wilson',
-      avatar: 'https://randomuser.me/api/portraits/women/28.jpg',
-      location: 'London, UK',
-      sessionTime: '2:30 PM / 26-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '6',
-      name: 'Ahmed Hassan',
-      avatar: 'https://randomuser.me/api/portraits/men/55.jpg',
-      location: 'Cairo, Egypt',
-      sessionTime: '9:00 AM / 27-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '7',
-      name: 'Priya Sharma',
-      avatar: 'https://randomuser.me/api/portraits/women/67.jpg',
-      location: 'Mumbai, India',
-      sessionTime: '12:30 PM / 28-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '8',
-      name: 'Tom Johnson',
-      avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
-      location: 'New York, USA',
-      sessionTime: '5:00 PM / 29-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '9',
-      name: 'Mei Lin',
-      avatar: 'https://randomuser.me/api/portraits/women/79.jpg',
-      location: 'Beijing, China',
-      sessionTime: '10:00 AM / 30-Apr-2025',
-      status: 'pending',
-    },
-    {
-      id: '10',
-      name: 'Carlos Mendoza',
-      avatar: 'https://randomuser.me/api/portraits/men/81.jpg',
-      location: 'Mexico City, Mexico',
-      sessionTime: '3:00 PM / 01-May-2025',
-      status: 'pending',
-    },
-  ]);
+  // Updated state for real mentees/bookings data
+  const [allMentees, setAllMentees] = useState<Mentee[]>([]);
+
+  // Fetch mentee bookings from API
+  useEffect(() => {
+    const fetchMenteeBookings = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Get pending bookings for mentor using the booking service
+        const response = await getMentorBookings('scheduled');
+        
+        if (response.success && response.data.bookings) {
+          // Transform the booking data to match our Mentee interface
+          const menteesFromBookings = response.data.bookings.map((booking: any) => {
+            // Format date and time for display
+            const scheduledDate = new Date(booking.scheduledAt);
+            const formattedTime = scheduledDate.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            });
+            
+            const formattedDate = scheduledDate.toLocaleDateString('en-US', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            });
+            
+            return {
+              id: booking.menteeId._id,
+              name: booking.menteeId.fullName,
+              avatar: booking.menteeId.profileImage || '',
+              location: booking.menteeId.location || 'Location not provided',
+              sessionTime: `${formattedTime} / ${formattedDate}`,
+              status: booking.status === 'scheduled' ? 'accepted' : 'pending',
+              topic: booking.topic,
+              bookingId: booking._id
+            };
+          });
+          
+          setAllMentees(menteesFromBookings);
+        }
+      } catch (err: any) {
+        console.error('Error fetching mentee bookings:', err);
+        setError(err.response?.data?.error || 'Failed to load mentee data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchMenteeBookings();
+  }, []);
 
   // Get current mentees based on pagination
   const indexOfLastMentee = page * itemsPerPage;
@@ -470,15 +448,22 @@ export const Mentees: React.FC = () => {
     console.log('Message mentee:', mentee);
   };
 
-  const handleReject = (mentee: Mentee) => {
-    // Implementation for rejecting a mentee
-    console.log('Reject mentee:', mentee);
-    
-    // Update the mentee's status to rejected
-    const updatedMentees = allMentees.map(m => 
-      m.id === mentee.id ? { ...m, status: 'rejected' as const } : m
-    );
-    setAllMentees(updatedMentees);
+  const handleReject = async (mentee: Mentee) => {
+    try {
+      // Call API to reject the booking using the booking service
+      const response = await cancelMentorBooking(mentee.bookingId!, 'Mentor is not available at this time');
+      
+      if (response.success) {
+        // Update the mentee status in our local state
+        const updatedMentees = allMentees.map(m => 
+          m.id === mentee.id ? { ...m, status: 'rejected' as const } : m
+        );
+        setAllMentees(updatedMentees);
+      }
+    } catch (err: any) {
+      console.error('Error rejecting booking:', err);
+      alert(err.response?.data?.error || 'Failed to reject booking');
+    }
   };
 
   const handleCloseRescheduleDialog = () => {
@@ -501,36 +486,40 @@ export const Mentees: React.FC = () => {
     setOpenConfirmationDialog(true);
   };
 
-  const handleAccept = (mentee: Mentee) => {
-    // Implementation for accepting a mentee
-    console.log('Accepted mentee:', mentee);
-    // Here you would call your API to update the mentee status
-    
-    // Set the selected mentee
-    setSelectedMentee(mentee);
-    
-    // Generate a default date and time (for example, tomorrow at 10:00 AM)
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Format the date as YYYY-MM-DD for the form field
-    const formattedDate = tomorrow.toISOString().split('T')[0];
-    setSelectedDate(formattedDate);
-    
-    // Set a default time
-    setSelectedTime('10:00');
-    
-    // Set a default duration
-    setDuration('30');
-    
-    // Generate meeting details with these default values
-    setTimeout(() => {
-      setConfirmationDetails(formatConfirmationDetails());
-      setMeetingLink(generateMeetingLink());
+  const handleAccept = async (mentee: Mentee) => {
+    try {
+      // Call API to accept the booking request using the booking service
+      const response = await updateBooking(mentee.bookingId!, {
+        status: 'scheduled'
+      });
       
-      // Open the confirmation dialog
-      setOpenConfirmationDialog(true);
-    }, 0);
+      if (response.success) {
+        // Update the mentee status in our local state
+        const updatedMentees = allMentees.map(m => 
+          m.id === mentee.id ? { ...m, status: 'accepted' as const } : m
+        );
+        setAllMentees(updatedMentees);
+        
+        // Generate meeting details for confirmation
+        setSelectedMentee(mentee);
+        
+        // Generate a default date and time based on the booking
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        setSelectedDate(formattedDate);
+        setSelectedTime('10:00');
+        setDuration('30');
+        
+        setTimeout(() => {
+          setConfirmationDetails(formatConfirmationDetails());
+          setMeetingLink(generateMeetingLink());
+          setOpenConfirmationDialog(true);
+        }, 0);
+      }
+    } catch (err: any) {
+      console.error('Error accepting booking:', err);
+      alert(err.response?.data?.error || 'Failed to accept booking');
+    }
   };
 
   const handleCloseConfirmation = () => {
@@ -546,17 +535,29 @@ export const Mentees: React.FC = () => {
     });
   };
 
-  const handleConfirmSession = () => {
-    if (selectedMentee) {
-      // Update the mentee's status to accepted
-      const updatedMentees = allMentees.map(mentee => 
-        mentee.id === selectedMentee.id 
-          ? { ...mentee, status: 'accepted' as const } 
-          : mentee
-      );
-      
-      setAllMentees(updatedMentees);
-      setOpenConfirmationDialog(false);
+  const handleConfirmSession = async () => {
+    if (selectedMentee && selectedMentee.bookingId) {
+      try {
+        // Update the booking with meeting link using the booking service
+        const response = await updateBooking(selectedMentee.bookingId, {
+          meetingLink
+        });
+        
+        if (response.success) {
+          // Update the mentee's status to accepted
+          const updatedMentees = allMentees.map(mentee => 
+            mentee.id === selectedMentee.id 
+              ? { ...mentee, status: 'accepted' as const } 
+              : mentee
+          );
+          
+          setAllMentees(updatedMentees);
+          setOpenConfirmationDialog(false);
+        }
+      } catch (err: any) {
+        console.error('Error updating meeting link:', err);
+        alert(err.response?.data?.error || 'Failed to update meeting link');
+      }
     }
   };
 
@@ -571,69 +572,88 @@ export const Mentees: React.FC = () => {
         </Typography>
       </PageHeader>
 
-      {currentMentees.map((mentee) => (
-        <MenteeCard key={mentee.id}>
-          {mentee.status === 'accepted' && (
-            <StatusStampContainer>
-              <StatusStamp status="accepted" src="/accepted.avif" alt="Accepted" />
-            </StatusStampContainer>
-          )}
-          {mentee.status === 'rejected' && (
-            <StatusStampContainer>
-              <StatusStamp status="rejected" src="/refused.avif" alt="Rejected" />
-            </StatusStampContainer>
-          )}
-          <MenteeInfo>
-            <MenteeAvatar 
-              src={mentee.avatar} 
-              alt={mentee.name}
-            >
-              {getInitials(mentee.name)}
-            </MenteeAvatar>
-            <MenteeDetails>
-              <MenteeName variant="h6">{mentee.name}</MenteeName>
-              <MenteeLocation>{mentee.location}</MenteeLocation>
-              <SessionTime>
-                <AccessTimeIcon sx={{ fontSize: 16, mr: 1 }} />
-                {mentee.sessionTime}
-              </SessionTime>
-            </MenteeDetails>
-          </MenteeInfo>
-          <Divider sx={{ my: 2 }} />
-          <ActionButtons>
-            {mentee.status === 'pending' && (
-              <>
-                <RejectButton
-                  onClick={() => handleReject(mentee)}
-                  startIcon={<CloseIcon />}
-                >
-                  Reject
-                </RejectButton>
-                <AcceptButton
-                  onClick={() => handleAccept(mentee)}
-                  startIcon={<CheckCircleIcon />}
-                >
-                  Accept
-                </AcceptButton>
-              </>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      ) : allMentees.length === 0 ? (
+        <Alert severity="info">
+          You don't have any mentee requests or bookings yet.
+        </Alert>
+      ) : (
+        currentMentees.map((mentee) => (
+          <MenteeCard key={mentee.id}>
+            {mentee.status === 'accepted' && (
+              <StatusStampContainer>
+                <StatusStamp status="accepted" src="/accepted.avif" alt="Accepted" />
+              </StatusStampContainer>
             )}
-            <MessageButton
-              onClick={() => handleMessage(mentee)}
-              startIcon={<ChatIcon />}
-            >
-              Message
-            </MessageButton>
-            <ScheduleButton
-              onClick={() => handleSessionAction(mentee)}
-              startIcon={<CalendarTodayIcon />}
-            >
-              {mentee.sessionTime ? 'Reschedule Session' : 'Schedule Session'}
-            </ScheduleButton>
-          </ActionButtons>
-        </MenteeCard>
-      ))}
+            {mentee.status === 'rejected' && (
+              <StatusStampContainer>
+                <StatusStamp status="rejected" src="/refused.avif" alt="Rejected" />
+              </StatusStampContainer>
+            )}
+            <MenteeInfo>
+              <MenteeAvatar 
+                src={mentee.avatar} 
+                alt={mentee.name}
+              >
+                {getInitials(mentee.name)}
+              </MenteeAvatar>
+              <MenteeDetails>
+                <MenteeName variant="h6">{mentee.name}</MenteeName>
+                <MenteeLocation>{mentee.location}</MenteeLocation>
+                <SessionTime>
+                  <AccessTimeIcon sx={{ fontSize: 16, mr: 1 }} />
+                  {mentee.sessionTime}
+                </SessionTime>
+                {mentee.topic && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    <strong>Topic:</strong> {mentee.topic}
+                  </Typography>
+                )}
+              </MenteeDetails>
+            </MenteeInfo>
+            <Divider sx={{ my: 2 }} />
+            <ActionButtons>
+              {mentee.status === 'pending' && (
+                <>
+                  <RejectButton
+                    onClick={() => handleReject(mentee)}
+                    startIcon={<CloseIcon />}
+                  >
+                    Reject
+                  </RejectButton>
+                  <AcceptButton
+                    onClick={() => handleAccept(mentee)}
+                    startIcon={<CheckCircleIcon />}
+                  >
+                    Accept
+                  </AcceptButton>
+                </>
+              )}
+              <MessageButton
+                onClick={() => handleMessage(mentee)}
+                startIcon={<ChatIcon />}
+              >
+                Message
+              </MessageButton>
+              <ScheduleButton
+                onClick={() => handleSessionAction(mentee)}
+                startIcon={<CalendarTodayIcon />}
+              >
+                {mentee.sessionTime ? 'Reschedule Session' : 'Schedule Session'}
+              </ScheduleButton>
+            </ActionButtons>
+          </MenteeCard>
+        ))
+      )}
 
-      {totalPages > 1 && (
+      {!loading && !error && totalPages > 1 && (
         <PaginationContainer>
           <Pagination 
             count={totalPages} 

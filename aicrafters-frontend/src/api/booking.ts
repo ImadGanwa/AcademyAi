@@ -67,8 +67,10 @@ export const rateBooking = async (bookingId: string, rating: number, review: str
 };
 
 // Get all bookings for a mentor
-export const getMentorBookings = async () => {
-  const response = await axiosInstance.get('/api/bookings/mentor');
+export const getMentorBookings = async (status?: string) => {
+  const response = await axiosInstance.get('/api/bookings/mentor', {
+    params: status ? { status } : undefined
+  });
   return response.data;
 };
 

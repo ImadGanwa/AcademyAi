@@ -11,10 +11,11 @@ import { LoginPopup } from '../../components/common/Popup/LoginPopup';
 import { MentorInfoCard } from '../../components/layout/Mentorship/booking/Mentorbookingsuggestion';
 import { BookingCalendar } from '../../components/layout/Mentorship/booking/BookingCalendar';
 import { MentorHeaderInfo } from '../../components/layout/Mentorship/booking/Mentorcardinfo';
+import BookingConfirmationPopup from '../../components/layout/Mentorship/booking/BookingConfirmationPopup';
 
 // Import API services
 import { getPublicMentorProfile } from '../../api/mentor';
-import { getMentorAvailableSlots } from '../../api/booking';
+import { getMentorAvailableSlots, createBooking } from '../../api/booking';
 
 // Import mock data for fallback
 import { mockMentors } from '../../components/layout/Mentorship/card/mentorsMock';
@@ -69,6 +70,17 @@ const MentorshipBookSession: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  
+  // New state for confirmation popup
+  const [showConfirmationPopup, setShowConfirmationPopup] = useState(false);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<{
+    mentorName?: string;
+    date?: string;
+    startTime?: string;
+    topic?: string;
+  }>({});
   
   // Store the mentorId for redirect after login when directly accessing the page
   useEffect(() => {
@@ -168,8 +180,11 @@ const MentorshipBookSession: React.FC = () => {
   }, [selectedDate, mentorId]);
   
   // Handler for booking submission
-  const handleBookSession = (topic: string, message: string) => {
+  const handleBookSession = async (topic: string, message: string) => {
     if (!selectedDate || !selectedTime || !mentorId) return;
+    
+    setBookingLoading(true);
+    setBookingError(null);
     
     // Format the start and end times
     const [time, period] = selectedTime.split(' ');
@@ -201,22 +216,47 @@ const MentorshipBookSession: React.FC = () => {
     const day = String(selectedDate.getDate()).padStart(2, '0');
     const formattedDate = `${year}-${month}-${day}`;
     
-    // Navigate to confirmation page with booking details
-    navigate(`/mentorship/booking-confirmation`, {
-      state: {
+    try {
+      // Call the API to create a booking using the service function
+      const response = await createBooking({
         mentorId,
-        mentorName: mentor?.fullName,
         date: formattedDate,
         startTime,
         endTime,
         topic,
         message
+      });
+      
+      if (response.success) {
+        // Store booking details for confirmation popup
+        setBookingDetails({
+          mentorName: mentor?.fullName,
+          date: formattedDate,
+          startTime,
+          topic
+        });
+        
+        // Show confirmation popup
+        setShowConfirmationPopup(true);
+      } else {
+        setBookingError(response.error || 'Failed to create booking');
       }
-    });
+    } catch (err: any) {
+      console.error('Error creating booking:', err);
+      setBookingError(err.response?.data?.error || 'An error occurred while booking the session');
+    } finally {
+      setBookingLoading(false);
+    }
   };
   
   const handleCloseLoginPopup = () => {
     setShowLoginPopup(false);
+  };
+  
+  const handleCloseConfirmation = () => {
+    setShowConfirmationPopup(false);
+    // Redirect to dashboard after successful booking
+    navigate('/dashboard/bookings');
   };
   
   // If user is not authenticated, redirect to login page
@@ -289,9 +329,18 @@ const MentorshipBookSession: React.FC = () => {
             message="Please login to book a session with this mentor"
           />
         )}
+
+        {/* Booking Confirmation Popup */}
+        <BookingConfirmationPopup
+          open={showConfirmationPopup}
+          onClose={handleCloseConfirmation}
+          bookingDetails={bookingDetails}
+          isLoading={bookingLoading}
+          error={bookingError}
+        />
       </PageContainer>
     </Layout>
   );
 };
 
-export default MentorshipBookSession; 
+export default MentorshipBookSession;
