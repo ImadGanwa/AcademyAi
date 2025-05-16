@@ -128,25 +128,37 @@ const MentorshipBookSession: React.FC = () => {
       setLoadingTimeSlots(true);
       
       try {
-        const formattedDate = selectedDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        // Format date as YYYY-MM-DD without timezone conversion
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        
+        console.log(`Fetching available slots for mentor ${mentorId} on date ${formattedDate}`);
         const response = await getMentorAvailableSlots(mentorId, formattedDate);
         
-        if (response && response.availableSlots) {
-          setAvailableTimeSlots(response.availableSlots);
+        if (response && response.success && response.data && Array.isArray(response.data.availableSlots)) {
+          console.log('Available slots fetched:', response.data.availableSlots);
+          // Format the time slots to 12-hour format for display
+          const formattedSlots = response.data.availableSlots.map((slot: string) => {
+            // Assuming slot is in 24-hour format like "09:00", "14:30"
+            const [hours, minutes] = slot.split(':');
+            const hour = parseInt(hours, 10);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+            return `${hour12}:${minutes} ${ampm}`;
+          });
+          
+          setAvailableTimeSlots(formattedSlots);
         } else {
-          // Fallback to mock time slots for testing
-          setAvailableTimeSlots([
-            '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', 
-            '11:00 AM', '2:00 PM', '2:30 PM', '3:00 PM'
-          ]);
+          console.warn('Invalid response format or no slots available:', response);
+          setAvailableTimeSlots([]);
         }
       } catch (err) {
         console.error("Error fetching available time slots:", err);
-        // Fallback to mock time slots
-        setAvailableTimeSlots([
-          '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', 
-          '11:00 AM', '2:00 PM', '2:30 PM', '3:00 PM'
-        ]);
+        setAvailableTimeSlots([]);
+        // Show error message to user
+        setError("Failed to load available time slots. Please try a different date.");
       } finally {
         setLoadingTimeSlots(false);
       }
@@ -183,12 +195,18 @@ const MentorshipBookSession: React.FC = () => {
     
     const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
     
+    // Format date consistently
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    
     // Navigate to confirmation page with booking details
     navigate(`/mentorship/booking-confirmation`, {
       state: {
         mentorId,
         mentorName: mentor?.fullName,
-        date: selectedDate.toISOString().split('T')[0],
+        date: formattedDate,
         startTime,
         endTime,
         topic,

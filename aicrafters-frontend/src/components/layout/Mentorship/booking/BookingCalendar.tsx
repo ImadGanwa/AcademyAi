@@ -413,9 +413,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
             </Box>
           ) : availableTimeSlots.length > 0 ? (
             <TimeSlotList>
-              {availableTimeSlots.map(time => (
+              {availableTimeSlots.map((time, index) => (
                 <TimeSlot
-                  key={time}
+                  key={`time-slot-${time}-${index}`}
                   isselected={(selectedTime === time).toString()}
                   onClick={() => onTimeSelect(time)}
                 >

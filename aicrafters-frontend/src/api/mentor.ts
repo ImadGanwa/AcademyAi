@@ -43,13 +43,6 @@ interface MentorAvailabilityData {
   [key: string]: any; // Allow additional fields
 }
 
-interface BookingUpdateData {
-  status?: string;
-  notes?: string;
-  meetingLink?: string;
-  [key: string]: any; // Allow additional fields
-}
-
 // Get public list of mentors with optional filters
 export const getPublicMentorList = async (filters: MentorFilters = {}) => {
   try {
@@ -191,36 +184,6 @@ export const updateMentorAvailability = async (availabilityData: MentorAvailabil
   return response.data;
 };
 
-// Get all bookings for a mentor
-export const getMentorBookings = async () => {
-  const response = await axiosInstance.get('/api/mentor/bookings');
-  return response.data;
-};
-
-// Get specific booking details
-export const getBookingDetails = async (bookingId: string) => {
-  const response = await axiosInstance.get(`/api/mentor/bookings/${bookingId}`);
-  return response.data;
-};
-
-// Update booking
-export const updateBooking = async (bookingId: string, updateData: BookingUpdateData) => {
-  const response = await axiosInstance.put(`/api/mentor/bookings/${bookingId}`, updateData);
-  return response.data;
-};
-
-// Complete a booking
-export const completeBooking = async (bookingId: string) => {
-  const response = await axiosInstance.post(`/api/mentor/bookings/${bookingId}/complete`);
-  return response.data;
-};
-
-// Cancel a booking
-export const cancelBooking = async (bookingId: string, reason: string) => {
-  const response = await axiosInstance.post(`/api/mentor/bookings/${bookingId}/cancel`, { reason });
-  return response.data;
-};
-
 // Get all conversations for a mentor
 export const getMentorConversations = async () => {
   const response = await axiosInstance.get('/api/mentor/messages');
@@ -248,9 +211,6 @@ export const getMentorApplications = async () => {
 
 // Update mentor application status
 export const updateMentorApplicationStatus = async (applicationId: string, status: 'approved' | 'rejected', notes?: string) => {
-  const response = await axiosInstance.put(`/api/admin/mentor-applications/${applicationId}`, { 
-    status,
-    adminNotes: notes 
-  });
+  const response = await axiosInstance.put(`/api/admin/mentor-applications/${applicationId}`, { status, notes });
   return response.data;
 }; 

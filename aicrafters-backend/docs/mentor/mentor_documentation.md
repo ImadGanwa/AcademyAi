@@ -88,34 +88,6 @@ mentorProfile: {
 }
 ```
 
-### Mentorship Booking
-
-```typescript
-interface MentorshipBooking {
-  _id: mongoose.Types.ObjectId;
-  mentorId: mongoose.Types.ObjectId;     // Reference to the User (mentor)
-  menteeId: mongoose.Types.ObjectId;     // Reference to the User (student)
-  scheduledAt: Date;                     // Date and time of session
-  duration: number;                      // Duration in minutes
-  status: 'scheduled' | 'completed' | 'cancelled' | 'no-show';
-  topic: string;                         // Main topic for discussion
-  notes: {                               // Session notes
-    mentorNotes?: string;                // Mentor's private notes
-    menteeNotes?: string;                // Mentee's private notes
-    sharedNotes?: string;                // Notes visible to both
-  };
-  feedback: {                            // Session feedback
-    rating?: number;                     // 1-5 rating
-    comment?: string;                    // Written feedback
-    submittedAt?: Date;                  // When feedback was submitted
-  };
-  meetingLink?: string;                  // Video conferencing link
-  price: number;                         // Price paid for the session
-  createdAt: Date;
-  updatedAt: Date;
-}
-```
-
 ### Mentor Message
 
 ```typescript
@@ -154,14 +126,6 @@ interface MentorMessage {
 - `PUT /api/mentor/availability`: Update mentor availability
   - Updates the mentor's available time slots
   - Validates for conflicts with existing bookings
-
-### Mentorship Sessions
-
-- `GET /api/mentor/bookings`: Get all bookings for a mentor
-- `GET /api/mentor/bookings/:id`: Get details for a specific booking
-- `PUT /api/mentor/bookings/:id`: Update booking details
-- `POST /api/mentor/bookings/:id/complete`: Mark a booking as completed
-- `POST /api/mentor/bookings/:id/cancel`: Cancel a booking
 
 ### Mentee Management
 
@@ -218,9 +182,6 @@ interface MentorMessage {
 
 - `GET /api/mentors`: Get all available mentors
 - `GET /api/mentors/:id`: Get a specific mentor's public profile
-- `POST /api/mentors/:id/book`: Book a session with a mentor
-- `GET /api/user/mentorship/bookings`: Get user's mentorship bookings
-- `GET /api/user/mentorship/bookings/:id`: Get details for a specific booking
 
 ## Authentication & Authorization
 
@@ -375,26 +336,10 @@ Mentors can set their weekly availability, which is then used to generate bookab
 3. Upon approval, user role is updated to include 'mentor'
 4. Mentor sets up their profile and availability
 
-### Booking a Session
-
-1. User browses available mentors
-2. User selects a mentor and views their profile
-3. User books a session by selecting an available time slot
-4. Mentor receives notification about new booking
-5. Both parties join at the scheduled time
-
-### After Session
-
-1. Both mentor and mentee can provide feedback
-2. Mentor can add notes about the session
-3. Session is marked as completed
-
 ## Implementation Considerations
 
 - **Scheduling System**: Need to handle timezones properly
-- **Payment Integration**: Process payments for mentorship sessions
-- **Video Conferencing**: Integration with video platforms
-- **Notification System**: Email and in-app notifications for bookings
+- **Notification System**: Email and in-app notifications
 - **Rating System**: Calculate average mentor ratings from session feedback
 - **Search & Filtering**: Allow users to find mentors by skills, availability, etc.
 

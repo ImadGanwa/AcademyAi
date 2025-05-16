@@ -19,8 +19,27 @@ export interface IMentorshipBooking extends Document {
   };
   meetingLink?: string;
   price: number;
+  mentorAvailabilityId?: string; // Reference to specific availability slot
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Add static methods interface
+interface MentorshipBookingModel extends mongoose.Model<IMentorshipBooking> {
+  checkForConflicts(
+    mentorId: mongoose.Types.ObjectId,
+    scheduledAt: Date,
+    duration: number,
+    excludeBookingId?: mongoose.Types.ObjectId
+  ): Promise<boolean>;
+  getUpcomingForMentor(
+    mentorId: mongoose.Types.ObjectId,
+    limit?: number
+  ): Promise<IMentorshipBooking[]>;
+  getUpcomingForMentee(
+    menteeId: mongoose.Types.ObjectId,
+    limit?: number
+  ): Promise<IMentorshipBooking[]>;
 }
 
 const MentorshipBookingSchema = new Schema({
@@ -95,6 +114,10 @@ const MentorshipBookingSchema = new Schema({
     type: Number,
     required: true,
     min: 0
+  },
+  mentorAvailabilityId: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true
@@ -206,4 +229,4 @@ MentorshipBookingSchema.statics.getUpcomingForMentee = function(
     .exec();
 };
 
-export const MentorshipBooking = mongoose.model<IMentorshipBooking>('MentorshipBooking', MentorshipBookingSchema); 
+export const MentorshipBooking = mongoose.model<IMentorshipBooking, MentorshipBookingModel>('MentorshipBooking', MentorshipBookingSchema); 

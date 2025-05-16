@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState,  useEffect } from 'react';
 import {
   Box,
   Typography,
   Paper,
-  Grid,
   FormGroup,
   FormControlLabel,
   Checkbox,
@@ -12,10 +11,8 @@ import {
   MenuItem,
   SelectChangeEvent,
   FormControl,
-  InputLabel,
   RadioGroup,
   Radio,
-  TextField,
   Table,
   TableBody,
   TableCell,
@@ -31,8 +28,6 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import InfoIcon from '@mui/icons-material/Info';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -369,9 +364,16 @@ export const Availability: React.FC = () => {
 
   // Get current week key for storage
   const getCurrentWeekKey = (date: Date = currentWeek): string => {
-    const firstDayOfWeek = new Date(date);
-    firstDayOfWeek.setDate(date.getDate() - date.getDay() + 1); // Start with Monday
-    return firstDayOfWeek.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    // Calculate Monday of the week (day 1)
+    const mondayDate = new Date(date);
+    const day = date.getDay() || 7; // Convert Sunday (0) to 7
+    mondayDate.setDate(date.getDate() - day + 1); // 1 = Monday
+    
+    // Format as YYYY-MM-DD
+    const year = mondayDate.getFullYear();
+    const month = String(mondayDate.getMonth() + 1).padStart(2, '0');
+    const dayOfMonth = String(mondayDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${dayOfMonth}`;
   };
 
   // Get availability for a specific week
@@ -382,6 +384,9 @@ export const Availability: React.FC = () => {
   // Get current week's availability slots
   const getCurrentWeekAvailability = (): {[key: string]: boolean} => {
     const weekKey = getCurrentWeekKey();
+    console.log(`Getting availability for week key: ${weekKey}`);
+    console.log('Available week keys in data:', Object.keys(availabilityByWeek));
+    console.log('Current week availability:', availabilityByWeek[weekKey] || {});
     return getWeekAvailability(weekKey);
   };
 
@@ -699,7 +704,21 @@ export const Availability: React.FC = () => {
           const startTime12h = convert24To12Hour(slot.startTime);
           const endTime12h = convert24To12Hour(slot.endTime);
           
-          console.log(`Converting slot: Day ${slot.day} (${day}), Start: ${slot.startTime} (${startTime12h}), End: ${slot.endTime} (${endTime12h}), Week: ${slot.weekKey || 'current'}`);
+          // Get or ensure proper week key format
+          let weekKey = slot.weekKey;
+          if (weekKey) {
+            // Parse weekKey date and recalculate to ensure consistent formatting
+            const weekKeyDate = new Date(weekKey);
+            if (!isNaN(weekKeyDate.getTime())) {
+              // Use our fixed getCurrentWeekKey function to ensure format consistency
+              weekKey = getCurrentWeekKey(weekKeyDate);
+            }
+          } else {
+            // If no weekKey, use the recurring weekly schedule (current week)
+            weekKey = getCurrentWeekKey();
+          }
+          
+          console.log(`Processing slot: Day ${slot.day} (${day}), Start: ${slot.startTime} (${startTime12h}), End: ${slot.endTime} (${endTime12h}), Week: ${weekKey}`);
           
           // Find all timeslots between start and end time
           const startIndex = timeSlots.indexOf(startTime12h);
@@ -708,9 +727,6 @@ export const Availability: React.FC = () => {
           console.log(`Start index: ${startIndex}, End index: ${endIndex}`);
           
           if (startIndex !== -1 && endIndex !== -1) {
-            // Determine which week this slot belongs to
-            let weekKey = slot.weekKey || getCurrentWeekKey();
-            
             // Initialize the week if not already in the map
             if (!allWeeksAvailability[weekKey]) {
               allWeeksAvailability[weekKey] = {};
@@ -938,6 +954,13 @@ export const Availability: React.FC = () => {
       return `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
     }
   };
+
+  // Add a useEffect to log and verify week changes
+  useEffect(() => {
+    const weekKey = getCurrentWeekKey();
+    console.log(`Week changed to: ${weekKey}`);
+    console.log('Current week availability after change:', availabilityByWeek[weekKey] || {});
+  }, [currentWeek, availabilityByWeek]);
 
   // Navigate to previous week
   const handlePreviousWeek = () => {

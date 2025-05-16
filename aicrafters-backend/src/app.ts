@@ -23,6 +23,7 @@ import organizationRoutes from './routes/organizationRoutes';
 import transcriptionRoutes from './routes/transcriptionRoutes';
 import summaryRoutes from './routes/summaryRoutes';
 import mindMapRoutes from './routes/mindMapRoutes';
+import bookingRoutes from './routes/bookingRoutes';
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api/organizations', organizationRoutes);
 app.use('/api/transcriptions', transcriptionRoutes);
 app.use('/api/summaries', summaryRoutes);
 app.use('/api/mindmaps', mindMapRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/aicrafters')

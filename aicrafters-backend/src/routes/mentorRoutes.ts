@@ -74,41 +74,6 @@ router.get('/availability', authMiddleware, isMentor, mentorController.getMentor
 router.put('/availability', authMiddleware, isMentor, mentorController.updateMentorAvailability);
 
 /**
- * @route   GET /api/mentor/bookings
- * @desc    Get all bookings for a mentor
- * @access  Private (requires mentor authentication)
- */
-router.get('/bookings', authMiddleware, isApprovedMentor, mentorController.getMentorBookings);
-
-/**
- * @route   GET /api/mentor/bookings/:id
- * @desc    Get details for a specific booking
- * @access  Private (requires mentor authentication)
- */
-router.get('/bookings/:id', authMiddleware, isApprovedMentor, mentorController.getBookingDetails);
-
-/**
- * @route   PUT /api/mentor/bookings/:id
- * @desc    Update booking details
- * @access  Private (requires mentor authentication)
- */
-router.put('/bookings/:id', authMiddleware, isApprovedMentor, mentorController.updateBooking);
-
-/**
- * @route   POST /api/mentor/bookings/:id/complete
- * @desc    Mark a booking as completed
- * @access  Private (requires mentor authentication)
- */
-router.post('/bookings/:id/complete', authMiddleware, isApprovedMentor, mentorController.completeBooking);
-
-/**
- * @route   POST /api/mentor/bookings/:id/cancel
- * @desc    Cancel a booking
- * @access  Private (requires mentor authentication)
- */
-router.post('/bookings/:id/cancel', authMiddleware, isApprovedMentor, mentorController.cancelBooking);
-
-/**
  * @route   GET /api/mentor/messages
  * @desc    Get all conversations for a mentor
  * @access  Private (requires mentor authentication)

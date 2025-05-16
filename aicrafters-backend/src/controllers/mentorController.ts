@@ -373,26 +373,61 @@ export const mentorController = {
         return;
       }
 
-      // Validate each availability slot
-      const isValidAvailability = availability.every(slot => 
-        typeof slot.day === 'number' && 
-        slot.day >= 0 && 
-        slot.day <= 6 &&
-        typeof slot.startTime === 'string' && 
-        typeof slot.endTime === 'string' &&
-        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.startTime) &&
-        /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.endTime) &&
-        slot.startTime < slot.endTime &&
-        (!slot.weekKey || typeof slot.weekKey === 'string')
-      );
-
-      if (!isValidAvailability) {
-        res.status(400).json({
-          success: false,
-          error: 'Invalid availability format. Each slot must have day (0-6), startTime and endTime (HH:MM)'
-        });
-        return;
-      }
+      // Validate each availability slot and ensure it has all required fields
+      const processedAvailability = availability.map(slot => {
+        // Ensure the day is a number between 0-6
+        const day = Number(slot.day);
+        
+        if (isNaN(day) || day < 0 || day > 6) {
+          throw new Error(`Invalid day value: ${slot.day}. Must be a number 0-6`);
+        }
+        
+        // Ensure start/end times are in HH:MM format
+        if (!/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.startTime) ||
+            !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(slot.endTime)) {
+          throw new Error(`Invalid time format for slot. Must be HH:MM`);
+        }
+        
+        // Ensure start time is before end time
+        if (slot.startTime >= slot.endTime) {
+          throw new Error(`Start time (${slot.startTime}) must be before end time (${slot.endTime})`);
+        }
+        
+        // Validate weekKey format if provided (should be YYYY-MM-DD)
+        let normalizedWeekKey = null;
+        if (slot.weekKey) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(slot.weekKey)) {
+            throw new Error(`Invalid weekKey format: ${slot.weekKey}. Must be YYYY-MM-DD`);
+          }
+          
+          // Ensure the weekKey is actually a Monday (beginning of week)
+          const calculatedMonday = getMondayOfWeek(slot.weekKey);
+          if (calculatedMonday !== slot.weekKey) {
+            console.warn(`Warning: Correcting weekKey from ${slot.weekKey} to ${calculatedMonday} (Monday of that week)`);
+            normalizedWeekKey = calculatedMonday;
+          } else {
+            normalizedWeekKey = slot.weekKey;
+          }
+        }
+        
+        // Generate a unique ID for each slot based on its data
+        return {
+          id: `${day}-${slot.startTime}-${slot.endTime}-${slot.weekKey || 'recurring'}`,
+          day,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          weekKey: normalizedWeekKey,
+          status: 'active'
+        };
+      });
+      
+      // Check for duplicate slots and filter them out
+      const uniqueSlotMap = new Map();
+      processedAvailability.forEach(slot => {
+        uniqueSlotMap.set(slot.id, slot);
+      });
+      
+      const uniqueAvailability = Array.from(uniqueSlotMap.values());
 
       // Check if user exists and has a mentor profile
       const user = await User.findById(userId);
@@ -413,7 +448,7 @@ export const mentorController = {
       // Update availability
       const updatedUser = await User.findByIdAndUpdate(
         userId,
-        { $set: { 'mentorProfile.availability': availability } },
+        { $set: { 'mentorProfile.availability': uniqueAvailability } },
         { new: true }
       );
 
@@ -435,386 +470,6 @@ export const mentorController = {
       res.status(500).json({ 
         success: false, 
         error: error.message || 'An error occurred while updating mentor availability' 
-      });
-    }
-  },
-
-  /**
-   * Get all bookings for a mentor
-   * @route GET /api/mentor/bookings
-   */
-  getMentorBookings: async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.user) {
-        res.status(401).json({ success: false, error: 'User not authenticated' });
-        return;
-      }
-
-      const mentorId = req.user._id;
-      const { status, startDate, endDate } = req.query;
-      
-      // Build filter object
-      const filter: any = { mentorId };
-      
-      // Add status filter if provided
-      if (status && ['scheduled', 'completed', 'cancelled', 'no-show'].includes(status as string)) {
-        filter.status = status;
-      }
-      
-      // Add date range filter if provided
-      if (startDate || endDate) {
-        filter.scheduledAt = {};
-        if (startDate) filter.scheduledAt.$gte = new Date(startDate as string);
-        if (endDate) filter.scheduledAt.$lte = new Date(endDate as string);
-      }
-      
-      // Get bookings for the mentor
-      const bookings = await MentorshipBooking.find(filter)
-        .sort({ scheduledAt: -1 })
-        .populate('menteeId', 'fullName email profileImage')
-        .exec();
-      
-      res.status(200).json({
-        success: true,
-        data: {
-          bookings,
-          count: bookings.length
-        }
-      });
-    } catch (error: any) {
-      console.error('Error fetching mentor bookings:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message || 'An error occurred while fetching bookings'
-      });
-    }
-  },
-
-  /**
-   * Get details for a specific booking
-   * @route GET /api/mentor/bookings/:id
-   */
-  getBookingDetails: async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.user) {
-        res.status(401).json({ success: false, error: 'User not authenticated' });
-        return;
-      }
-
-      const mentorId = req.user._id;
-      const bookingId = req.params.id;
-      
-      // Validate booking ID
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        res.status(400).json({ 
-          success: false, 
-          error: 'Invalid booking ID format'
-        });
-        return;
-      }
-      
-      // Find booking with mentorId to ensure mentor can only access their bookings
-      const booking = await MentorshipBooking.findOne({
-        _id: bookingId,
-        mentorId
-      }).populate('menteeId', 'fullName email profileImage').exec();
-      
-      if (!booking) {
-        res.status(404).json({
-          success: false,
-          error: 'Booking not found or you do not have permission to view it'
-        });
-        return;
-      }
-      
-      res.status(200).json({
-        success: true,
-        data: {
-          booking
-        }
-      });
-    } catch (error: any) {
-      console.error('Error fetching booking details:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message || 'An error occurred while fetching booking details'
-      });
-    }
-  },
-
-  /**
-   * Update booking details
-   * @route PUT /api/mentor/bookings/:id
-   */
-  updateBooking: async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.user) {
-        res.status(401).json({ success: false, error: 'User not authenticated' });
-        return;
-      }
-
-      const mentorId = req.user._id;
-      const bookingId = req.params.id;
-      const { notes, meetingLink } = req.body;
-      
-      // Validate booking ID
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        res.status(400).json({ 
-          success: false, 
-          error: 'Invalid booking ID format'
-        });
-        return;
-      }
-      
-      // Find booking with mentorId to ensure mentor can only update their bookings
-      const booking = await MentorshipBooking.findOne({
-        _id: bookingId,
-        mentorId
-      });
-      
-      if (!booking) {
-        res.status(404).json({
-          success: false,
-          error: 'Booking not found or you do not have permission to update it'
-        });
-        return;
-      }
-      
-      // Prepare update object with only provided fields
-      const updateFields: any = {};
-      
-      if (notes?.mentorNotes !== undefined) {
-        updateFields['notes.mentorNotes'] = notes.mentorNotes;
-      }
-      
-      if (notes?.sharedNotes !== undefined) {
-        updateFields['notes.sharedNotes'] = notes.sharedNotes;
-      }
-      
-      if (meetingLink !== undefined) {
-        updateFields.meetingLink = meetingLink;
-      }
-      
-      // Only allow updates to active bookings
-      if (booking.status !== 'scheduled') {
-        res.status(400).json({
-          success: false,
-          error: `Cannot update a booking with status: ${booking.status}`
-        });
-        return;
-      }
-      
-      // Perform the update
-      const updatedBooking = await MentorshipBooking.findByIdAndUpdate(
-        bookingId,
-        { $set: updateFields },
-        { new: true, runValidators: true }
-      ).populate('menteeId', 'fullName email profileImage');
-      
-      res.status(200).json({
-        success: true,
-        message: 'Booking updated successfully',
-        data: {
-          booking: updatedBooking
-        }
-      });
-    } catch (error: any) {
-      console.error('Error updating booking:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message || 'An error occurred while updating booking'
-      });
-    }
-  },
-
-  /**
-   * Mark a booking as completed
-   * @route POST /api/mentor/bookings/:id/complete
-   */
-  completeBooking: async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.user) {
-        res.status(401).json({ success: false, error: 'User not authenticated' });
-        return;
-      }
-
-      const mentorId = req.user._id;
-      const bookingId = req.params.id;
-      const { notes } = req.body;
-      
-      // Validate booking ID
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        res.status(400).json({ 
-          success: false, 
-          error: 'Invalid booking ID format'
-        });
-        return;
-      }
-      
-      // Find booking with mentorId to ensure mentor can only complete their bookings
-      const booking = await MentorshipBooking.findOne({
-        _id: bookingId,
-        mentorId
-      });
-      
-      if (!booking) {
-        res.status(404).json({
-          success: false,
-          error: 'Booking not found or you do not have permission to complete it'
-        });
-        return;
-      }
-      
-      // Only allow completion of scheduled bookings
-      if (booking.status !== 'scheduled') {
-        res.status(400).json({
-          success: false,
-          error: `Cannot complete a booking with status: ${booking.status}`
-        });
-        return;
-      }
-      
-      // Update booking status and notes if provided
-      const updateFields: any = {
-        status: 'completed'
-      };
-      
-      if (notes?.mentorNotes) {
-        updateFields['notes.mentorNotes'] = notes.mentorNotes;
-      }
-      
-      if (notes?.sharedNotes) {
-        updateFields['notes.sharedNotes'] = notes.sharedNotes;
-      }
-      
-      // Complete the booking
-      const completedBooking = await MentorshipBooking.findByIdAndUpdate(
-        bookingId,
-        { $set: updateFields },
-        { new: true }
-      ).populate('menteeId', 'fullName email profileImage');
-      
-      // Increment sessions count for mentor
-      await User.findByIdAndUpdate(
-        mentorId,
-        { $inc: { 'mentorProfile.sessionsCount': 1 } }
-      );
-      
-      // TODO: Send notification to mentee about session completion
-      
-      res.status(200).json({
-        success: true,
-        message: 'Booking marked as completed',
-        data: {
-          booking: completedBooking
-        }
-      });
-    } catch (error: any) {
-      console.error('Error completing booking:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message || 'An error occurred while completing booking'
-      });
-    }
-  },
-
-  /**
-   * Cancel a booking
-   * @route POST /api/mentor/bookings/:id/cancel
-   */
-  cancelBooking: async (req: Request, res: Response): Promise<void> => {
-    try {
-      if (!req.user) {
-        res.status(401).json({ success: false, error: 'User not authenticated' });
-        return;
-      }
-
-      const mentorId = req.user._id;
-      const bookingId = req.params.id;
-      const { cancelReason } = req.body;
-      
-      // Validate booking ID
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        res.status(400).json({ 
-          success: false, 
-          error: 'Invalid booking ID format'
-        });
-        return;
-      }
-      
-      // Validate cancel reason
-      if (!cancelReason) {
-        res.status(400).json({
-          success: false,
-          error: 'Cancellation reason is required'
-        });
-        return;
-      }
-      
-      // Find booking with mentorId to ensure mentor can only cancel their bookings
-      const booking = await MentorshipBooking.findOne({
-        _id: bookingId,
-        mentorId
-      });
-      
-      if (!booking) {
-        res.status(404).json({
-          success: false,
-          error: 'Booking not found or you do not have permission to cancel it'
-        });
-        return;
-      }
-      
-      // Only allow cancellation of scheduled bookings
-      if (booking.status !== 'scheduled') {
-        res.status(400).json({
-          success: false,
-          error: `Cannot cancel a booking with status: ${booking.status}`
-        });
-        return;
-      }
-      
-      // Get time difference to check if cancellation is allowed
-      const now = new Date();
-      const sessionTime = new Date(booking.scheduledAt);
-      const hoursDifference = (sessionTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-      
-      // Check if cancellation is within allowed time (24 hours)
-      if (hoursDifference < 24) {
-        res.status(400).json({
-          success: false,
-          error: 'Bookings can only be cancelled at least 24 hours before the scheduled time'
-        });
-        return;
-      }
-      
-      // Cancel the booking
-      const cancelledBooking = await MentorshipBooking.findByIdAndUpdate(
-        bookingId,
-        { 
-          $set: { 
-            status: 'cancelled',
-            'notes.mentorNotes': `Cancelled by mentor. Reason: ${cancelReason}`
-          } 
-        },
-        { new: true }
-      ).populate('menteeId', 'fullName email profileImage');
-      
-      // TODO: Send notification to mentee about cancellation
-      // TODO: Initiate refund process if payment was made
-      
-      res.status(200).json({
-        success: true,
-        message: 'Booking cancelled successfully',
-        data: {
-          booking: cancelledBooking
-        }
-      });
-    } catch (error: any) {
-      console.error('Error cancelling booking:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message || 'An error occurred while cancelling booking'
       });
     }
   },
@@ -1210,5 +865,17 @@ export const mentorController = {
         error: error.message || 'An error occurred while fetching mentor profile'
       });
     }
-  }
+  },
+};
+
+// Helper function to get the Monday of a week for a given date
+const getMondayOfWeek = (date: Date | string): string => {
+  const dateObj = new Date(date);
+  const day = dateObj.getDay() || 7; // Convert Sunday (0) to 7
+  const diff = dateObj.getDate() - day + 1; // 1 = Monday
+  const mondayDate = new Date(dateObj);
+  mondayDate.setDate(diff);
+  
+  // Format as YYYY-MM-DD
+  return mondayDate.toISOString().split('T')[0];
 }; 
