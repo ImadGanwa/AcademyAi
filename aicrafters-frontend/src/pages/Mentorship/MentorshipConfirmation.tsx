@@ -8,6 +8,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import TimerIcon from '@mui/icons-material/Timer';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import AddIcon from '@mui/icons-material/Add';
+import { useTranslation } from 'react-i18next';
 
 // Import API methods
 import { createBooking } from '../../api/booking';
@@ -167,6 +168,8 @@ const MentorshipConfirmation: React.FC = () => {
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [mentor, setMentor] = useState<any>(null);
   
+  const { t } = useTranslation();
+  
   // Create the booking when component mounts
   useEffect(() => {
     const createNewBooking = async () => {
@@ -255,11 +258,11 @@ const MentorshipConfirmation: React.FC = () => {
   // Show loading state
   if (loading) {
     return (
-      <Layout title="Processing Booking">
+      <Layout title={t('mentorship.confirmationTitle', 'Processing Booking')}>
         <PageContainer>
           <LoadingContainer>
             <CircularProgress size={60} />
-            <Typography variant="h6" sx={{ mt: 3 }}>Processing your booking...</Typography>
+            <Typography variant="h6" sx={{ mt: 3 }}>{t('mentorship.loadingMentorProfile', 'Processing your booking...')}</Typography>
           </LoadingContainer>
         </PageContainer>
       </Layout>
@@ -269,13 +272,13 @@ const MentorshipConfirmation: React.FC = () => {
   // Show error state
   if (error && !bookingCreated) {
     return (
-      <Layout title="Booking Error">
+      <Layout title={t('mentorship.confirmationTitle', 'Booking Error')}>
         <PageContainer>
           <ConfirmationCard>
-            <Title variant="h2">Booking Error</Title>
+            <Title variant="h2">{t('mentorship.bookingError', 'Booking Error')}</Title>
             <Alert severity="error" sx={{ width: '100%', mb: 3 }}>{error}</Alert>
             <Button variant="contained" color="primary" onClick={handleReturnToMentors}>
-              Return to mentors
+              {t('mentorship.returnToMentors', 'Return to mentors')}
             </Button>
           </ConfirmationCard>
         </PageContainer>
@@ -285,18 +288,37 @@ const MentorshipConfirmation: React.FC = () => {
   
   // Format the date for display
   const formattedDate = new Date(bookingDetails?.date || state?.date || Date.now())
-    .toLocaleDateString('en-US', {
+    .toLocaleDateString(localStorage.getItem('i18nextLng') === 'fr' ? 'fr-FR' : 'en-US', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     });
   
   const startTime = bookingDetails?.startTime || state?.startTime || '09:00';
-  const [startHour, startMinute] = startTime.split(':');
-  const formattedStartTime = `${parseInt(startHour) > 12 ? parseInt(startHour) - 12 : startHour}:${startMinute}${parseInt(startHour) >= 12 ? ' PM' : ' AM'}`;
+  const endTime = bookingDetails?.endTime || state?.endTime || '09:30';
+  
+  // Format the time based on the locale
+  let formattedStartTime, formattedEndTime;
+  const currentLang = localStorage.getItem('i18nextLng') || 'en';
+  
+  if (currentLang === 'fr') {
+    // French uses 24-hour format
+    formattedStartTime = startTime;
+    formattedEndTime = endTime;
+  } else {
+    // Format time for English (12-hour with AM/PM)
+    const [startHour, startMinute] = startTime.split(':');
+    const [endHour, endMinute] = endTime.split(':');
+    
+    const startHourInt = parseInt(startHour);
+    const endHourInt = parseInt(endHour);
+    
+    formattedStartTime = `${startHourInt > 12 ? startHourInt - 12 : startHourInt}:${startMinute}${startHourInt >= 12 ? ' PM' : ' AM'}`;
+    formattedEndTime = `${endHourInt > 12 ? endHourInt - 12 : endHourInt}:${endMinute}${endHourInt >= 12 ? ' PM' : ' AM'}`;
+  }
   
   // Calculate duration in minutes
-  const endTime = bookingDetails?.endTime || state?.endTime || '09:30';
+  const [startHour, startMinute] = startTime.split(':');
   const [endHour, endMinute] = endTime.split(':');
   const startMinutes = parseInt(startHour) * 60 + parseInt(startMinute);
   const endMinutes = parseInt(endHour) * 60 + parseInt(endMinute);
@@ -306,11 +328,11 @@ const MentorshipConfirmation: React.FC = () => {
   const mentorName = mentor?.name || bookingDetails?.mentorName || state?.mentorName || 'your mentor';
   
   return (
-    <Layout title="Booking Confirmed">
+    <Layout title={t('mentorship.confirmationTitle', 'Booking Confirmed')}>
       <PageContainer>
         <ConfirmationCard>
-          <Title variant="h2">Your Session is Confirmed</Title>
-          <Subtitle>You're all set for your mentorship session with {mentorName}</Subtitle>
+          <Title variant="h2">{t('mentorship.confirmationTitle', 'Your Session is Confirmed')}</Title>
+          <Subtitle>{t('mentorship.confirmationSubtitle', 'You\'re all set for your mentorship session with ')} {mentorName}</Subtitle>
           
           <ImageContainer>
             <img 
@@ -322,12 +344,12 @@ const MentorshipConfirmation: React.FC = () => {
           
           {error && (
             <Alert severity="warning" sx={{ width: '100%', mb: 3 }}>
-              {error} We've still processed your booking for demonstration purposes.
+              {error} {t('mentorship.demoBookingMessage', 'We\'ve still processed your booking for demonstration purposes.')}
             </Alert>
           )}
           
           <InfoContainer>
-            <SessionHeader>Book a Session with {mentorName}</SessionHeader>
+            <SessionHeader>{t('mentorship.sessionWith', 'Book a Session with')} {mentorName}</SessionHeader>
             
             <InfoRow>
               <CalendarMonthIcon /> 
@@ -341,7 +363,7 @@ const MentorshipConfirmation: React.FC = () => {
             
             <InfoRow>
               <TimerIcon /> 
-              {duration} min
+              {duration} {t('mentorship.minutes', 'min')}
             </InfoRow>
           </InfoContainer>
           
@@ -352,7 +374,7 @@ const MentorshipConfirmation: React.FC = () => {
               onClick={handleZoomLink}
               fullWidth
             >
-              Zoom Meeting Link
+              {t('mentorship.zoomMeetingLink', 'Zoom Meeting Link')}
             </ZoomButton>
             
             <CalendarButton 
@@ -361,12 +383,12 @@ const MentorshipConfirmation: React.FC = () => {
               onClick={handleAddToCalendar}
               fullWidth
             >
-              Add to Calendar
+              {t('mentorship.addToCalendar', 'Add to Calendar')}
             </CalendarButton>
           </ButtonsContainer>
           
           <ReturnButton onClick={handleReturnToMentors}>
-            Return to Mentors
+            {t('mentorship.returnToMentors', 'Return to Mentors')}
           </ReturnButton>
         </ConfirmationCard>
       </PageContainer>

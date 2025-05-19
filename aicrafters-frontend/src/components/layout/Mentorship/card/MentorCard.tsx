@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { LoginPopup } from '../../../common/Popup/LoginPopup';
+import { useTranslation } from 'react-i18next';
 
 // Types
 export interface MentorSkill {
@@ -236,6 +237,7 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
   const { lang } = useParams<{ lang: string }>();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const { t } = useTranslation();
   
   const handleBookSession = () => {
     if (isAuthenticated) {
@@ -258,21 +260,21 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
             <Name variant="body1">
               {mentor.fullName}
               {mentor.isVerified && <VerifiedBadge />}
-              {mentor.countryFlag && <CountryFlag src={mentor.countryFlag} alt="Country flag" />}
+              {mentor.countryFlag && <CountryFlag src={mentor.countryFlag} alt={t('mentorship.countryFlagAlt', { defaultValue: 'Country flag' }) as string} />}
             </Name>
           </NameContainer>
-          <Title>{mentor.title}</Title>
+          <Title>{t(`titles.${mentor.title}`, { defaultValue: mentor.title }) as string}</Title>
           
           <SkillsContainer>
             {mentor.skills.map(skill => (
               <SkillTag key={skill.id || skill._id}>
-                {skill.name}
+                {t(`skills.${skill.name}`, { defaultValue: skill.name }) as string}
               </SkillTag>
             ))}
           </SkillsContainer>
           
           <Description>
-            {mentor.bio}
+            {t(`bios.${mentor.id}`, { defaultValue: mentor.bio }) as string}
           </Description>
         </HeaderSection>
         <Box sx={{ padding: '10px 0' }} />
@@ -280,17 +282,17 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
         <ButtonContainer>
           <LanguagesContainer>
             {mentor.languages?.map(language => (
-              <Language key={language.id || language._id}>{language.name}</Language>
+              <Language key={language.id || language._id}>{t(`languages.${language.name}`, { defaultValue: language.name }) as string}</Language>
             ))}
           </LanguagesContainer>
           <Box display="flex" alignItems="center" gap={2}>
             {mentor.hourlyRate && (
               <Typography variant="h6" fontWeight="bold" color="primary">
-                ${mentor.hourlyRate}/hr
+                {t('mentorship.hourlyRate', { rate: mentor.hourlyRate, defaultValue: `$${mentor.hourlyRate}/hr` }) as string}
               </Typography>
             )}
             <BookButton variant="contained" onClick={handleBookSession}>
-              Book a session
+              {t('mentorship.bookSessionButton', { defaultValue: 'Book a session' }) as string}
             </BookButton>
           </Box>
         </ButtonContainer>
@@ -299,7 +301,7 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
       {showLoginPopup && (
         <LoginPopup 
           onClose={() => setShowLoginPopup(false)}
-          message="Please login to book a session with this mentor"
+          message={t('mentorship.pleaseLoginToBook')}
         />
       )}
     </CardContainer>

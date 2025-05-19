@@ -1108,6 +1108,58 @@ export interface Translations {
     daysAgo: string;
     noNotifications: string;
   };
+  mentorship: {
+    pageTitle: string;
+    becomeMentorTitle: string;
+    becomeMentorSubtitle: string;
+    missionTitle: string;
+    missionText1: string;
+    missionText2: string;
+    whyMentorTitle: string;
+    benefitImpactTitle: string;
+    benefitImpactText: string;
+    benefitCrossCulturalTitle: string;
+    benefitCrossCulturalText: string;
+    benefitShareTitle: string;
+    benefitShareText: string;
+    benefitFlexibleTitle: string;
+    benefitFlexibleText: string;
+    benefitRecognitionTitle: string;
+    benefitRecognitionText: string;
+    applicationSubmittedTitle: string;
+    applicationSubmittedThankYou: string;
+    applicationSubmittedSubtitle: string;
+    applicationNextStepsTitle: string;
+    applicationNextStep1: string;
+    applicationNextStep2: string;
+    applicationNextStep3: string;
+    bookSessionTitle: string;
+    loadingMentorProfile: string;
+    mentorNotFound: string;
+    failedToLoadMentor: string;
+    failedToLoadSlots: string;
+    failedToCreateBooking: string;
+    bookingError: string;
+    returnToMentors: string;
+    pleaseLoginToBook: string;
+    confirmationTitle: string;
+    confirmationSubtitle: string;
+    confirmationDetails: string;
+    confirmationMentor: string;
+    confirmationDate: string;
+    confirmationTime: string;
+    confirmationTopic: string;
+    confirmationJoinZoom: string;
+    confirmationAddCalendar: string;
+    confirmationReturn: string;
+    dashboardTitle: string;
+    sidebarDashboard: string;
+    sidebarMentees: string;
+    sidebarMessages: string;
+    sidebarNotifications: string;
+    sidebarAvailability: string;
+    sidebarSettings: string;
+  };
 }
 
 declare module 'i18next' {

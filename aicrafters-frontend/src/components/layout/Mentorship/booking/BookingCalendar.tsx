@@ -3,6 +3,7 @@ import { Box, Typography, Button, TextField, CircularProgress } from '@mui/mater
 import styled from 'styled-components';
 import { KeyboardArrowLeft as ArrowLeftIcon, KeyboardArrowRight as ArrowRightIcon } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const CalendarContainer = styled(Box)`
   display: flex;
@@ -219,6 +220,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
 }) => {
   const navigate = useNavigate();
   const { mentorId } = useParams<{ mentorId: string }>();
+  const { t, i18n } = useTranslation();
   
   // Current display month/year
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -229,6 +231,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   const [isFormValid, setIsFormValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Get current locale
+  const currentLocale = i18n.language || 'en';
+  
   // Validate form when inputs change
   React.useEffect(() => {
     setIsFormValid(!!selectedDate && !!selectedTime && !!topic.trim());
@@ -236,7 +241,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   
   // Format month and year for display
   const formatMonthYear = (date: Date) => {
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return date.toLocaleDateString(currentLocale, { month: 'long', year: 'numeric' });
   };
   
   // Navigate to previous or next month
@@ -338,7 +343,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   const getFormattedSelectedDateTime = () => {
     if (!selectedDate) return '';
     
-    const formattedDate = selectedDate.toLocaleDateString('en-US', { 
+    const formattedDate = selectedDate.toLocaleDateString(currentLocale, { 
       weekday: 'long', 
       month: 'long', 
       day: 'numeric',
@@ -347,7 +352,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     
     if (!selectedTime) return formattedDate;
     
-    return `${formattedDate} at ${selectedTime}`;
+    return `${formattedDate} ${t('mentorship.booking.at', 'at') as string} ${selectedTime}`;
   };
   
   // Handle booking submission
@@ -363,7 +368,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   };
   
   const calendarDays = generateCalendarData();
-  const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  // Use localized weekday abbreviations
+  const weekdays = currentLocale === 'fr' 
+    ? ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'] 
+    : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   
   return (
     <CalendarContainer>
@@ -405,7 +413,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       {/* Time slot selection */}
       {selectedDate && (
         <TimeSlotSection>
-          <TimeSlotTitle>Available Time Slots</TimeSlotTitle>
+          <TimeSlotTitle>{t('mentorship.booking.availableTimeSlots', 'Available Time Slots') as string}</TimeSlotTitle>
           
           {loadingTimeSlots ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -426,7 +434,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           ) : (
             <Box sx={{ textAlign: 'center', py: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                No available time slots for this date.
+                {t('mentorship.booking.noAvailableSlots', 'No available time slots for this date.') as string}
               </Typography>
             </Box>
           )}
@@ -436,7 +444,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       {/* Selected date & time display */}
       {selectedDate && selectedTime && (
         <SelectedTimeBox>
-          <SelectedTimeLabel>Selected Date & Time:</SelectedTimeLabel>
+          <SelectedTimeLabel>{t('mentorship.booking.selectedDateTime', 'Selected Date & Time:') as string}</SelectedTimeLabel>
           <SelectedTimeValue>{getFormattedSelectedDateTime()}</SelectedTimeValue>
         </SelectedTimeBox>
       )}
@@ -444,13 +452,13 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       {/* Booking form */}
       {selectedDate && selectedTime && (
         <>
-          <TimeSlotTitle sx={{ mt: 3 }}>Booking Details</TimeSlotTitle>
+          <TimeSlotTitle sx={{ mt: 3 }}>{t('mentorship.booking.bookingDetails', 'Booking Details') as string}</TimeSlotTitle>
           
           <FormField>
-            <FieldLabel>Topic*</FieldLabel>
+            <FieldLabel>{t('mentorship.booking.topicRequired', 'Topic*') as string}</FieldLabel>
             <TextField
               fullWidth
-              placeholder="Enter the topic you'd like to discuss"
+              placeholder={t('mentorship.booking.topicPlaceholder', 'Enter the topic you\'d like to discuss') as string}
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               required
@@ -460,12 +468,12 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           </FormField>
           
           <FormField>
-            <FieldLabel>Message (Optional)</FieldLabel>
+            <FieldLabel>{t('mentorship.booking.messageOptional', 'Message (Optional)') as string}</FieldLabel>
             <TextField
               fullWidth
               multiline
               rows={3}
-              placeholder="Provide additional details about what you'd like to discuss"
+              placeholder={t('mentorship.booking.messagePlaceholder', 'Provide additional details about what you\'d like to discuss') as string}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               variant="outlined"
@@ -480,7 +488,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
               onClick={handleSubmitBooking}
               startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
             >
-              {isSubmitting ? 'Processing...' : 'Book Session'}
+              {isSubmitting ? t('mentorship.booking.processing', 'Processing...') as string : t('mentorship.booking.bookSession', 'Book Session') as string}
             </BookButton>
           </Box>
         </>

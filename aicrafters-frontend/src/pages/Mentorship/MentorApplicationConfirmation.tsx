@@ -2,6 +2,7 @@ import React from 'react';
 import { Typography } from '@mui/material';
 import styled from 'styled-components';
 import { Layout } from '../../components/layout/Layout/Layout';
+import { useTranslation } from 'react-i18next';
 
 // Styled components
 const PageContainer = styled.div`
@@ -84,17 +85,18 @@ const NextStepList = styled.ul`
 `;
 
 const MentorApplicationConfirmation: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
-    <Layout title="Application Submitted">
+    <Layout title={t('mentorship.applicationSubmittedTitle')}>
       <PageContainer>
         <ConfirmationCard>
           <Title variant="h2">
-            Thank You! Your Mentor Application Has Been Submitted
+            {t('mentorship.applicationSubmittedThankYou')}
           </Title>
           
           <Subtitle>
-            We've received your information and our team is reviewing your profile.
-            We're excited to have you join the AiCademy mentor community.
+            {t('mentorship.applicationSubmittedSubtitle')}
           </Subtitle>
           
           <ImageContainer>
@@ -106,11 +108,11 @@ const MentorApplicationConfirmation: React.FC = () => {
           </ImageContainer>
           
           <InfoContainer>
-            <NextStepTitle>What's next?</NextStepTitle>
+            <NextStepTitle>{t('mentorship.applicationNextStepsTitle')}</NextStepTitle>
             <NextStepList>
-              <li>Our team will review your details and verify your profile</li>
-              <li>You'll receive an email once your account is approved</li>
-              <li>Once approved, you'll start receiving mentee match requests based on your experience and preferences</li>
+              <li>{t('mentorship.applicationNextStep1')}</li>
+              <li>{t('mentorship.applicationNextStep2')}</li>
+              <li>{t('mentorship.applicationNextStep3')}</li>
             </NextStepList>
           </InfoContainer>
         </ConfirmationCard>

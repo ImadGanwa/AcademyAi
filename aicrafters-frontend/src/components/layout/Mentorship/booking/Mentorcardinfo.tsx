@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import styled from 'styled-components';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { Mentor } from '../card/MentorCard';
+import { useTranslation } from 'react-i18next';
 
 // Main container for the entire header card
 const HeaderContainer = styled(Box)`
@@ -186,44 +187,46 @@ const languageFlagMap: Record<string, string> = {
 
 // --- MAIN COMPONENT ---
 export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) => {
+  const { t } = useTranslation();
+
   return (
     <HeaderContainer>
       <MentorAvatar 
         src={mentor.profileImage || 'https://placehold.co/80x80/E0E0E0/BDBDBD?text=Mentor'} 
-        alt={`${mentor.fullName}'s avatar`} 
+        alt={t('mentorship.mentorAvatar', { name: mentor.fullName, defaultValue: `${mentor.fullName}'s avatar` }) as string} 
         onError={(e) => (e.currentTarget.src = 'https://placehold.co/80x80/E0E0E0/BDBDBD?text=Mentor')}
       />
       <MainContentWrapper>
         <MentorNameSection>
-          <MentorName variant="h4"> {/* Changed to h1 for semantic, styled for visual */}
+          <MentorName variant="h4">
             {mentor.fullName}
-            {mentor.isVerified !== false && <VerifiedBadge />} {/* Show badge if true or undefined */}
+            {mentor.isVerified !== false && <VerifiedBadge />}
             {mentor.countryFlag && (
               <CountryFlag 
                 src={mentor.countryFlag} 
-                alt="Country flag" 
+                alt={t('mentorship.countryFlagAlt', { defaultValue: 'Country flag' }) as string}
                 onError={(e) => (e.currentTarget.style.display = 'none')}
               />
             )}
           </MentorName>
-          <MentorTitle>{mentor.title}</MentorTitle>
+          <MentorTitle>{t(`titles.${mentor.title}`, { defaultValue: mentor.title }) as string}</MentorTitle>
         </MentorNameSection>
 
         {mentor.bio && (
           <>
-            <SectionTitle>About Me</SectionTitle>
-            <AboutText>{mentor.bio}</AboutText>
+            <SectionTitle>{t('mentorship.aboutMe', { defaultValue: 'About Me' }) as string}</SectionTitle>
+            <AboutText>{t(`bios.${mentor.id}`, { defaultValue: mentor.bio }) as string}</AboutText>
           </>
         )}
         
         {mentor.skills && mentor.skills.length > 0 && (
           <>
-            <SectionTitle>Skills</SectionTitle> {/* Removed colon for cleaner look */}
+            <SectionTitle>{t('mentorship.skillsSection', { defaultValue: 'Skills' }) as string}</SectionTitle>
             <SkillsContainer>
               {mentor.skills.map(skill => (
                 <SkillTag key={skill.id}>
-                  <Bullet>•</Bullet> {/* Using bullet as per original */}
-                  {skill.name}
+                  <Bullet>•</Bullet>
+                  {t(`skills.${skill.name}`, { defaultValue: skill.name }) as string}
                 </SkillTag>
               ))}
             </SkillsContainer>
@@ -232,18 +235,18 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
         
         {mentor.languages && mentor.languages.length > 0 && (
           <>
-            <SectionTitle>Spoken Languages</SectionTitle> {/* Removed colon */}
+            <SectionTitle>{t('mentorship.spokenLanguages', { defaultValue: 'Spoken Languages' }) as string}</SectionTitle>
             <LanguageSection>
               {mentor.languages.map(language => (
                 <Language key={language.id}>
                   {languageFlagMap[language.name] && (
                     <LanguageFlag 
                         src={languageFlagMap[language.name]} 
-                        alt={`${language.name} flag`} 
+                        alt={t('mentorship.languageFlagAlt', { language: language.name, defaultValue: `${language.name} flag` }) as string}
                         onError={(e) => (e.currentTarget.style.display = 'none')}
                     />
                   )}
-                  {language.name}
+                  {t(`languages.${language.name}`, { defaultValue: language.name }) as string}
                 </Language>
               ))}
             </LanguageSection>

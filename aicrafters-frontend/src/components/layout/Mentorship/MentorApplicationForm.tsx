@@ -5,6 +5,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { applyToBecomeMentor } from '../../../api/mentor';
+import { useTranslation } from 'react-i18next';
 
 // Styled components
 const FormSection = styled.div`
@@ -145,6 +146,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   const [newInterest, setNewInterest] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -299,16 +301,16 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   
   return (
     <FormSection>
-      <FormTitle variant="h4">Join our growing network of mentors</FormTitle>
+      <FormTitle variant="h4">{t('mentorship.applicationForm.title', 'Join our growing network of mentors') as string}</FormTitle>
       <StepIndicator currentStep={currentStep} />
       
       {currentStep === 1 && (
         <form>
           <FormField>
-            <FieldLabel>Full Name</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.fullName', 'Full Name') as string}</FieldLabel>
             <TextField 
               fullWidth
-              placeholder="John Doe"
+              placeholder={t('mentorship.applicationForm.fullNamePlaceholder', 'John Doe') as string}
               variant="outlined"
               name="fullName"
               value={formData.fullName}
@@ -317,10 +319,10 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>Email</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.email', 'Email') as string}</FieldLabel>
             <TextField 
               fullWidth
-              placeholder="email@example.com"
+              placeholder={t('mentorship.applicationForm.emailPlaceholder', 'email@example.com') as string}
               variant="outlined"
               type="email"
               name="email"
@@ -330,10 +332,10 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>LinkedIn URL</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.linkedinUrl', 'LinkedIn URL') as string}</FieldLabel>
             <TextField 
               fullWidth
-              placeholder="LinkedIn profile"
+              placeholder={t('mentorship.applicationForm.linkedinUrlPlaceholder', 'LinkedIn profile') as string}
               variant="outlined"
               name="linkedinUrl"
               value={formData.linkedinUrl}
@@ -351,12 +353,12 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>Country of Residence</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.country', 'Country of Residence') as string}</FieldLabel>
             <FormControl fullWidth variant="outlined">
               <TextField
                 select
                 fullWidth
-                placeholder="Select a country"
+                placeholder={t('mentorship.applicationForm.selectCountry', 'Select a country') as string}
                 variant="outlined"
                 name="country"
                 value={formData.country}
@@ -365,22 +367,22 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                   native: true,
                 }}
               >
-                <option value="" disabled>Select a country</option>
-                <option value="USA">United States</option>
-                <option value="CAN">Canada</option>
-                <option value="UK">United Kingdom</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
-                <option value="NG">Nigeria</option>
-                <option value="GH">Ghana</option>
-                <option value="KE">Kenya</option>
-                <option value="ZA">South Africa</option>
+                <option value="" disabled>{t('mentorship.applicationForm.selectCountry', 'Select a country') as string}</option>
+                <option value="USA">{t('mentorship.applicationForm.countries.usa', 'United States') as string}</option>
+                <option value="CAN">{t('mentorship.applicationForm.countries.canada', 'Canada') as string}</option>
+                <option value="UK">{t('mentorship.applicationForm.countries.uk', 'United Kingdom') as string}</option>
+                <option value="FR">{t('mentorship.applicationForm.countries.france', 'France') as string}</option>
+                <option value="DE">{t('mentorship.applicationForm.countries.germany', 'Germany') as string}</option>
+                <option value="NG">{t('mentorship.applicationForm.countries.nigeria', 'Nigeria') as string}</option>
+                <option value="GH">{t('mentorship.applicationForm.countries.ghana', 'Ghana') as string}</option>
+                <option value="KE">{t('mentorship.applicationForm.countries.kenya', 'Kenya') as string}</option>
+                <option value="ZA">{t('mentorship.applicationForm.countries.southAfrica', 'South Africa') as string}</option>
               </TextField>
             </FormControl>
           </FormField>
           
           <FormField>
-            <FieldLabel>Languages Spoken</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.languagesSpoken', 'Languages Spoken') as string}</FieldLabel>
             <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '10px' }}>
               {selectedLanguages.map((language) => (
                 <LanguageChip
@@ -398,13 +400,13 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                 onChange={handleLanguageChange}
                 renderValue={(selected) => {
                   if (!selected) {
-                    return <span style={{ color: theme.palette.text.secondary }}>Select a language</span>;
+                    return <span style={{ color: theme.palette.text.secondary }}>{t('mentorship.applicationForm.selectLanguage', 'Select a language') as string}</span>;
                   }
                   return selected;
                 }}
               >
                 <MenuItem value="" disabled>
-                  <em>Select a language</em>
+                  <em>{t('mentorship.applicationForm.selectLanguage', 'Select a language') as string}</em>
                 </MenuItem>
                 {availableLanguages.map((language) => (
                   <MenuItem key={language} value={language}>
@@ -416,12 +418,11 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <ButtonContainer>
-            <Box /> {/* Empty box for spacing */}
             <NextButton 
               endIcon={<ArrowForwardIcon />}
               onClick={handleNext}
             >
-              Next
+              {t('mentorship.applicationForm.next', 'Next') as string}
             </NextButton>
           </ButtonContainer>
         </form>
@@ -430,10 +431,10 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       {currentStep === 2 && (
         <form>
           <FormField>
-            <FieldLabel>Desired Professional Role</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.professionalRole', 'Desired Professional Role') as string}</FieldLabel>
             <TextField 
               fullWidth
-              placeholder="e.g., Product Manager, UX Designer"
+              placeholder={t('mentorship.applicationForm.professionalRolePlaceholder', 'e.g., Product Manager, UX Designer') as string}
               variant="outlined"
               name="professionalRole"
               value={formData.professionalRole}
@@ -442,12 +443,12 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>Academic Background</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.academicBackground', 'Academic Background') as string}</FieldLabel>
             <TextField 
               fullWidth
               multiline
               rows={4}
-              placeholder="Describe your academic and professional background"
+              placeholder={t('mentorship.applicationForm.academicBackgroundPlaceholder', 'Describe your academic and professional background') as string}
               variant="outlined"
               name="academicBackground"
               value={formData.academicBackground}
@@ -456,7 +457,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>Areas of Interest</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.areasOfInterest', 'Areas of Interest') as string}</FieldLabel>
             <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '10px' }}>
               {formData.areasOfInterest.map((area) => (
                 <LanguageChip
@@ -473,7 +474,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             </div>
             <TextField 
               fullWidth
-              placeholder="Type an area of interest and press Enter"
+              placeholder={t('mentorship.applicationForm.areasOfInterestPlaceholder', 'Type an area of interest and press Enter') as string}
               variant="outlined"
               value={newInterest}
               onChange={(e) => setNewInterest(e.target.value)}
@@ -482,7 +483,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>International Experience</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.internationalExperience', 'International Experience') as string}</FieldLabel>
             <FormControlLabel
               control={
                 <Checkbox 
@@ -492,7 +493,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                   color="primary"
                 />
               }
-              label="Yes, I have international work experience"
+              label={t('mentorship.applicationForm.hasInternationalExperience', 'Yes, I have international work experience') as string}
             />
           </FormField>
           
@@ -501,13 +502,13 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               startIcon={<ArrowBackIcon />}
               onClick={handleBack}
             >
-              Previous
+              {t('mentorship.applicationForm.previous', 'Previous') as string}
             </BackButton>
             <NextButton 
               endIcon={<ArrowForwardIcon />}
               onClick={handleNext}
             >
-              Next
+              {t('mentorship.applicationForm.next', 'Next') as string}
             </NextButton>
           </ButtonContainer>
         </form>
@@ -516,37 +517,37 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       {currentStep === 3 && (
         <form>
           <FormField>
-            <FieldLabel>Desired Duration</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.desiredDuration', 'Desired Duration') as string}</FieldLabel>
             <RadioOptionContainer>
               <RadioOption 
                 selected={formData.desiredDuration === '1h'}
                 onClick={() => handleDurationChange('1h')}
               >
-                <Typography variant="body1" fontWeight={500}>1h over 1 month</Typography>
+                <Typography variant="body1" fontWeight={500}>{t('mentorship.applicationForm.duration.1h', '1h over 1 month') as string}</Typography>
               </RadioOption>
               <RadioOption 
                 selected={formData.desiredDuration === '2-3h'}
                 onClick={() => handleDurationChange('2-3h')}
               >
-                <Typography variant="body1" fontWeight={500}>2-3h over 2 months</Typography>
+                <Typography variant="body1" fontWeight={500}>{t('mentorship.applicationForm.duration.2-3h', '2-3h over 2 months') as string}</Typography>
               </RadioOption>
               <RadioOption 
                 selected={formData.desiredDuration === '4-5h'}
                 onClick={() => handleDurationChange('4-5h')}
               >
-                <Typography variant="body1" fontWeight={500}>4-5h over 4 months</Typography>
+                <Typography variant="body1" fontWeight={500}>{t('mentorship.applicationForm.duration.4-5h', '4-5h over 4 months') as string}</Typography>
               </RadioOption>
               <RadioOption 
                 selected={formData.desiredDuration === '6h+'}
                 onClick={() => handleDurationChange('6h+')}
               >
-                <Typography variant="body1" fontWeight={500}>6h over 6 months</Typography>
+                <Typography variant="body1" fontWeight={500}>{t('mentorship.applicationForm.duration.6h+', '6h over 6 months') as string}</Typography>
               </RadioOption>
             </RadioOptionContainer>
           </FormField>
           
           <FormField>
-            <FieldLabel>Mentor Preferences</FieldLabel>
+            <FieldLabel>{t('mentorship.applicationForm.mentorPreferences', 'Mentor Preferences') as string}</FieldLabel>
             <Box mt={2}>
               <FormControlLabel
                 control={
@@ -557,7 +558,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                     color="primary"
                   />
                 }
-                label="Mentor with international experience"
+                label={t('mentorship.applicationForm.internationalExperiencePreference', 'Mentor with international experience') as string}
               />
             </Box>
             <Box>
@@ -570,7 +571,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                     color="primary"
                   />
                 }
-                label="Funding agency experience"
+                label={t('mentorship.applicationForm.fundingAgency', 'Funding agency experience') as string}
               />
             </Box>
             <Box>
@@ -583,7 +584,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                     color="primary"
                   />
                 }
-                label="International organization background"
+                label={t('mentorship.applicationForm.internationalOrganization', 'International organization background') as string}
               />
             </Box>
           </FormField>
@@ -594,14 +595,14 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               onClick={handleBack}
               disabled={submitting}
             >
-              Back
+              {t('mentorship.applicationForm.back', 'Back') as string}
             </BackButton>
             <SubmitButton 
               endIcon={submitting ? <CircularProgress size={20} color="inherit" /> : undefined} 
               onClick={handleSubmit}
               disabled={submitting}
             >
-              {submitting ? 'Submitting...' : 'Submit Application'}
+              {submitting ? t('mentorship.applicationForm.submitting', 'Submitting...') as string : t('mentorship.applicationForm.submitApplication', 'Submit Application') as string}
             </SubmitButton>
           </ButtonContainer>
           

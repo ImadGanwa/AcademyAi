@@ -15,6 +15,7 @@ node_modules/
 /dist
 /out
 mynotes.txt
+NEW_FILE_REQUESTS.md
 
 /adwin-old-backend
 /aicrafters-frontend-example

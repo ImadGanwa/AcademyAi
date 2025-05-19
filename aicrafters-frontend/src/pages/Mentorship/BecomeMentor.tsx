@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import styled from 'styled-components';
 import { Layout } from '../../components/layout/Layout/Layout';
 import MentorApplicationForm from '../../components/layout/Mentorship/MentorApplicationForm';
+import { useTranslation } from 'react-i18next';
 
 // Styled components
 const PageContainer = styled.div`
@@ -170,15 +171,15 @@ const IconWrapper = styled.div`
 
 // Main component
 const BecomeMentor: React.FC = () => {
-  // const theme = useTheme();
+  const { t } = useTranslation();
   
   return (
-    <Layout title="Become a Mentor">
+    <Layout title={t('mentorship.becomeMentorTitle')}>
       <PageContainer>
         {/* Hero Section */}
         <HeroSection>
-          <MainTitle variant="h2">Become a Mentor</MainTitle>
-          <SubTitle variant="h3"><span>Empower</span> a New Generation of Women.</SubTitle>
+          <MainTitle variant="h2">{t('mentorship.becomeMentorTitle')}</MainTitle>
+          <SubTitle variant="h3"><span>{t('mentorship.becomeMentorSubtitle')}</span></SubTitle>
         </HeroSection>
         
         {/* Mission Section */}
@@ -187,58 +188,54 @@ const BecomeMentor: React.FC = () => {
             <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80" alt="Professional mentors" />
           </MissionImage>
           <MissionContent>
-            <SectionTitle variant="h4">Our Mission</SectionTitle>
-            <SectionText>
-              We believe that mentorship can be a life-changing force, not only for those receiving guidance, but also for those giving it. Our platform is built to create intentional, respectful, and impactful connections between Afro-descendant women and experienced mentors who can support their journey toward personal and professional growth.
-            </SectionText>
-            <SectionText>
-              We aim to create a global network where knowledge, trust, and confidence flow freely, helping mentees gain clarity, unlock opportunities, and move closer to their aspirations.
-            </SectionText>
+            <SectionTitle variant="h4">{t('mentorship.missionTitle')}</SectionTitle>
+            <SectionText>{t('mentorship.missionText1')}</SectionText>
+            <SectionText>{t('mentorship.missionText2')}</SectionText>
           </MissionContent>
         </MissionSection>
         
         {/* Benefits Section */}
         <BenefitsSection>
-          <SectionTitle variant="h4">Why Mentor with Us?</SectionTitle>
+          <SectionTitle variant="h4">{t('mentorship.whyMentorTitle')}</SectionTitle>
           <BenefitsGrid>
             <BenefitCard>
               <IconWrapper>
                 <img src="/logo192.png" alt="Impact Icon" />
               </IconWrapper>
-              <h3>Create Real Impact</h3>
-              <p>Your mentorship could be the turning point in someone's academic, personal, or career journey. Empower women who are actively seeking guidance to navigate challenges and set meaningful goals.</p>
+              <h3>{t('mentorship.benefitImpactTitle')}</h3>
+              <p>{t('mentorship.benefitImpactText')}</p>
             </BenefitCard>
             
             <BenefitCard>
               <IconWrapper>
                 <img src="/logo192.png" alt="Cross-Cultural Icon" />
               </IconWrapper>
-              <h3>Build Cross-Cultural Relationships</h3>
-              <p>Connect with mentees across different countries, industries, and backgrounds — fostering shared learning and new perspectives for both of you.</p>
+              <h3>{t('mentorship.benefitCrossCulturalTitle')}</h3>
+              <p>{t('mentorship.benefitCrossCulturalText')}</p>
             </BenefitCard>
             
             <BenefitCard>
               <IconWrapper>
                 <img src="/logo192.png" alt="Sharing Icon" />
               </IconWrapper>
-              <h3>Share What You've Learned</h3>
-              <p>Your life experience and career path hold valuable lessons. Help someone else grow by sharing your story, knowledge, and insights.</p>
+              <h3>{t('mentorship.benefitShareTitle')}</h3>
+              <p>{t('mentorship.benefitShareText')}</p>
             </BenefitCard>
             
             <BenefitCard>
               <IconWrapper>
                 <img src="/logo192.png" alt="Flexible Commitment Icon" />
               </IconWrapper>
-              <h3>Flexible Commitment</h3>
-              <p>Whether you can offer one hour a month or a deeper engagement over several months, we accommodate your availability and preferred mentorship style.</p>
+              <h3>{t('mentorship.benefitFlexibleTitle')}</h3>
+              <p>{t('mentorship.benefitFlexibleText')}</p>
             </BenefitCard>
             
             <BenefitCard>
               <IconWrapper>
                 <img src="/logo192.png" alt="Recognition Icon" />
               </IconWrapper>
-              <h3>Be Recognized</h3>
-              <p>Mentors receive official certificates, LinkedIn badges, and visibility through AiCademy's spotlight features.</p>
+              <h3>{t('mentorship.benefitRecognitionTitle')}</h3>
+              <p>{t('mentorship.benefitRecognitionText')}</p>
             </BenefitCard>
           </BenefitsGrid>
         </BenefitsSection>

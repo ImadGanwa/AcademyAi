@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Container } from '@mui/material';
 import styled from 'styled-components';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const HeroWrapper = styled.div`
   background-color: ${props => props.theme.palette.background.default};
@@ -81,7 +81,7 @@ const Description = styled(Typography)`
 `;
 
 export const MentorHero: React.FC = () => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <HeroWrapper>
@@ -89,11 +89,13 @@ export const MentorHero: React.FC = () => {
         <HeroContainer maxWidth="lg">
           <TitleWrapper>
             <Title variant="h1">
-              Find Your <Highlight>Ideal</Highlight> Mentor
+              {t('mentorship.heroTitle.firstPart', 'Find Your') as string}{' '}
+              <Highlight>{t('mentorship.heroTitle.highlight', 'Ideal') as string}</Highlight>{' '}
+              {t('mentorship.heroTitle.lastPart', 'Mentor') as string}
             </Title>
           </TitleWrapper>
           <Description>
-            Explore trusted experts ready to support your personal and professional growth.
+            {t('mentorship.heroDescription', 'Explore trusted experts ready to support your personal and professional growth.') as string}
           </Description>
         </HeroContainer>
       </HeroSection>

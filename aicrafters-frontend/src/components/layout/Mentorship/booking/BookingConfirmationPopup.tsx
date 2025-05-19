@@ -19,6 +19,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PersonIcon from '@mui/icons-material/Person';
 import TopicIcon from '@mui/icons-material/Topic';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useTranslation } from 'react-i18next';
 
 const SuccessIcon = styled(CheckCircleOutlineIcon)`
   font-size: 60px;
@@ -58,10 +59,12 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
   error = null
 }) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language || 'en';
 
-  // Format the date if available
+  // Format the date if available with proper locale support
   const formattedDate = bookingDetails.date 
-    ? new Date(bookingDetails.date).toLocaleDateString('en-US', {
+    ? new Date(bookingDetails.date).toLocaleDateString(currentLocale, {
         weekday: 'long',
         year: 'numeric', 
         month: 'long', 
@@ -78,7 +81,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
       aria-labelledby="booking-confirmation-dialog-title"
     >
       <DialogTitle id="booking-confirmation-dialog-title" sx={{ pb: 1 }}>
-        Booking Confirmation
+        {t('mentorship.confirmation.bookingConfirmation', 'Booking Confirmation')}
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -101,7 +104,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
         ) : error ? (
           <Box sx={{ textAlign: 'center', py: 2 }}>
             <Typography color="error" variant="h6" gutterBottom>
-              Error Creating Booking
+              {t('mentorship.confirmation.errorCreatingBooking', 'Error Creating Booking')}
             </Typography>
             <Typography color="error" variant="body2">
               {error}
@@ -111,17 +114,17 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
           <Box sx={{ textAlign: 'center', py: 2 }}>
             <SuccessIcon />
             <Typography variant="h5" gutterBottom>
-              Your booking is confirmed!
+              {t('mentorship.confirmation.bookingConfirmed', 'Your booking is confirmed!')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              Your request has been sent to the mentor and is awaiting their approval.
+              {t('mentorship.confirmation.requestSent', 'Your request has been sent to the mentor and is awaiting their approval.')}
             </Typography>
             
             <Divider sx={{ my: 2 }} />
             
             <Box sx={{ textAlign: 'left', my: 3 }}>
               <Typography variant="h6" gutterBottom>
-                Booking Details
+                {t('mentorship.confirmation.bookingDetails', 'Booking Details')}
               </Typography>
               
               {bookingDetails.mentorName && (
@@ -131,7 +134,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
                   </DetailIcon>
                   <Box>
                     <Typography variant="body2" color="text.secondary">
-                      Mentor
+                      {t('mentorship.confirmation.mentor', 'Mentor')}
                     </Typography>
                     <Typography variant="body1">
                       {bookingDetails.mentorName}
@@ -147,7 +150,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
                   </DetailIcon>
                   <Box>
                     <Typography variant="body2" color="text.secondary">
-                      Date
+                      {t('mentorship.confirmation.date', 'Date')}
                     </Typography>
                     <Typography variant="body1">
                       {formattedDate}
@@ -163,7 +166,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
                   </DetailIcon>
                   <Box>
                     <Typography variant="body2" color="text.secondary">
-                      Time
+                      {t('mentorship.confirmation.time', 'Time')}
                     </Typography>
                     <Typography variant="body1">
                       {bookingDetails.startTime}
@@ -179,7 +182,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
                   </DetailIcon>
                   <Box>
                     <Typography variant="body2" color="text.secondary">
-                      Topic
+                      {t('mentorship.confirmation.topic', 'Topic')}
                     </Typography>
                     <Typography variant="body1">
                       {bookingDetails.topic}
@@ -192,8 +195,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
             <Divider sx={{ my: 2 }} />
             
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-              You will receive a notification once the mentor approves your booking. 
-              You can view all your bookings in your dashboard.
+              {t('mentorship.confirmation.notificationMessage', 'You will receive a notification once the mentor approves your booking. You can view all your bookings in your dashboard.')}
             </Typography>
           </Box>
         )}
@@ -207,7 +209,7 @@ const BookingConfirmationPopup: React.FC<BookingConfirmationPopupProps> = ({
           fullWidth
           disabled={isLoading}
         >
-          Done
+          {t('mentorship.confirmation.done', 'Done')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -6,6 +6,7 @@ import { Layout } from '../../components/layout/Layout/Layout';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { LoginPopup } from '../../components/common/Popup/LoginPopup';
+import { useTranslation } from 'react-i18next';
 
 // Import our components
 import { MentorInfoCard } from '../../components/layout/Mentorship/booking/Mentorbookingsuggestion';
@@ -58,6 +59,7 @@ const MentorshipBookSession: React.FC = () => {
   const { mentorId } = useParams<{ mentorId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { t } = useTranslation();
   
   // State for mentor data and loading status
   const [mentor, setMentor] = useState<any>(null);
@@ -94,7 +96,7 @@ const MentorshipBookSession: React.FC = () => {
   useEffect(() => {
     const fetchMentorProfile = async () => {
       if (!mentorId) {
-        setError("No mentor ID provided");
+        setError(t('mentorship.mentorNotFound'));
         setLoading(false);
         return;
       }
@@ -112,12 +114,12 @@ const MentorshipBookSession: React.FC = () => {
           if (mockMentor) {
             setMentor(mockMentor);
           } else {
-            setError("Mentor not found");
+            setError(t('mentorship.mentorNotFound'));
           }
         }
       } catch (err) {
         console.error("Error fetching mentor profile:", err);
-        setError("Failed to load mentor profile. Please try again later.");
+        setError(t('mentorship.failedToLoadMentor'));
         
         // Fallback to mock data
         const mockMentor = mockMentors.find(m => m.id === mentorId);
@@ -130,7 +132,7 @@ const MentorshipBookSession: React.FC = () => {
     };
     
     fetchMentorProfile();
-  }, [mentorId]);
+  }, [mentorId, t]);
   
   // Fetch available time slots when date is selected
   useEffect(() => {
@@ -151,14 +153,24 @@ const MentorshipBookSession: React.FC = () => {
         
         if (response && response.success && response.data && Array.isArray(response.data.availableSlots)) {
           console.log('Available slots fetched:', response.data.availableSlots);
-          // Format the time slots to 12-hour format for display
+          // Get the current language for formatting
+          const currentLang = localStorage.getItem('i18nextLng') || 'en';
+          // Format the time slots to 12/24-hour format for display based on locale
           const formattedSlots = response.data.availableSlots.map((slot: string) => {
             // Assuming slot is in 24-hour format like "09:00", "14:30"
             const [hours, minutes] = slot.split(':');
             const hour = parseInt(hours, 10);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            const hour12 = hour % 12 || 12; // Convert 0 to 12 for 12 AM
-            return `${hour12}:${minutes} ${ampm}`;
+            
+            // Use localized time format based on language
+            if (currentLang === 'fr') {
+              // French uses 24-hour format
+              return `${hours}:${minutes}`;
+            } else {
+              // English uses 12-hour format with AM/PM
+              const ampm = hour >= 12 ? 'PM' : 'AM';
+              const hour12 = hour % 12 || 12; // Convert 0 to 12 for 12 AM
+              return `${hour12}:${minutes} ${ampm}`;
+            }
           });
           
           setAvailableTimeSlots(formattedSlots);
@@ -169,15 +181,14 @@ const MentorshipBookSession: React.FC = () => {
       } catch (err) {
         console.error("Error fetching available time slots:", err);
         setAvailableTimeSlots([]);
-        // Show error message to user
-        setError("Failed to load available time slots. Please try a different date.");
+        setError(t('mentorship.failedToLoadSlots'));
       } finally {
         setLoadingTimeSlots(false);
       }
     };
     
     fetchAvailableTimeSlots();
-  }, [selectedDate, mentorId]);
+  }, [selectedDate, mentorId, t]);
   
   // Handler for booking submission
   const handleBookSession = async (topic: string, message: string) => {
@@ -186,22 +197,36 @@ const MentorshipBookSession: React.FC = () => {
     setBookingLoading(true);
     setBookingError(null);
     
-    // Format the start and end times
-    const [time, period] = selectedTime.split(' ');
-    const [hours, minutes] = time.split(':');
-    let startHour = parseInt(hours);
+    // Get current language
+    const currentLang = localStorage.getItem('i18nextLng') || 'en';
     
-    if (period === 'PM' && startHour !== 12) {
-      startHour += 12;
-    } else if (period === 'AM' && startHour === 12) {
-      startHour = 0;
+    // Format the start and end times correctly based on locale
+    let startHour, minutes;
+    
+    if (currentLang === 'fr') {
+      // French time format (24h)
+      [startHour, minutes] = selectedTime.split(':');
+    } else {
+      // English time format (12h with AM/PM)
+      const [time, period] = selectedTime.split(' ');
+      [startHour, minutes] = time.split(':');
+      startHour = parseInt(startHour);
+      
+      if (period === 'PM' && startHour !== 12) {
+        startHour += 12;
+      } else if (period === 'AM' && startHour === 12) {
+        startHour = 0;
+      }
     }
     
-    const startTime = `${startHour.toString().padStart(2, '0')}:${minutes}`;
+    startHour = parseInt(startHour as string);
+    minutes = parseInt(minutes as string);
+    
+    const startTime = `${startHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     
     // End time is 30 minutes after start time
     let endHour = startHour;
-    let endMinute = parseInt(minutes) + 30;
+    let endMinute = minutes + 30;
     
     if (endMinute >= 60) {
       endHour = (endHour + 1) % 24;
@@ -239,11 +264,11 @@ const MentorshipBookSession: React.FC = () => {
         // Show confirmation popup
         setShowConfirmationPopup(true);
       } else {
-        setBookingError(response.error || 'Failed to create booking');
+        setBookingError(t('mentorship.failedToCreateBooking'));
       }
     } catch (err: any) {
       console.error('Error creating booking:', err);
-      setBookingError(err.response?.data?.error || 'An error occurred while booking the session');
+      setBookingError(t('mentorship.bookingError'));
     } finally {
       setBookingLoading(false);
     }
@@ -267,12 +292,12 @@ const MentorshipBookSession: React.FC = () => {
   
   if (loading) {
     return (
-      <Layout title="Book a Session">
+      <Layout title={t('mentorship.bookSessionTitle')}>
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">Book a Session</PageTitle>
+          <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
           <LoadingContainer>
             <CircularProgress size={60} />
-            <Typography variant="h6" sx={{ mt: 3 }}>Loading mentor profile...</Typography>
+            <Typography variant="h6" sx={{ mt: 3 }}>{t('mentorship.loadingMentorProfile')}</Typography>
           </LoadingContainer>
         </PageContainer>
       </Layout>
@@ -281,14 +306,14 @@ const MentorshipBookSession: React.FC = () => {
   
   if (error || !mentor) {
     return (
-      <Layout title="Book a Session">
+      <Layout title={t('mentorship.bookSessionTitle')}>
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">Book a Session</PageTitle>
+          <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
           <Alert severity="error" sx={{ mb: 3 }}>
-            {error || "Failed to load mentor information."}
+            {error || t('mentorship.failedToLoadMentor')}
           </Alert>
           <Button variant="contained" onClick={() => navigate('/mentorship')}>
-            Return to Mentors
+            {t('mentorship.returnToMentors')}
           </Button>
         </PageContainer>
       </Layout>
@@ -296,9 +321,9 @@ const MentorshipBookSession: React.FC = () => {
   }
   
   return (
-    <Layout title="Book a Session">
+    <Layout title={t('mentorship.bookSessionTitle')}>
       <PageContainer maxWidth="lg">
-        <PageTitle variant="h2">Book a Session</PageTitle>
+        <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
         
         {/* Header with Mentor's basic info */}
         <MentorHeaderInfo mentor={mentor} />
@@ -326,7 +351,7 @@ const MentorshipBookSession: React.FC = () => {
         {showLoginPopup && (
           <LoginPopup 
             onClose={handleCloseLoginPopup}
-            message="Please login to book a session with this mentor"
+            message={t('mentorship.pleaseLoginToBook')}
           />
         )}
 

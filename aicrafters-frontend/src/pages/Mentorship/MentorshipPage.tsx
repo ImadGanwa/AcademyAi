@@ -5,10 +5,10 @@ import { MentorsList } from '../../components/layout/Mentorship/MentorsList';
 import { useTranslation } from 'react-i18next';
 
 export const MentorshipPage: React.FC = () => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   return (
-    <Layout title="Mentorship">
+    <Layout title={t('mentorship.pageTitle')}>
       <MentorHero />
       <MentorsList />
     </Layout>
