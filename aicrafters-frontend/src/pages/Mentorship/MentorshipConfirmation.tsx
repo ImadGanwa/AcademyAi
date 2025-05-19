@@ -352,18 +352,25 @@ const MentorshipConfirmation: React.FC = () => {
             <SessionHeader>{t('mentorship.sessionWith', 'Book a Session with')} {mentorName}</SessionHeader>
             
             <InfoRow>
-              <CalendarMonthIcon /> 
-              {formattedDate}
+              // TODO: figure out another solution other than adding a span here to fix children lint error. 
+              <span>
+                <CalendarMonthIcon /> 
+                {formattedDate}
+              </span>
             </InfoRow>
             
             <InfoRow>
-              <ScheduleIcon /> 
-              {formattedStartTime}
+              <span>
+                <ScheduleIcon /> 
+                {formattedStartTime}
+              </span>
             </InfoRow>
             
             <InfoRow>
-              <TimerIcon /> 
-              {duration} {t('mentorship.minutes', 'min')}
+              <span>
+                <TimerIcon /> 
+                {duration} {t('mentorship.minutes', 'min')}
+              </span>
             </InfoRow>
           </InfoContainer>
           
@@ -374,7 +381,7 @@ const MentorshipConfirmation: React.FC = () => {
               onClick={handleZoomLink}
               fullWidth
             >
-              {t('mentorship.zoomMeetingLink', 'Zoom Meeting Link')}
+              {t('mentorship.zoomMeetingLink', 'Zoom Meeting Link') as string}
             </ZoomButton>
             
             <CalendarButton 
@@ -383,12 +390,12 @@ const MentorshipConfirmation: React.FC = () => {
               onClick={handleAddToCalendar}
               fullWidth
             >
-              {t('mentorship.addToCalendar', 'Add to Calendar')}
+              {t('mentorship.addToCalendar', 'Add to Calendar') as string}
             </CalendarButton>
           </ButtonsContainer>
           
           <ReturnButton onClick={handleReturnToMentors}>
-            {t('mentorship.returnToMentors', 'Return to Mentors')}
+            {t('mentorship.returnToMentors', 'Return to Mentors') as string}
           </ReturnButton>
         </ConfirmationCard>
       </PageContainer>
