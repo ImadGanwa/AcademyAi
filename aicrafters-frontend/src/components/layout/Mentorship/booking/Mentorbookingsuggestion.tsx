@@ -66,7 +66,7 @@ export const MentorInfoCard: React.FC<MentorInfoCardProps> = ({ mentor }) => {
   return (
     <CardContainer>
       <BookingSection>
-        <BookingTitle>{t('mentorship.booking.bookSession', 'Book a Session with')} {mentor.fullName}</BookingTitle>
+        <BookingTitle>{t('mentorship.booking.bookSession', 'Book a Session with') as string} {mentor.fullName}</BookingTitle>
         <BookingDescription>
           {t('mentorship.booking.description', 'Choose a date and time that works for you. Once confirmed, your mentor will receive the request and you\'ll both get a calendar invite.') as string}
         </BookingDescription>
