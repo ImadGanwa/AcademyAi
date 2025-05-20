@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Box, Container, Typography, Skeleton, CircularProgress } from '@mui/material';
 import { MentorCard, Mentor } from './MentorCard';
 import { mockMentors } from './mentorsMock';
+import { useTranslation } from 'react-i18next';
 
 const ListContainer = styled(Box)`
   padding: 20px 0 60px;
@@ -56,6 +57,7 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
   mentors = [], 
   loading = false 
 }) => {
+  const {t} = useTranslation();
   if (loading) {
     return (
       <ListContainer>
@@ -87,7 +89,7 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
     return (
       <ListContainer>
         <NoResultsMessage variant="h6">
-          No mentors found matching your criteria. Try adjusting your filters.
+          {t('mentorship.noMentorsFound', 'No mentors found matching your criteria. Try adjusting your filters.') as string} 
         </NoResultsMessage>
       </ListContainer>
     );

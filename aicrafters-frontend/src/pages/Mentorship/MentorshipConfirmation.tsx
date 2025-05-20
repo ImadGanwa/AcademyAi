@@ -328,7 +328,7 @@ const MentorshipConfirmation: React.FC = () => {
   const mentorName = mentor?.name || bookingDetails?.mentorName || state?.mentorName || 'your mentor';
   
   return (
-    <Layout title={t('mentorship.confirmationTitle', 'Booking Confirmed')}>
+    <Layout title={t('mentorship.confirmationTitle', 'Booking Confirmed') as string}>
       <PageContainer>
         <ConfirmationCard>
           <Title variant="h2">{t('mentorship.confirmationTitle', 'Your Session is Confirmed')}</Title>
@@ -337,7 +337,7 @@ const MentorshipConfirmation: React.FC = () => {
           <ImageContainer>
             <img 
               src="/Zoom_confirmation.png" 
-              alt="Zoom session confirmation" 
+              alt={t('mentorship.alt.zoomSessionConfirmation', 'Zoom session confirmation') as string} 
               style={{ width: '100%', height: 'auto' }}
             />
           </ImageContainer>
@@ -369,7 +369,7 @@ const MentorshipConfirmation: React.FC = () => {
             <InfoRow>
               <span>
                 <TimerIcon /> 
-                {duration} {t('mentorship.minutes', 'min')}
+                {duration} {t('mentorship.minutes', 'min') as string}
               </span>
             </InfoRow>
           </InfoContainer>

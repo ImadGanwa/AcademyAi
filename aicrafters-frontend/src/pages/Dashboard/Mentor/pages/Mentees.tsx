@@ -37,6 +37,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import DoneIcon from '@mui/icons-material/Done';
 import { getMentorBookings, updateBooking, cancelMentorBooking } from '../../../../api/booking';
+import { useTranslation } from 'react-i18next';
 
 const PageContainer = styled(Box)`
   background: #ffffff;
@@ -258,6 +259,8 @@ const getInitials = (name: string): string => {
 
 export const Mentees: React.FC = () => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language;
   const [openScheduleDialog, setOpenScheduleDialog] = useState(false);
   const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
@@ -313,7 +316,7 @@ export const Mentees: React.FC = () => {
               id: booking.menteeId._id,
               name: booking.menteeId.fullName,
               avatar: booking.menteeId.profileImage || '',
-              location: booking.menteeId.location || 'Location not provided',
+              location: booking.menteeId.location || t('mentorship.mentees.locationNotProvided', 'Location not provided') as string,
               sessionTime: `${formattedTime} / ${formattedDate}`,
               status: booking.status === 'scheduled' ? 'accepted' : 'pending',
               topic: booking.topic,
@@ -462,7 +465,7 @@ export const Mentees: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error rejecting booking:', err);
-      alert(err.response?.data?.error || 'Failed to reject booking');
+      alert(t('mentorship.mentees.error.rejectFailed', 'Failed to reject booking. Please try again.') as string);
     }
   };
 
@@ -518,7 +521,7 @@ export const Mentees: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error accepting booking:', err);
-      alert(err.response?.data?.error || 'Failed to accept booking');
+      alert(t('mentorship.mentees.error.acceptFailed', 'Failed to accept booking. Please try again.') as string);
     }
   };
 
@@ -556,7 +559,7 @@ export const Mentees: React.FC = () => {
         }
       } catch (err: any) {
         console.error('Error updating meeting link:', err);
-        alert(err.response?.data?.error || 'Failed to update meeting link');
+        alert(t('mentorship.mentees.error.updateLinkFailed', 'Failed to update meeting link. Please try again.') as string);
       }
     }
   };
@@ -565,10 +568,10 @@ export const Mentees: React.FC = () => {
     <PageContainer>
       <PageHeader>
         <Typography variant="h4" gutterBottom>
-          Your Mentees
+          {t('mentorship.mentees.title', 'Your Mentees') as string}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Manage your mentorship connections and schedule sessions
+          {t('mentorship.mentees.subtitle', 'Manage your mentorship sessions and mentee interactions') as string}
         </Typography>
       </PageHeader>
 
@@ -578,23 +581,23 @@ export const Mentees: React.FC = () => {
         </Box>
       ) : error ? (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+          {t('mentorship.errorLoadingMentees', 'Failed to load mentee bookings. Please try again.') as string}
         </Alert>
       ) : allMentees.length === 0 ? (
         <Alert severity="info">
-          You don't have any mentee requests or bookings yet.
+          {t('mentorship.noMentees', 'You currently have no mentee bookings.') as string}
         </Alert>
       ) : (
         currentMentees.map((mentee) => (
           <MenteeCard key={mentee.id}>
             {mentee.status === 'accepted' && (
               <StatusStampContainer>
-                <StatusStamp status="accepted" src="/accepted.avif" alt="Accepted" />
+                <StatusStamp status="accepted" src="/accepted.avif" alt={t('mentorship.mentees.alt.accepted', 'Accepted stamp') as string} />
               </StatusStampContainer>
             )}
             {mentee.status === 'rejected' && (
               <StatusStampContainer>
-                <StatusStamp status="rejected" src="/refused.avif" alt="Rejected" />
+                <StatusStamp status="rejected" src="/refused.avif" alt={t('mentorship.mentees.alt.rejected', 'Rejected stamp') as string} />
               </StatusStampContainer>
             )}
             <MenteeInfo>
@@ -626,13 +629,13 @@ export const Mentees: React.FC = () => {
                     onClick={() => handleReject(mentee)}
                     startIcon={<CloseIcon />}
                   >
-                    Reject
+                    {t('common.reject', 'Reject') as string}
                   </RejectButton>
                   <AcceptButton
                     onClick={() => handleAccept(mentee)}
                     startIcon={<CheckCircleIcon />}
                   >
-                    Accept
+                    {t('common.accept', 'Accept') as string}
                   </AcceptButton>
                 </>
               )}
@@ -640,13 +643,15 @@ export const Mentees: React.FC = () => {
                 onClick={() => handleMessage(mentee)}
                 startIcon={<ChatIcon />}
               >
-                Message
+                {t('common.message', 'Message') as string}
               </MessageButton>
               <ScheduleButton
                 onClick={() => handleSessionAction(mentee)}
                 startIcon={<CalendarTodayIcon />}
               >
-                {mentee.sessionTime ? 'Reschedule Session' : 'Schedule Session'}
+                {mentee.sessionTime 
+                  ? t('mentorship.mentees.button.rescheduleSession', 'Reschedule Session') as string
+                  : t('mentorship.mentees.button.scheduleSession', 'Schedule Session') as string}
               </ScheduleButton>
             </ActionButtons>
           </MenteeCard>
@@ -670,7 +675,7 @@ export const Mentees: React.FC = () => {
       {/* Schedule/Reschedule Session Dialogs */}
       <Dialog open={openScheduleDialog} onClose={handleCloseScheduleDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Schedule Mentorship Session
+          {t('mentorship.mentees.dialog.scheduleTitle', 'Schedule Mentorship Session') as string}
           <IconButton
             aria-label="close"
             onClick={handleCloseScheduleDialog}
@@ -692,7 +697,7 @@ export const Mentees: React.FC = () => {
                   {getInitials(selectedMentee.name)}
                 </Avatar>
                 <Typography variant="subtitle1">
-                  Schedule a session with {selectedMentee.name}
+                  {t('mentorship.mentees.dialog.scheduleWith', { name: selectedMentee.name } as any) as string}
                 </Typography>
               </Stack>
               
@@ -700,7 +705,7 @@ export const Mentees: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Session Date"
+                    label={t('mentorship.mentees.dialog.sessionDate', 'Session Date') as string}
                     type="date"
                     value={selectedDate}
                     onChange={handleDateChange}
@@ -713,7 +718,7 @@ export const Mentees: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="Session Time"
+                    label={t('mentorship.mentees.dialog.sessionTime', 'Session Time') as string}
                     type="time"
                     value={selectedTime}
                     onChange={handleTimeChange}
@@ -725,26 +730,26 @@ export const Mentees: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth margin="normal">
-                    <InputLabel>Session Duration</InputLabel>
+                    <InputLabel>{t('mentorship.mentees.dialog.sessionDuration', 'Session Duration') as string}</InputLabel>
                     <Select
                       value={duration}
-                      label="Session Duration"
+                      label={t('mentorship.mentees.dialog.sessionDuration', 'Session Duration') as string}
                       onChange={handleDurationChange}
                     >
-                      <MenuItem value="30">30 minutes</MenuItem>
-                      <MenuItem value="60">1 hour</MenuItem>
-                      <MenuItem value="90">1.5 hours</MenuItem>
-                      <MenuItem value="120">2 hours</MenuItem>
+                      <MenuItem value="30">{t('durations.30min', '30 minutes') as string}</MenuItem>
+                      <MenuItem value="60">{t('durations.60min', '1 hour') as string}</MenuItem>
+                      <MenuItem value="90">{t('durations.90min', '1.5 hours') as string}</MenuItem>
+                      <MenuItem value="120">{t('durations.120min', '2 hours') as string}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Session Notes (Optional)"
+                    label={t('mentorship.mentees.dialog.sessionNotesOptional', 'Session Notes (Optional)') as string}
                     multiline
                     rows={4}
-                    placeholder="Add any notes or topics to discuss during the session"
+                    placeholder={t('mentorship.mentees.dialog.sessionNotesPlaceholder', 'Add any notes or topics to discuss during the session') as string}
                     margin="normal"
                   />
                 </Grid>
@@ -754,7 +759,7 @@ export const Mentees: React.FC = () => {
         </DialogContent>
         <DialogActions sx={{ padding: '16px 24px' }}>
           <Button onClick={handleCloseScheduleDialog} color="inherit">
-            Cancel
+            {t('common.cancel', 'Cancel') as string}
           </Button>
           <Button 
             onClick={handleConfirmSchedule} 
@@ -762,14 +767,14 @@ export const Mentees: React.FC = () => {
             color="primary"
             disabled={!selectedDate || !selectedTime}
           >
-            Schedule Session
+            {t('mentorship.mentees.button.scheduleSession', 'Schedule Session') as string}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={openRescheduleDialog} onClose={handleCloseRescheduleDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Reschedule Mentorship Session
+          {t('mentorship.mentees.dialog.rescheduleTitle', 'Reschedule Mentorship Session') as string}
           <IconButton
             aria-label="close"
             onClick={handleCloseRescheduleDialog}
@@ -791,19 +796,19 @@ export const Mentees: React.FC = () => {
                   {getInitials(selectedMentee.name)}
                 </Avatar>
                 <Typography variant="subtitle1">
-                  Reschedule session with {selectedMentee.name}
+                  {t('mentorship.mentees.dialog.rescheduleWith', { name: selectedMentee.name } as any) as string}
                 </Typography>
               </Stack>
               
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Currently scheduled for: {selectedMentee.sessionTime}
+                {t('mentorship.mentees.dialog.currentlyScheduled', { time: selectedMentee.sessionTime } as any) as string}
               </Typography>
               
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="New Session Date"
+                    label={t('mentorship.mentees.dialog.newSessionDate', 'New Session Date') as string}
                     type="date"
                     value={selectedDate}
                     onChange={handleDateChange}
@@ -816,7 +821,7 @@ export const Mentees: React.FC = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
-                    label="New Session Time"
+                    label={t('mentorship.mentees.dialog.newSessionTime', 'New Session Time') as string}
                     type="time"
                     value={selectedTime}
                     onChange={handleTimeChange}
@@ -828,26 +833,26 @@ export const Mentees: React.FC = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth margin="normal">
-                    <InputLabel>Session Duration</InputLabel>
+                    <InputLabel>{t('mentorship.mentees.dialog.sessionDuration', 'Session Duration') as string}</InputLabel>
                     <Select
                       value={duration}
-                      label="Session Duration"
+                      label={t('mentorship.mentees.dialog.sessionDuration', 'Session Duration') as string}
                       onChange={handleDurationChange}
                     >
-                      <MenuItem value="30">30 minutes</MenuItem>
-                      <MenuItem value="60">1 hour</MenuItem>
-                      <MenuItem value="90">1.5 hours</MenuItem>
-                      <MenuItem value="120">2 hours</MenuItem>
+                      <MenuItem value="30">{t('durations.30min', '30 minutes') as string}</MenuItem>
+                      <MenuItem value="60">{t('durations.60min', '1 hour') as string}</MenuItem>
+                      <MenuItem value="90">{t('durations.90min', '1.5 hours') as string}</MenuItem>
+                      <MenuItem value="120">{t('durations.120min', '2 hours') as string}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Reason for Rescheduling (Optional)"
+                    label={t('mentorship.mentees.dialog.rescheduleReasonOptional', 'Reason for Rescheduling (Optional)') as string}
                     multiline
                     rows={4}
-                    placeholder="Explain why you need to reschedule this session"
+                    placeholder={t('mentorship.mentees.dialog.rescheduleReasonPlaceholder', 'Explain why you need to reschedule this session') as string}
                     margin="normal"
                   />
                 </Grid>
@@ -857,7 +862,7 @@ export const Mentees: React.FC = () => {
         </DialogContent>
         <DialogActions sx={{ padding: '16px 24px' }}>
           <Button onClick={handleCloseRescheduleDialog} color="inherit">
-            Cancel
+            {t('common.cancel', 'Cancel') as string}
           </Button>
           <Button 
             onClick={handleConfirmReschedule} 
@@ -865,7 +870,7 @@ export const Mentees: React.FC = () => {
             color="primary"
             disabled={!selectedDate || !selectedTime}
           >
-            Confirm Reschedule
+            {t('mentorship.mentees.button.confirmReschedule', 'Confirm Reschedule') as string}
           </Button>
         </DialogActions>
       </Dialog>
@@ -877,7 +882,10 @@ export const Mentees: React.FC = () => {
         maxWidth="sm"
       >
         <DialogTitle sx={{ borderBottom: `1px solid ${theme.palette.divider}`, padding: '20px 24px' }}>
-          {selectedMentee ? `Confirm Session with ${selectedMentee.name}` : 'Confirm Session'}
+          {selectedMentee 
+            ? t('mentorship.mentees.dialog.confirmTitle', { name: selectedMentee.name } as any) as string
+            : t('mentorship.mentees.dialog.confirmTitle', { name: '' } as any) as string // Provide a fallback for name
+          }
           <IconButton
             aria-label="close"
             onClick={handleCloseConfirmation}
@@ -893,36 +901,40 @@ export const Mentees: React.FC = () => {
         </DialogTitle>
         <SessionConfirmedContent>
           <Typography variant="subtitle1" sx={{ mb: 3 }}>
-            Session Details
+            {t('mentorship.mentees.dialog.sessionDetails', 'Session Details') as string}
           </Typography>
           
           <SessionDetailItem>
-            <SessionDetailLabel>Date:</SessionDetailLabel>
+            <SessionDetailLabel>{t('mentorship.mentees.dialog.dateLabel', 'Date:') as string}</SessionDetailLabel>
             <SessionDetailValue>{confirmationDetails.date}</SessionDetailValue>
           </SessionDetailItem>
           
           <SessionDetailItem>
-            <SessionDetailLabel>Time:</SessionDetailLabel>
+            <SessionDetailLabel>{t('mentorship.mentees.dialog.timeLabel', 'Time:') as string}</SessionDetailLabel>
             <SessionDetailValue>{confirmationDetails.time}</SessionDetailValue>
           </SessionDetailItem>
           
           <SessionDetailItem>
-            <SessionDetailLabel>Duration:</SessionDetailLabel>
+            <SessionDetailLabel>{t('mentorship.mentees.dialog.durationLabel', 'Duration:') as string}</SessionDetailLabel>
             <SessionDetailValue>{confirmationDetails.duration}</SessionDetailValue>
           </SessionDetailItem>
           
           <SessionDetailItem>
-            <SessionDetailLabel>Time Zone:</SessionDetailLabel>
+            <SessionDetailLabel>{t('mentorship.mentees.dialog.timeZoneLabel', 'Time Zone:') as string}</SessionDetailLabel>
             <SessionDetailValue>{confirmationDetails.timeZone}</SessionDetailValue>
           </SessionDetailItem>
           
           <Typography variant="subtitle1" sx={{ mb: 1, mt: 3 }}>
-            Meeting Link
+            {t('mentorship.mentees.dialog.meetingLinkLabel', 'Meeting Link') as string}
           </Typography>
           
           <MeetingLinkContainer>
             <MeetingLink>{meetingLink}</MeetingLink>
-            <Tooltip title={linkCopied ? "Copied!" : "Copy Link"} placement="top">
+            <Tooltip title={linkCopied 
+              ? t('mentorship.mentees.dialog.copiedTooltip', 'Copied!') as string 
+              : t('mentorship.mentees.dialog.copyLinkTooltip', 'Copy Link') as string} 
+              placement="top"
+            >
               <CopyButton onClick={handleCopyLink}>
                 <ContentCopyIcon fontSize="small" />
               </CopyButton>
@@ -930,7 +942,7 @@ export const Mentees: React.FC = () => {
           </MeetingLinkContainer>
           
           <Typography variant="caption" color="text.secondary">
-            This link will be shared with the mentee once you confirm.
+            {t('mentorship.mentees.dialog.linkShareNote', 'This link will be shared with the mentee once you confirm.') as string}
           </Typography>
           
           <ConfirmButton
@@ -939,7 +951,7 @@ export const Mentees: React.FC = () => {
             startIcon={<VideocamIcon />}
             onClick={handleConfirmSession}
           >
-            Confirm Session
+            {t('mentorship.mentees.dialog.confirmSessionButton', 'Confirm Session') as string}
           </ConfirmButton>
         </SessionConfirmedContent>
       </SessionConfirmedDialog>

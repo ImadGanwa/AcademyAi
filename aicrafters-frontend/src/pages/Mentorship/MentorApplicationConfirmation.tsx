@@ -88,7 +88,7 @@ const MentorApplicationConfirmation: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Layout title={t('mentorship.applicationSubmittedTitle')}>
+    <Layout title={t('mentorship.applicationSubmittedTitle') as string}>
       <PageContainer>
         <ConfirmationCard>
           <Title variant="h2">
@@ -102,7 +102,7 @@ const MentorApplicationConfirmation: React.FC = () => {
           <ImageContainer>
             <img 
               src="/mentor_confirm.png" 
-              alt="Mentor Application Confirmation" 
+              alt={t('mentorship.alt.mentorApplicationConfirmation', 'Mentor application confirmation') as string} 
               style={{ width: '100%', height: 'auto' }}
             />
           </ImageContainer>

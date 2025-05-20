@@ -154,6 +154,7 @@ interface ViewDialogProps {
 // View Details Dialog Component
 const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, onAccept, onDeny }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   if (!request) return null;
   
   // Get the status color safely
@@ -169,7 +170,7 @@ const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, 
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <Typography variant="h5" fontWeight={600}>Mentor Request Details</Typography>
+        <Typography variant="h5" fontWeight={600}>{t('mentor.request.details', 'Request Details') as string}</Typography>
         <Chip 
           label={String(requestStatus).charAt(0).toUpperCase() + String(requestStatus).slice(1)} 
           sx={{ 

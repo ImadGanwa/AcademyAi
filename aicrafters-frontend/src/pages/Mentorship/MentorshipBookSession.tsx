@@ -96,7 +96,7 @@ const MentorshipBookSession: React.FC = () => {
   useEffect(() => {
     const fetchMentorProfile = async () => {
       if (!mentorId) {
-        setError(t('mentorship.mentorNotFound'));
+        setError(t('mentorship.mentorNotFound') as string);
         setLoading(false);
         return;
       }
@@ -114,12 +114,12 @@ const MentorshipBookSession: React.FC = () => {
           if (mockMentor) {
             setMentor(mockMentor);
           } else {
-            setError(t('mentorship.mentorNotFound'));
+            setError(t('mentorship.mentorNotFound') as string);
           }
         }
       } catch (err) {
         console.error("Error fetching mentor profile:", err);
-        setError(t('mentorship.failedToLoadMentor'));
+        setError(t('mentorship.failedToLoadMentor') as string);
         
         // Fallback to mock data
         const mockMentor = mockMentors.find(m => m.id === mentorId);
@@ -181,7 +181,7 @@ const MentorshipBookSession: React.FC = () => {
       } catch (err) {
         console.error("Error fetching available time slots:", err);
         setAvailableTimeSlots([]);
-        setError(t('mentorship.failedToLoadSlots'));
+        setError(t('mentorship.failedToLoadSlots') as string);
       } finally {
         setLoadingTimeSlots(false);
       }
@@ -264,11 +264,11 @@ const MentorshipBookSession: React.FC = () => {
         // Show confirmation popup
         setShowConfirmationPopup(true);
       } else {
-        setBookingError(t('mentorship.failedToCreateBooking'));
+        setBookingError(t('mentorship.failedToCreateBooking') as string);
       }
     } catch (err: any) {
       console.error('Error creating booking:', err);
-      setBookingError(t('mentorship.bookingError'));
+      setBookingError(t('mentorship.bookingError') as string);
     } finally {
       setBookingLoading(false);
     }
@@ -292,12 +292,12 @@ const MentorshipBookSession: React.FC = () => {
   
   if (loading) {
     return (
-      <Layout title={t('mentorship.bookSessionTitle')}>
+      <Layout title={t('mentorship.bookSessionTitle') as string}>
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
+          <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
           <LoadingContainer>
             <CircularProgress size={60} />
-            <Typography variant="h6" sx={{ mt: 3 }}>{t('mentorship.loadingMentorProfile')}</Typography>
+            <Typography variant="h6" sx={{ mt: 3 }}>{t('mentorship.loadingMentorProfile') as string}</Typography>
           </LoadingContainer>
         </PageContainer>
       </Layout>
@@ -306,14 +306,14 @@ const MentorshipBookSession: React.FC = () => {
   
   if (error || !mentor) {
     return (
-      <Layout title={t('mentorship.bookSessionTitle')}>
+      <Layout title={t('mentorship.bookSessionTitle') as string}>
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
+          <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
           <Alert severity="error" sx={{ mb: 3 }}>
-            {error || t('mentorship.failedToLoadMentor')}
+            {error || t('mentorship.failedToLoadMentor') as string}
           </Alert>
           <Button variant="contained" onClick={() => navigate('/mentorship')}>
-            {t('mentorship.returnToMentors')}
+            {t('mentorship.returnToMentors') as string}
           </Button>
         </PageContainer>
       </Layout>
@@ -321,9 +321,9 @@ const MentorshipBookSession: React.FC = () => {
   }
   
   return (
-    <Layout title={t('mentorship.bookSessionTitle')}>
+    <Layout title={t('mentorship.bookSessionTitle') as string}>
       <PageContainer maxWidth="lg">
-        <PageTitle variant="h2">{t('mentorship.bookSessionTitle')}</PageTitle>
+        <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
         
         {/* Header with Mentor's basic info */}
         <MentorHeaderInfo mentor={mentor} />
@@ -351,7 +351,7 @@ const MentorshipBookSession: React.FC = () => {
         {showLoginPopup && (
           <LoginPopup 
             onClose={handleCloseLoginPopup}
-            message={t('mentorship.pleaseLoginToBook')}
+            message={t('mentorship.pleaseLoginToBook') as string}
           />
         )}
 

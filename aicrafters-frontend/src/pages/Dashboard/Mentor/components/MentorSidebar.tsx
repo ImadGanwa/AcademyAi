@@ -206,7 +206,7 @@ export const MentorSidebar: React.FC<SidebarProps> = ({
     <>
       <SidebarHeader $isOpen={isOpen} $isMobile={isMobile}>
         <SidebarTitle variant="h6" $isOpen={isOpen} $isMobile={isMobile}>
-          Mentor Dashboard
+          {t('mentorship.dashboardTitle', 'Mentor Dashboard') as string}
         </SidebarTitle>
         <ToggleButton onClick={onToggle} $isMobile={isMobile}>
           {isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
@@ -222,7 +222,7 @@ export const MentorSidebar: React.FC<SidebarProps> = ({
             onClick={() => handleNavigation(item.path)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemText primary={t(`mentor.sidebar.${item.text.toLowerCase()}`, item.text) as string} />
           </StyledListItem>
         ))}
       </List>

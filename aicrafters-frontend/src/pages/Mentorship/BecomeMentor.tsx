@@ -174,7 +174,7 @@ const BecomeMentor: React.FC = () => {
   const { t } = useTranslation();
   
   return (
-    <Layout title={t('mentorship.becomeMentorTitle')}>
+    <Layout title={t('mentorship.becomeMentorTitle') as string}>
       <PageContainer>
         {/* Hero Section */}
         <HeroSection>
@@ -185,7 +185,7 @@ const BecomeMentor: React.FC = () => {
         {/* Mission Section */}
         <MissionSection>
           <MissionImage>
-            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80" alt="Professional mentors" />
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80" alt={t('mentorship.alt.professionalMentors', 'Professional Mentors') as string} />
           </MissionImage>
           <MissionContent>
             <SectionTitle variant="h4">{t('mentorship.missionTitle')}</SectionTitle>
@@ -200,7 +200,7 @@ const BecomeMentor: React.FC = () => {
           <BenefitsGrid>
             <BenefitCard>
               <IconWrapper>
-                <img src="/logo192.png" alt="Impact Icon" />
+                <img src="/logo192.png" alt={t('mentorship.iconAlt.impact', 'Impact') as string} />
               </IconWrapper>
               <h3>{t('mentorship.benefitImpactTitle')}</h3>
               <p>{t('mentorship.benefitImpactText')}</p>
@@ -208,7 +208,7 @@ const BecomeMentor: React.FC = () => {
             
             <BenefitCard>
               <IconWrapper>
-                <img src="/logo192.png" alt="Cross-Cultural Icon" />
+                <img src="/logo192.png" alt={t('mentorship.iconAlt.crossCultural', 'Cross Cultural') as string} />
               </IconWrapper>
               <h3>{t('mentorship.benefitCrossCulturalTitle')}</h3>
               <p>{t('mentorship.benefitCrossCulturalText')}</p>
@@ -216,7 +216,7 @@ const BecomeMentor: React.FC = () => {
             
             <BenefitCard>
               <IconWrapper>
-                <img src="/logo192.png" alt="Sharing Icon" />
+                <img src="/logo192.png" alt={t('mentorship.iconAlt.sharing', 'Sharing') as string} />
               </IconWrapper>
               <h3>{t('mentorship.benefitShareTitle')}</h3>
               <p>{t('mentorship.benefitShareText')}</p>
@@ -224,7 +224,7 @@ const BecomeMentor: React.FC = () => {
             
             <BenefitCard>
               <IconWrapper>
-                <img src="/logo192.png" alt="Flexible Commitment Icon" />
+                <img src="/logo192.png" alt={t('mentorship.iconAlt.flexibleCommitment', 'Flexible Commitment') as string} />
               </IconWrapper>
               <h3>{t('mentorship.benefitFlexibleTitle')}</h3>
               <p>{t('mentorship.benefitFlexibleText')}</p>
@@ -232,7 +232,7 @@ const BecomeMentor: React.FC = () => {
             
             <BenefitCard>
               <IconWrapper>
-                <img src="/logo192.png" alt="Recognition Icon" />
+                <img src="/logo192.png" alt={t('mentorship.iconAlt.recognition', 'Recognition') as string} />
               </IconWrapper>
               <h3>{t('mentorship.benefitRecognitionTitle')}</h3>
               <p>{t('mentorship.benefitRecognitionText')}</p>

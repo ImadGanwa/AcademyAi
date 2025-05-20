@@ -236,11 +236,11 @@ export const Settings: React.FC = () => {
         console.log('Profile data set successfully');
       } else {
         console.error('API returned success:false', response.error);
-        setError('Failed to load mentor profile');
+        setError(t('mentor.settings.error.loadFailed', 'Failed to load mentor profile. Please try again later.') as string);
       }
     } catch (err) {
       console.error('Error fetching mentor profile:', err);
-      setError('Failed to load mentor profile. Please try again later.');
+      setError(t('mentor.settings.error.loadFailed', 'Failed to load mentor profile. Please try again later.') as string);
     } finally {
       setLoading(false);
     }
@@ -284,14 +284,14 @@ export const Settings: React.FC = () => {
       
       // Validate file type
       if (!file.type.match(/image\/(jpeg|jpg|png|gif)/i)) {
-        setError('Please select a valid image file (JPEG, PNG, or GIF)');
+        setError(t('mentor.settings.error.invalidImageFile', 'Please select a valid image file (JPEG, PNG, or GIF)') as string);
         setImageLoading(false);
         return;
       }
       
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image file is too large. Please select an image smaller than 5MB');
+        setError(t('mentor.settings.error.imageTooLarge', 'Image file is too large. Please select an image smaller than 5MB') as string);
         setImageLoading(false);
         return;
       }
@@ -370,18 +370,19 @@ export const Settings: React.FC = () => {
       console.log('Update profile API response:', response);
       
       if (response.success) {
-        setSuccess('Profile updated successfully');
+        setSuccess(t('mentor.settings.success.profileUpdated', 'Profile updated successfully') as string);
         console.log('Profile updated successfully');
         // Refresh data
         fetchMentorProfile();
       } else {
         console.error('API returned success:false on update', response.error);
-        setError('Failed to update profile: ' + (response.error || 'Unknown error'));
+        const apiError = response.error || 'Unknown error';
+        setError(t('mentor.settings.error.updateFailed', { error: apiError } as any) as string);
       }
     } catch (err: any) {
       console.error('Error updating mentor profile:', err);
       const errorMsg = err.response?.data?.error || err.message || 'Unknown error';
-      setError(`Failed to update profile: ${errorMsg}`);
+      setError(t('mentor.settings.error.updateFailed', { error: errorMsg } as any) as string);
     } finally {
       setSaveLoading(false);
     }
@@ -391,7 +392,7 @@ export const Settings: React.FC = () => {
     // Here you would send the updated notification settings to your backend
     console.log('Saving notification settings:', notificationSettings);
     // Show success message or handle errors
-    setSuccess('Notification preferences saved successfully');
+    setSuccess(t('mentor.settings.success.notificationsSaved', 'Notification preferences saved successfully') as string);
   };
 
   // Create a click handler for the camera icon that triggers the file input click
@@ -486,10 +487,10 @@ export const Settings: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        {t('mentor.sidebar.settings')}
+        {t('mentor.settings.title', 'Settings') as string}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Manage your account settings and preferences
+        {t('mentor.settings.accountDescription', 'Manage your account settings and preferences') as string}
       </Typography>
 
       {error && (
@@ -506,15 +507,15 @@ export const Settings: React.FC = () => {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="settings tabs">
-          <Tab label="Profile" />
-          <Tab label="Notifications" />
-          <Tab label="Account" />
+          <Tab label={t('mentor.settings.tabs.profile', 'Profile') as string} />
+          <Tab label={t('mentor.settings.tabs.notifications', 'Notifications') as string} />
+          <Tab label={t('mentor.settings.tabs.account', 'Account') as string} />
         </Tabs>
       </Box>
 
       <TabPanel value={tabValue} index={0}>
         <SettingsSection>
-          <SettingTitle variant="h6">Profile Information</SettingTitle>
+          <SettingTitle variant="h6">{t('mentor.settings.profileInformation', 'Profile Information') as string}</SettingTitle>
           
           <AvatarWrapper>
             <AvatarContainer onClick={handleAvatarClick}>
@@ -535,7 +536,7 @@ export const Settings: React.FC = () => {
               ) : (
                 <ProfileAvatar 
                   src={displayImageUrl}
-                  alt={profileData.name || 'Profile'} 
+                  alt={profileData.name || t('mentor.settings.profile', 'Profile') as string} 
                   onError={(e) => {
                     console.error('Failed to load image:', displayImageUrl);
                     // If image fails to load, fallback to default
@@ -554,7 +555,7 @@ export const Settings: React.FC = () => {
               />
               <AvatarUploadButton 
                 size="large" 
-                aria-label="upload picture"
+                aria-label={t('mentor.settings.uploadPhoto', 'Upload photo') as string}
                 disabled={imageLoading}
               >
                 {imageLoading ? (
@@ -582,7 +583,7 @@ export const Settings: React.FC = () => {
                 onClick={handleRemoveImage}
                 disabled={imageLoading || saveLoading}
               >
-                Remove photo
+                {t('mentor.settings.removePhoto', 'Remove photo') as string}
               </Button>
             )}
           </AvatarWrapper>
@@ -591,7 +592,7 @@ export const Settings: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Full Name"
+                label={t('mentor.settings.fullName', 'Full Name') as string}
                 name="name"
                 value={profileData.name}
                 onChange={handleProfileChange}
@@ -602,7 +603,7 @@ export const Settings: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Email Address"
+                label={t('mentor.settings.emailAddress', 'Email Address') as string}
                 name="email"
                 type="email"
                 value={profileData.email}
@@ -614,31 +615,31 @@ export const Settings: React.FC = () => {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Professional Headline"
+                label={t('mentor.settings.professionalHeadline', 'Professional Headline') as string}
                 name="headline"
                 value={profileData.headline}
                 onChange={handleProfileChange}
                 margin="normal"
-                placeholder="e.g. Senior Software Engineer & Mentor"
+                placeholder={t('mentor.settings.headlinePlaceholder', 'e.g. Senior Software Engineer & Mentor') as string}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Bio"
+                label={t('mentor.settings.bio', 'Bio') as string}
                 name="bio"
                 value={profileData.bio}
                 onChange={handleProfileChange}
                 margin="normal"
                 multiline
                 rows={4}
-                placeholder="Tell mentees about your experience and expertise"
+                placeholder={t('mentor.settings.bioPlaceholder', 'Tell mentees about your experience and expertise') as string}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Hourly Rate (USD)"
+                label={t('mentor.settings.hourlyRate', 'Hourly Rate (USD)') as string}
                 name="hourlyRate"
                 value={profileData.hourlyRate}
                 onChange={handleProfileChange}
@@ -652,7 +653,7 @@ export const Settings: React.FC = () => {
 
           <Box sx={{ mt: 3 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Skills & Expertise
+              {t('mentor.settings.skillsExpertise', 'Skills & Expertise') as string}
             </Typography>
             <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1, mb: 2 }}>
               {profileData.skills.map((skill) => (
@@ -667,11 +668,11 @@ export const Settings: React.FC = () => {
               <Grid item xs>
                 <TextField
                   fullWidth
-                  label="Add a skill"
+                  label={t('mentor.settings.addSkill', 'Add a skill') as string}
                   name="newSkill"
                   value={profileData.newSkill}
                   onChange={handleProfileChange}
-                  placeholder="e.g. JavaScript, React, Node.js"
+                  placeholder={t('mentor.settings.skillPlaceholder', 'e.g. JavaScript, React, Node.js') as string}
                 />
               </Grid>
               <Grid item>
@@ -681,7 +682,7 @@ export const Settings: React.FC = () => {
                   onClick={handleAddSkill}
                   sx={{ height: '56px' }}
                 >
-                  Add
+                  {t('mentor.settings.add', 'Add') as string}
                 </Button>
               </Grid>
             </Grid>
@@ -695,16 +696,16 @@ export const Settings: React.FC = () => {
             sx={{ mt: 4 }}
             disabled={saveLoading || imageLoading}
           >
-            {saveLoading ? 'Saving...' : 'Save Changes'}
+            {saveLoading ? t('mentor.settings.saving', 'Saving...') as string : t('mentor.settings.saveChanges', 'Save Changes') as string}
           </Button>
         </SettingsSection>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
         <SettingsSection>
-          <SettingTitle variant="h6">Notification Preferences</SettingTitle>
+          <SettingTitle variant="h6">{t('mentor.settings.notificationPreferences', 'Notification Preferences') as string}</SettingTitle>
           <Typography variant="body2" color="text.secondary" paragraph>
-            Control how and when you receive notifications from the platform
+            {t('mentor.settings.notificationDescription', 'Control how and when you receive notifications from the platform') as string}
           </Typography>
 
           <FormControlLabel
@@ -716,10 +717,10 @@ export const Settings: React.FC = () => {
                 color="primary"
               />
             }
-            label="Email Notifications"
+            label={t('mentor.settings.emailNotifications', 'Email Notifications') as string}
           />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
-            Receive emails about important updates and activity
+            {t('mentor.settings.emailNotificationsDesc', 'Receive emails about important updates and activity') as string}
           </Typography>
 
           <FormControlLabel
@@ -731,10 +732,10 @@ export const Settings: React.FC = () => {
                 color="primary"
               />
             }
-            label="Session Reminders"
+            label={t('mentor.settings.sessionReminders', 'Session Reminders') as string}
           />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
-            Get reminders before your scheduled mentorship sessions
+            {t('mentor.settings.sessionRemindersDesc', 'Get reminders before your scheduled mentorship sessions') as string}
           </Typography>
 
           <FormControlLabel
@@ -746,10 +747,10 @@ export const Settings: React.FC = () => {
                 color="primary"
               />
             }
-            label="Message Notifications"
+            label={t('mentor.settings.messageNotifications', 'Message Notifications') as string}
           />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
-            Receive notifications when you get new messages
+            {t('mentor.settings.messageNotificationsDesc', 'Receive notifications when you get new messages') as string}
           </Typography>
 
           <FormControlLabel
@@ -761,10 +762,10 @@ export const Settings: React.FC = () => {
                 color="primary"
               />
             }
-            label="Marketing Emails"
+            label={t('mentor.settings.marketingEmails', 'Marketing Emails') as string}
           />
           <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 3 }}>
-            Receive promotional emails and newsletters
+            {t('mentor.settings.marketingEmailsDesc', 'Receive promotional emails and newsletters') as string}
           </Typography>
 
           <Divider sx={{ my: 3 }} />
@@ -775,27 +776,27 @@ export const Settings: React.FC = () => {
             startIcon={<SaveIcon />}
             onClick={handleSaveNotifications}
           >
-            Save Preferences
+            {t('mentor.settings.savePreferences', 'Save Preferences') as string}
           </Button>
         </SettingsSection>
       </TabPanel>
 
       <TabPanel value={tabValue} index={2}>
         <SettingsSection>
-          <SettingTitle variant="h6">Account Settings</SettingTitle>
+          <SettingTitle variant="h6">{t('mentor.settings.accountSettings', 'Account Settings') as string}</SettingTitle>
           <Typography variant="body2" color="text.secondary" paragraph>
-            Manage your account security and preferences
+            {t('mentor.settings.accountDescription', 'Manage your account security and preferences') as string}
           </Typography>
 
           <Typography variant="subtitle1" gutterBottom sx={{ mt: 3 }}>
-            Change Password
+            {t('mentor.settings.changePassword', 'Change Password') as string}
           </Typography>
           <form onSubmit={handleUpdatePassword}>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('user.passwordSettings.currentPassword')}
+                  label={t('user.passwordSettings.currentPassword', 'Current Password') as string}
                   type={showCurrentPassword ? "text" : "password"}
                   margin="normal"
                   value={currentPassword}
@@ -824,7 +825,7 @@ export const Settings: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('user.passwordSettings.newPassword')}
+                  label={t('user.passwordSettings.newPassword', 'New Password') as string}
                   type={showNewPassword ? "text" : "password"}
                   margin="normal"
                   value={newPassword}
@@ -852,7 +853,7 @@ export const Settings: React.FC = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label={t('user.passwordSettings.confirmNewPassword')}
+                  label={t('user.passwordSettings.confirmNewPassword', 'Confirm New Password') as string}
                   type={showConfirmPassword ? "text" : "password"}
                   margin="normal"
                   value={confirmPassword}
@@ -887,7 +888,7 @@ export const Settings: React.FC = () => {
               disabled={passwordLoading}
               startIcon={passwordLoading ? <CircularProgress size={24} color="inherit" /> : null}
             >
-              {passwordLoading ? "Updating..." : t('user.passwordSettings.updatePassword')}
+              {passwordLoading ? t('mentor.settings.saving', 'Updating...') as string : t('user.passwordSettings.updatePassword', 'Update Password') as string}
             </Button>
           </form>
 

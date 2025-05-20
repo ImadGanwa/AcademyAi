@@ -9,6 +9,7 @@ import { Mentees } from './pages/Mentees';
 import { Messages } from './pages/Messages';
 import { Availability } from './pages/Availability';
 import { Settings } from './pages/Settings';
+import { useTranslation } from 'react-i18next';
 
 const DashboardContainer = styled(Box)`
   display: flex;
@@ -62,6 +63,7 @@ const MobileMenuButton = styled(IconButton)`
 export const MentorDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -76,7 +78,7 @@ export const MentorDashboard: React.FC = () => {
   };
 
   return (
-    <Layout title="Mentor Dashboard">
+    <Layout title={t('mentorship.dashboardTitle', 'Mentor Dashboard') as string}>
       <DashboardContainer>
         <MentorSidebar
           isOpen={isSidebarOpen}

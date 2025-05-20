@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -12,6 +13,8 @@ import {
   TextField,
   Button,
   IconButton,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import styled from 'styled-components';
 import SearchIcon from '@mui/icons-material/Search';
@@ -110,8 +113,12 @@ interface Contact {
 }
 
 export const Messages: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language;
   const [activeContact, setActiveContact] = React.useState<string | null>(null);
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Mock data - would come from API in real application
   const contacts: Contact[] = [
@@ -163,137 +170,148 @@ export const Messages: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Messages
+      <Typography variant="h4" sx={{  mb: 3 }}>
+        {t('mentorship.messages.title', 'Messages') as string}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Chat with your mentees and manage your conversations
+        {t('mentorship.messages.description', 'Chat with your mentees and manage your conversations')}
       </Typography>
 
-      <MessagesContainer>
-        <ContactsList elevation={1}>
-          <ContactsHeader>
-            <Typography variant="h6">Conversations</Typography>
-            <SearchContainer>
-              <SearchIcon sx={{ color: '#666', mr: 1 }} />
-              <TextField
-                fullWidth
-                variant="standard"
-                placeholder="Search contacts"
-                InputProps={{ disableUnderline: true }}
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-            </SearchContainer>
-          </ContactsHeader>
-          <ContactsListContainer>
-            {filteredContacts.map((contact) => (
-              <React.Fragment key={contact.id}>
-                <ContactItem
-                  $isActive={activeContact === contact.id}
-                  onClick={() => handleContactClick(contact.id)}
-                >
-                  <ListItemAvatar>
-                    <Avatar src={contact.avatar} alt={contact.name} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="subtitle1">{contact.name}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {contact.time}
-                        </Typography>
-                      </Box>
-                    }
-                    secondary={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            maxWidth: '180px',
-                          }}
-                        >
-                          {contact.lastMessage}
-                        </Typography>
-                        {contact.unread > 0 && (
-                          <Box
-                            sx={{
-                              ml: 1,
-                              bgcolor: 'primary.main',
-                              color: 'white',
-                              borderRadius: '50%',
-                              width: 20,
-                              height: 20,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: 12,
-                            }}
-                          >
-                            {contact.unread}
-                          </Box>
-                        )}
-                      </Box>
-                    }
-                  />
-                </ContactItem>
-                <Divider component="li" />
-              </React.Fragment>
-            ))}
-          </ContactsListContainer>
-        </ContactsList>
-
-        <ChatContainer elevation={1}>
-          {activeContact ? (
-            <>
-              <ChatHeader>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Avatar
-                    src={contacts.find((c) => c.id === activeContact)?.avatar}
-                    alt={contacts.find((c) => c.id === activeContact)?.name}
-                    sx={{ mr: 2 }}
-                  />
-                  <Typography variant="h6">
-                    {contacts.find((c) => c.id === activeContact)?.name}
-                  </Typography>
-                </Box>
-                <IconButton>
-                  <MoreVertIcon />
-                </IconButton>
-              </ChatHeader>
-              <ChatContent>
-                {/* Message bubbles would go here in a real app */}
-                <Typography variant="body2" color="text.secondary" align="center">
-                  Messages will appear here
-                </Typography>
-              </ChatContent>
-              <ChatInputContainer>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {t('mentorship.messages.error', 'Failed to load conversations. Please try again.') as string}
+        </Alert>
+      ) : (
+        <MessagesContainer>
+          <ContactsList elevation={1}>
+            <ContactsHeader>
+              <Typography variant="h6">{t('mentorship.messages.conversations', 'Conversations')}</Typography>
+              <SearchContainer>
+                <SearchIcon sx={{ color: '#666', mr: 1 }} />
                 <TextField
                   fullWidth
-                  placeholder="Type a message"
-                  variant="outlined"
-                  size="small"
-                  sx={{ mr: 2 }}
+                  variant="standard"
+                  placeholder={t('mentorship.messages.searchPlaceholder', 'Search contacts')}
+                  InputProps={{ disableUnderline: true }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
-                <Button variant="contained">Send</Button>
-              </ChatInputContainer>
-            </>
-          ) : (
-            <MessagePlaceholder>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Select a conversation
-              </Typography>
-              <Typography variant="body2">
-                Choose a contact from the list to start chatting
-              </Typography>
-            </MessagePlaceholder>
-          )}
-        </ChatContainer>
-      </MessagesContainer>
+              </SearchContainer>
+            </ContactsHeader>
+            <ContactsListContainer>
+              {filteredContacts.map((contact) => (
+                <React.Fragment key={contact.id}>
+                  <ContactItem
+                    $isActive={activeContact === contact.id}
+                    onClick={() => handleContactClick(contact.id)}
+                  >
+                    <ListItemAvatar>
+                      <Avatar src={contact.avatar} alt={contact.name} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Typography variant="subtitle1">{contact.name}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {contact.time}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: '180px',
+                            }}
+                          >
+                            {contact.lastMessage}
+                          </Typography>
+                          {contact.unread > 0 && (
+                            <Box
+                              sx={{
+                                ml: 1,
+                                bgcolor: 'primary.main',
+                                color: 'white',
+                                borderRadius: '50%',
+                                width: 20,
+                                height: 20,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: 12,
+                              }}
+                            >
+                              {contact.unread}
+                            </Box>
+                          )}
+                        </Box>
+                      }
+                    />
+                  </ContactItem>
+                  <Divider component="li" />
+                </React.Fragment>
+              ))}
+            </ContactsListContainer>
+          </ContactsList>
+
+          <ChatContainer elevation={1}>
+            {activeContact ? (
+              <>
+                <ChatHeader>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar
+                      src={contacts.find((c) => c.id === activeContact)?.avatar}
+                      alt={contacts.find((c) => c.id === activeContact)?.name}
+                      sx={{ mr: 2 }}
+                    />
+                    <Typography variant="h6">
+                      {contacts.find((c) => c.id === activeContact)?.name}
+                    </Typography>
+                  </Box>
+                  <IconButton>
+                    <MoreVertIcon />
+                  </IconButton>
+                </ChatHeader>
+                <ChatContent>
+                  {/* Message bubbles would go here in a real app */}
+                  <Typography variant="body2" color="text.secondary" align="center">
+                    {/* Messages will appear here in a real app */}
+                    {t('mentorship.messages.noMessagesYet', 'Messages will appear here.') as string}
+                  </Typography>
+                </ChatContent>
+                <ChatInputContainer>
+                  <TextField
+                    fullWidth
+                    placeholder={t('mentorship.messages.typeMessage', 'Type a message')}
+                    variant="outlined"
+                    size="small"
+                    sx={{ mr: 2 }}
+                  />
+                  <Button variant="contained">{t('mentorship.messages.send', 'Send')}</Button>
+                </ChatInputContainer>
+              </>
+            ) : (
+              <MessagePlaceholder>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  {t('mentorship.messages.selectConversation', 'Select a conversation')}
+                </Typography>
+                <Typography variant="body2">
+                  {t('mentorship.messages.chooseContact', 'Choose a contact from the list to start chatting')}
+                </Typography>
+              </MessagePlaceholder>
+            )}
+          </ChatContainer>
+        </MessagesContainer>
+      )}
     </Box>
   );
 }; 

@@ -1,4 +1,4 @@
-import React, { useState,  useEffect } from 'react';
+import React, { useState,  useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -33,6 +33,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getMentorAvailability, updateMentorAvailability } from '../../../../api/mentor';
+import { useTranslation } from 'react-i18next';
 
 const Container = styled(Paper)`
   padding: 24px;
@@ -317,6 +318,8 @@ const convert24To12Hour = (time24h: string): string => {
 };
 
 export const Availability: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language;
   const theme = useTheme();
   const [timeZone, setTimeZone] = useState('Casablanca (GMT+1)');
   const [sessionDuration, setSessionDuration] = useState('30 minutes');
@@ -439,7 +442,7 @@ export const Availability: React.FC = () => {
     const endIndex = timeSlots.indexOf(endTime);
     
     if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
-      setSnackbarMessage('Invalid time range. Start time must be earlier than end time.');
+      setSnackbarMessage(t('mentorship.availability.error.invalidTimeRange', 'Invalid time range') as string);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
@@ -450,7 +453,7 @@ export const Availability: React.FC = () => {
     
     // Show success feedback
     setUpdateRangeSuccess(true);
-    setSnackbarMessage('Time range updated successfully!');
+    setSnackbarMessage(t('mentorship.availability.success.timeRangeUpdated', 'Time range updated') as string);
     setSnackbarSeverity('success');
     setSnackbarOpen(true);
     
@@ -490,7 +493,11 @@ export const Availability: React.FC = () => {
     updateCurrentWeekAvailability(newAvailability);
     
     // Provide some feedback
-    setSnackbarMessage(`Time slot ${newState ? 'selected' : 'unselected'}: ${day} at ${time}`);
+    setSnackbarMessage(
+      newState 
+        ? t('mentorship.availability.info.slotSelected', 'Slot selected') as string
+        : t('mentorship.availability.info.slotUnselected', 'Slot unselected') as string
+    );
     setSnackbarSeverity(newState ? 'success' : 'info');
     setSnackbarOpen(true);
   };
@@ -498,7 +505,7 @@ export const Availability: React.FC = () => {
   // Clear all slots for current week
   const handleClearAllSlots = () => {
     updateCurrentWeekAvailability({});
-    setSnackbarMessage('All availability slots cleared for current week');
+    setSnackbarMessage(t('mentorship.availability.info.allSlotsCleared', 'All slots cleared') as string);
     setSnackbarSeverity('info');
     setSnackbarOpen(true);
   };
@@ -629,11 +636,11 @@ export const Availability: React.FC = () => {
       updateCurrentWeekAvailability(newSlots);
       
       // Show feedback for multiple selection
-      if (currentlyDraggedCells.length > 1) {
-        setSnackbarMessage(`${currentlyDraggedCells.length} time slots ${selectingState ? 'selected' : 'unselected'}`);
-        setSnackbarSeverity(selectingState ? 'success' : 'info');
-        setSnackbarOpen(true);
-      }
+      setSnackbarMessage(
+        `${currentlyDraggedCells.length} ${t(selectingState ? 'mentorship.availability.slotsSelected' : 'mentorship.availability.slotsUnselected', 'Slots selected') as string}`
+      );
+      setSnackbarSeverity(selectingState ? 'success' : 'info');
+      setSnackbarOpen(true);
     }
     
     // Reset drag state
@@ -749,7 +756,7 @@ export const Availability: React.FC = () => {
       }
     } catch (error) {
       console.error('Error fetching mentor availability:', error);
-      setSnackbarMessage('Failed to fetch availability. Please try again.');
+      setSnackbarMessage(t('mentorship.availability.error.fetchFailed', 'Error fetching mentor availability') as string);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {
@@ -919,12 +926,12 @@ export const Availability: React.FC = () => {
       // Call API to update availability - pass exactly what the backend expects
       await updateMentorAvailability({ availability: availabilitySlots });
       
-      setSnackbarMessage('Availability saved successfully!');
+      setSnackbarMessage(t('mentorship.availability.success.saveSuccess', 'Availability saved successfully') as string);
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
     } catch (error) {
       console.error('Error saving mentor availability:', error);
-      setSnackbarMessage('Failed to save availability. Please try again.');
+      setSnackbarMessage(t('mentorship.availability.error.saveFailed', 'Error saving mentor availability') as string);
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
     } finally {
@@ -1000,25 +1007,32 @@ export const Availability: React.FC = () => {
 
   return (
     <Box>
+      <Typography variant="h5" component="h1" sx={{ fontWeight: 600, mb: 1 }}>
+        {t('mentorship.availability.title', 'My Availability') as string}
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        {t('mentorship.availability.subtitle', 'Manage your availability for mentorship sessions') as string}
+      </Typography>
+      
       {isLoading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
           <CircularProgress />
           <Typography variant="body1" sx={{ ml: 2 }}>
-            Loading your availability...
+            {t('mentorship.availability.loading', 'Loading your availability...') as string}
           </Typography>
         </Box>
       ) : (
         <>
           <Container>
             <SectionTitle variant="h5">
-              Set Your Availability
+              {t('mentorship.availability.setAvailability', 'Set Your Availability') as string}
             </SectionTitle>
             <SectionDescription variant="body1">
-              Define when you're available for mentorship sessions. You can adjust these settings anytime.
+              {t('mentorship.availability.defineAvailability', 'Define when you\'re available for mentorship sessions. You can adjust these settings anytime.') as string}
             </SectionDescription>
 
             <FormRow>
-              <FormLabel>Time Zone:</FormLabel>
+              <FormLabel>{t('mentor.dashboard.availability.timeZone', 'Time Zone:') as string}</FormLabel>
               <FormControl sx={{ minWidth: 240 }}>
                 <Select
                   value={timeZone}
@@ -1026,21 +1040,21 @@ export const Availability: React.FC = () => {
                   displayEmpty
                   size="small"
                 >
-                  <MenuItem value="Casablanca (GMT+1)">Casablanca (GMT+1)</MenuItem>
-                  <MenuItem value="London (GMT+0)">London (GMT+0)</MenuItem>
-                  <MenuItem value="New York (GMT-5)">New York (GMT-5)</MenuItem>
-                  <MenuItem value="Los Angeles (GMT-8)">Los Angeles (GMT-8)</MenuItem>
-                  <MenuItem value="Tokyo (GMT+9)">Tokyo (GMT+9)</MenuItem>
+                  <MenuItem value="Casablanca (GMT+1)">{t('timezones.casablanca', 'Casablanca (GMT+1)') as string}</MenuItem>
+                  <MenuItem value="London (GMT+0)">{t('timezones.london', 'London (GMT+0)') as string}</MenuItem>
+                  <MenuItem value="New York (GMT-5)">{t('timezones.newYork', 'New York (GMT-5)') as string}</MenuItem>
+                  <MenuItem value="Los Angeles (GMT-8)">{t('timezones.losAngeles', 'Los Angeles (GMT-8)') as string}</MenuItem>
+                  <MenuItem value="Tokyo (GMT+9)">{t('timezones.tokyo', 'Tokyo (GMT+9)') as string}</MenuItem>
                 </Select>
               </FormControl>
             </FormRow>
 
             <SectionTitle variant="h6">
-              Session Duration
+              {t('mentor.dashboard.availability.sessionDuration', 'Session Duration') as string}
             </SectionTitle>
             
             <FormRow>
-              <FormLabel>Default session length:</FormLabel>
+              <FormLabel>{t('mentor.dashboard.availability.defaultSessionLength', 'Default session length:') as string}</FormLabel>
               <FormControl sx={{ minWidth: 240 }}>
                 <Select
                   value={sessionDuration}
@@ -1048,22 +1062,22 @@ export const Availability: React.FC = () => {
                   displayEmpty
                   size="small"
                 >
-                  <MenuItem value="15 minutes">15 minutes</MenuItem>
-                  <MenuItem value="30 minutes">30 minutes</MenuItem>
-                  <MenuItem value="45 minutes">45 minutes</MenuItem>
-                  <MenuItem value="60 minutes">1 hour</MenuItem>
-                  <MenuItem value="90 minutes">1.5 hours</MenuItem>
+                  <MenuItem value="15 minutes">{t('durations.15min', '15 minutes') as string}</MenuItem>
+                  <MenuItem value="30 minutes">{t('durations.30min', '30 minutes') as string}</MenuItem>
+                  <MenuItem value="45 minutes">{t('durations.45min', '45 minutes') as string}</MenuItem>
+                  <MenuItem value="60 minutes">{t('durations.60min', '1 hour') as string}</MenuItem>
+                  <MenuItem value="90 minutes">{t('durations.90min', '1.5 hours') as string}</MenuItem>
                 </Select>
               </FormControl>
             </FormRow>
 
             <SectionTitle variant="h6">
-              Weekly Schedule Configuration
+              {t('mentor.dashboard.availability.weeklyScheduleConfig', 'Weekly Schedule Configuration') as string}
             </SectionTitle>
             
             {/* Week Selector */}
             <WeekSelectorContainer>
-              <Tooltip title="Previous Week">
+              <Tooltip title={t('mentor.dashboard.availability.previousWeek', 'Previous Week') as string}>
                 <WeekNavigationButton onClick={handlePreviousWeek}>
                   <ArrowBackIosNewIcon fontSize="small" />
                 </WeekNavigationButton>
@@ -1074,7 +1088,7 @@ export const Availability: React.FC = () => {
                 {formatDateRange(currentWeek)}
               </WeekDisplay>
               
-              <Tooltip title="Next Week">
+              <Tooltip title={t('mentor.dashboard.availability.nextWeek', 'Next Week') as string}>
                 <WeekNavigationButton onClick={handleNextWeek}>
                   <ArrowForwardIosIcon fontSize="small" />
                 </WeekNavigationButton>
@@ -1085,12 +1099,12 @@ export const Availability: React.FC = () => {
                 onClick={handleCurrentWeek} 
                 sx={{ ml: 2, fontSize: '0.8rem' }}
               >
-                Current Week
+                {t('mentor.dashboard.availability.currentWeek', 'Current Week') as string}
               </Button>
             </WeekSelectorContainer>
             
             <TimeRangeContainer>
-              <FormLabel>Start Time:</FormLabel>
+              <FormLabel>{t('mentor.dashboard.availability.startTime', 'Start Time:') as string}</FormLabel>
               <FormControl sx={{ width: 140 }}>
                 <Select
                   value={startTime}
@@ -1104,7 +1118,7 @@ export const Availability: React.FC = () => {
                 </Select>
               </FormControl>
               
-              <FormLabel>End Time:</FormLabel>
+              <FormLabel>{t('mentor.dashboard.availability.endTime', 'End Time:') as string}</FormLabel>
               <FormControl sx={{ width: 140 }}>
                 <Select
                   value={endTime}
@@ -1120,14 +1134,14 @@ export const Availability: React.FC = () => {
               
               {updateRangeSuccess ? (
                 <UpdateButtonSuccess variant="contained">
-                  Updated!
+                  {t('mentor.dashboard.availability.updated', 'Updated!') as string}
                 </UpdateButtonSuccess>
               ) : (
                 <UpdateButton 
                   variant="contained" 
                   onClick={handleUpdateTimeRange}
                 >
-                  Update Time Range
+                  {t('mentor.dashboard.availability.updateTimeRange', 'Update Time Range') as string}
                 </UpdateButton>
               )}
             </TimeRangeContainer>
@@ -1140,11 +1154,11 @@ export const Availability: React.FC = () => {
               >
                 <RadioOption>
                   <Radio value="weekdays" />
-                  <Typography variant="body2">Apply to all weekdays (Mon-Fri)</Typography>
+                  <Typography variant="body2">{t('mentor.dashboard.availability.applyToWeekdays', 'Apply to all weekdays (Mon-Fri)') as string}</Typography>
                 </RadioOption>
                 <RadioOption>
                   <Radio value="alldays" />
-                  <Typography variant="body2">Apply to entire week (Mon-Sun)</Typography>
+                  <Typography variant="body2">{t('mentor.dashboard.availability.applyToAllDays', 'Apply to entire week (Mon-Sun)') as string}</Typography>
                 </RadioOption>
               </RadioGroup>
               
@@ -1153,22 +1167,22 @@ export const Availability: React.FC = () => {
                 color="error" 
                 onClick={handleClearAllSlots}
               >
-                Clear All Slots
+                {t('mentor.dashboard.availability.clearAllSlots', 'Clear All Slots') as string}
               </ClearButton>
             </Box>
             
             <LegendContainer>
               <LegendItem>
                 <ColorBox $color="rgba(63, 81, 181, 0.35)" />
-                <Typography variant="body2">Available</Typography>
+                <Typography variant="body2">{t('mentor.dashboard.availability.available', 'Available') as string}</Typography>
               </LegendItem>
               <LegendItem>
                 <ColorBox $color="transparent" />
-                <Typography variant="body2">Unavailable</Typography>
+                <Typography variant="body2">{t('mentor.dashboard.availability.unavailable', 'Unavailable') as string}</Typography>
               </LegendItem>
               <LegendItem>
                 <DragIndicatorIcon fontSize="small" color="action" />
-                <Typography variant="body2">Drag to select multiple slots</Typography>
+                <Typography variant="body2">{t('mentor.dashboard.availability.dragToSelect', 'Drag to select multiple slots') as string}</Typography>
               </LegendItem>
             </LegendContainer>
             
@@ -1188,7 +1202,7 @@ export const Availability: React.FC = () => {
                   <TableRow>
                     <TableCell sx={{ border: 'none', width: '100px' }}></TableCell>
                     {weekdays.map((day) => (
-                      <WeekdayCell key={day}>{day}</WeekdayCell>
+                      <WeekdayCell key={day}>{t(`mentorship.availability.days.${day.toLowerCase()}`, day) as string}</WeekdayCell>
                     ))}
                   </TableRow>
                 </TableHead>
@@ -1222,14 +1236,14 @@ export const Availability: React.FC = () => {
             <InfoCircle>
               <InfoIcon fontSize="small" />
               <Typography variant="body2">
-                Click on a slot to toggle availability, or click and drag to select multiple slots at once.
+                {t('mentor.dashboard.availability.clickInstructions', 'Click on a slot to toggle availability, or click and drag to select multiple slots at once.') as string}
               </Typography>
             </InfoCircle>
           </Container>
 
           <Container>
             <SectionTitle variant="h6">
-              What mentorship format do you accept?
+              {t('mentor.dashboard.availability.mentorshipFormatQuestion', 'What mentorship format do you accept?') as string}
             </SectionTitle>
             
             <FormGroup>
@@ -1240,7 +1254,7 @@ export const Availability: React.FC = () => {
                     onChange={() => handleMentorshipFormatChange('oneOnOne')}
                   />
                 }
-                label="1-on-1 Sessions"
+                label={t('mentor.dashboard.availability.oneOnOneSessions', '1-on-1 Sessions') as string}
               />
               <FormControlLabel
                 control={
@@ -1249,7 +1263,7 @@ export const Availability: React.FC = () => {
                     onChange={() => handleMentorshipFormatChange('smallGroup')}
                   />
                 }
-                label="Small Group (2-3 mentees)"
+                label={t('mentor.dashboard.availability.smallGroup', 'Small Group (2-3 mentees)') as string}
               />
               <FormControlLabel
                 control={
@@ -1258,14 +1272,14 @@ export const Availability: React.FC = () => {
                     onChange={() => handleMentorshipFormatChange('officeHours')}
                   />
                 }
-                label="Office Hours (Drop-in)"
+                label={t('mentor.dashboard.availability.officeHours', 'Office Hours (Drop-in)') as string}
               />
             </FormGroup>
           </Container>
 
           <ButtonContainer>
             <CancelButton variant="outlined">
-              Cancel
+              {t('mentor.dashboard.availability.cancel', 'Cancel') as string}
             </CancelButton>
             <SaveButton 
               variant="contained"
@@ -1275,10 +1289,10 @@ export const Availability: React.FC = () => {
               {isSaving ? (
                 <>
                   <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                  Saving...
+                  {t('mentor.dashboard.availability.saving', 'Saving...') as string}
                 </>
               ) : (
-                'Save Availability'
+                t('mentor.dashboard.availability.saveAvailability', 'Save Availability') as string
               )}
             </SaveButton>
           </ButtonContainer>
