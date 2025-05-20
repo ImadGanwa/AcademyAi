@@ -1,2 +1,6 @@
-- name: TODO to Issue
-  uses: alstr/todo-to-issue-action@v5.1.12
+jobs:
+  run-todo-to-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: TODO to Issue
+        uses: alstr/todo-to-issue-action@v5.1.12
