@@ -6,9 +6,11 @@ import redis from '../config/redis';
 import logger from '../config/logger';
 
 // Cache TTL settings
+// TODO: Move hardcoded cache TTL to environment variables or configuration
 const TRANSCRIPTION_CACHE_TTL = 60 * 60 * 24 * 30; // 30 days in seconds
 
 export class TranscriptionService {
+  // TODO: Move hardcoded retry values to environment variables or configuration
   private static readonly RETRY_DELAY = 10 * 60 * 1000; // 10 minutes in milliseconds
   private static readonly MAX_RETRIES = 3; // Maximum number of retry attempts
 

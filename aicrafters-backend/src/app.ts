@@ -28,6 +28,7 @@ import bookingRoutes from './routes/bookingRoutes';
 const app = express();
 
 // CORS configuration
+// TODO: Move hardcoded origin URLs to environment variables or configuration
 const corsOptions = {
   origin: [
     'http://localhost:3000',
@@ -43,6 +44,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Configure body parser for different content types
+// TODO: Move hardcoded request size limits to environment variables or configuration
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -70,6 +72,7 @@ app.use('/api/mindmaps', mindMapRoutes);
 app.use('/api/bookings', bookingRoutes);
 
 // Connect to MongoDB
+// TODO: Move hardcoded MongoDB connection string to environment variables
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/aicrafters')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));

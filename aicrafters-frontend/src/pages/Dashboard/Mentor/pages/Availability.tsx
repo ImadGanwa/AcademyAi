@@ -182,6 +182,7 @@ const ButtonContainer = styled(Box)`
 `;
 
 // Define time slots and days
+// TODO: Move hardcoded time slots to configuration to allow for customization
 const timeSlots = [
   '9:00 AM', '9:30 AM', 
   '10:00 AM', '10:30 AM', 
@@ -194,6 +195,7 @@ const timeSlots = [
   '5:00 PM'
 ];
 
+// TODO: Move hardcoded weekday names to i18n translations or configuration
 const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const UpdateButtonSuccess = styled(Button)`
@@ -321,8 +323,8 @@ export const Availability: React.FC = () => {
   const { t, i18n } = useTranslation();
   const currentLocale = i18n.language;
   const theme = useTheme();
-  const [timeZone, setTimeZone] = useState('Casablanca (GMT+1)');
-  const [sessionDuration, setSessionDuration] = useState('30 minutes');
+  const [timeZone, setTimeZone] = useState('Casablanca (GMT+1)'); // TODO: Use browser timezone or user preference instead of hardcoded default
+  const [sessionDuration, setSessionDuration] = useState('30 minutes'); // TODO: Move default session duration to configuration
   const [startTime, setStartTime] = useState('9:00 AM');
   const [endTime, setEndTime] = useState('5:00 PM');
   const [weekdayOption, setWeekdayOption] = useState('weekdays');
@@ -1040,6 +1042,7 @@ export const Availability: React.FC = () => {
                   displayEmpty
                   size="small"
                 >
+                  {/* TODO: Move hardcoded timezones to configuration and include full list of world timezones */}
                   <MenuItem value="Casablanca (GMT+1)">{t('timezones.casablanca', 'Casablanca (GMT+1)') as string}</MenuItem>
                   <MenuItem value="London (GMT+0)">{t('timezones.london', 'London (GMT+0)') as string}</MenuItem>
                   <MenuItem value="New York (GMT-5)">{t('timezones.newYork', 'New York (GMT-5)') as string}</MenuItem>

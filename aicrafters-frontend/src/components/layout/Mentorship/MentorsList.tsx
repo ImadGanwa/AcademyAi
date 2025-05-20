@@ -406,6 +406,7 @@ export const MentorsList: React.FC = () => {
                   label={t('mentorship.countryLabel', { defaultValue: 'Country' }) as string}
                   IconComponent={ArrowDownIcon}
                 >
+                  {/* TODO: Move hardcoded country list to a configuration file or fetch from an API */}
                   <MenuItem value="">{t('mentorship.allCountries', { defaultValue: 'All Countries' }) as string}</MenuItem>
                   <MenuItem value="us">{t('mentorship.countries.us', { defaultValue: 'United States' }) as string}</MenuItem>
                   <MenuItem value="uk">{t('mentorship.countries.uk', { defaultValue: 'United Kingdom' }) as string}</MenuItem>

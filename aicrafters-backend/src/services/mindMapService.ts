@@ -7,6 +7,7 @@ import redis from '../config/redis';
 dotenv.config();
 
 // Cache TTL settings
+// TODO: Move these hardcoded cache TTL and limit values to environment variables or configuration
 const MIND_MAP_STRUCTURE_CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
 const MIND_MAP_MARKDOWN_CACHE_TTL = 60 * 60 * 24 * 7; // 7 days in seconds
 const MAX_TRANSCRIPTION_SIZE = 15000; // Limit for transcription length to avoid AI context issues
@@ -23,6 +24,7 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Using Gemini-pro model which is suitable for text generation
+// TODO: Move hardcoded model name to environment variable or configuration
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Enhanced interface with recursive node structure for unlimited depth

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// TODO: Move hardcoded fallback URL to a central config file
 console.log('API baseURL configured as:', baseURL);
 
 const axiosInstance = axios.create({
@@ -8,7 +9,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000, // TODO: Move hardcoded timeout to a central config file
 });
 
 // Add a request interceptor to add the auth token

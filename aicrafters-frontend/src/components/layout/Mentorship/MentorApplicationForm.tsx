@@ -367,6 +367,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                   native: true,
                 }}
               >
+                {/* TODO: Move hardcoded country list to a configuration file or fetch from a countries API */}
                 <option value="" disabled>{t('mentorship.applicationForm.selectCountry', 'Select a country') as string}</option>
                 <option value="USA">{t('mentorship.applicationForm.countries.usa', 'United States') as string}</option>
                 <option value="CAN">{t('mentorship.applicationForm.countries.canada', 'Canada') as string}</option>
