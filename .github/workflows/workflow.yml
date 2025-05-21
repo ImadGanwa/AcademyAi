@@ -7,8 +7,7 @@ jobs:
       issues: write
       contents: read
     steps:
-      - uses: "actions/checkout@v4"
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: "TODO to Issue"
-        uses: "alstr/todo-to-issue-action@v5"
+        - name: TODO to Issue
+          uses: alstr/todo-to-issue-action@v5.1.12
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
