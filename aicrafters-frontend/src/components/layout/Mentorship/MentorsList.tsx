@@ -352,7 +352,7 @@ export const MentorsList: React.FC = () => {
                 <SearchIcon sx={{ fontSize: 24 }} />
               </SearchIconWrapper>
               <StyledTextField
-                placeholder={t('mentorship.searchPlaceholder', { defaultValue: 'Search' }) as string}
+                placeholder={t('mentor.searchPlaceholder', { defaultValue: 'Search' }) as string}
                 variant="outlined"
                 fullWidth
                 value={searchTerm}
@@ -365,71 +365,71 @@ export const MentorsList: React.FC = () => {
             
             <FiltersRow>
               <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentorship.categoryLabel', { defaultValue: 'Category' }) as string}</InputLabel>
+                <InputLabel>{t('mentor.categoryLabel', { defaultValue: 'Category' }) as string}</InputLabel>
                 <Select
                   value={category}
                   onChange={handleCategoryChange}
-                  label={t('mentorship.categoryLabel', { defaultValue: 'Category' }) as string}
+                  label={t('mentor.categoryLabel', { defaultValue: 'Category' }) as string}
                   IconComponent={ArrowDownIcon}
                 >
-                  <MenuItem value="">{t('mentorship.allCategories', { defaultValue: 'All Categories' }) as string}</MenuItem>
-                  <MenuItem value="webdev">{t('mentorship.categories.webdev', { defaultValue: 'Web Development' }) as string}</MenuItem>
-                  <MenuItem value="mobiledev">{t('mentorship.categories.mobiledev', { defaultValue: 'Mobile Development' }) as string}</MenuItem>
-                  <MenuItem value="ai">{t('mentorship.categories.ai', { defaultValue: 'Artificial Intelligence' }) as string}</MenuItem>
-                  <MenuItem value="datascience">{t('mentorship.categories.datascience', { defaultValue: 'Data Science' }) as string}</MenuItem>
-                  <MenuItem value="devops">{t('mentorship.categories.devops', { defaultValue: 'DevOps' }) as string}</MenuItem>
+                  <MenuItem value="">{t('mentor.allCategories', { defaultValue: 'All Categories' }) as string}</MenuItem>
+                  <MenuItem value="webdev">{t('mentor.categories.webdev', { defaultValue: 'Web Development' }) as string}</MenuItem>
+                  <MenuItem value="mobiledev">{t('mentor.categories.mobiledev', { defaultValue: 'Mobile Development' }) as string}</MenuItem>
+                  <MenuItem value="ai">{t('mentor.categories.ai', { defaultValue: 'Artificial Intelligence' }) as string}</MenuItem>
+                  <MenuItem value="datascience">{t('mentor.categories.datascience', { defaultValue: 'Data Science' }) as string}</MenuItem>
+                  <MenuItem value="devops">{t('mentor.categories.devops', { defaultValue: 'DevOps' }) as string}</MenuItem>
                 </Select>
               </FilterSelect>
               
               <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentorship.skillLabel', { defaultValue: 'Skill' }) as string}</InputLabel>
+                <InputLabel>{t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}</InputLabel>
                 <Select
                   value={skill}
                   onChange={handleSkillChange}
-                  label={t('mentorship.skillLabel', { defaultValue: 'Skill' }) as string}
+                  label={t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}
                   IconComponent={ArrowDownIcon}
                 >
-                  <MenuItem value="">{t('mentorship.allSkills', { defaultValue: 'All Skills' }) as string}</MenuItem>
-                  <MenuItem value="javascript">{t('mentorship.skills.javascript', { defaultValue: 'JavaScript' }) as string}</MenuItem>
-                  <MenuItem value="python">{t('mentorship.skills.python', { defaultValue: 'Python' }) as string}</MenuItem>
-                  <MenuItem value="react">{t('mentorship.skills.react', { defaultValue: 'React' }) as string}</MenuItem>
-                  <MenuItem value="nodejs">{t('mentorship.skills.nodejs', { defaultValue: 'Node.js' }) as string}</MenuItem>
-                  <MenuItem value="machinelearning">{t('mentorship.skills.machinelearning', { defaultValue: 'Machine Learning' }) as string}</MenuItem>
+                  <MenuItem value="">{t('mentor.allSkills', { defaultValue: 'All Skills' }) as string}</MenuItem>
+                  <MenuItem value="javascript">{t('mentor.skills.javascript', { defaultValue: 'JavaScript' }) as string}</MenuItem>
+                  <MenuItem value="python">{t('mentor.skills.python', { defaultValue: 'Python' }) as string}</MenuItem>
+                  <MenuItem value="react">{t('mentor.skills.react', { defaultValue: 'React' }) as string}</MenuItem>
+                  <MenuItem value="nodejs">{t('mentor.skills.nodejs', { defaultValue: 'Node.js' }) as string}</MenuItem>
+                  <MenuItem value="machinelearning">{t('mentor.skills.machinelearning', { defaultValue: 'Machine Learning' }) as string}</MenuItem>
                 </Select>
               </FilterSelect>
               
               <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentorship.countryLabel', { defaultValue: 'Country' }) as string}</InputLabel>
+                <InputLabel>{t('mentor.countryLabel', { defaultValue: 'Country' }) as string}</InputLabel>
                 <Select
                   value={country}
                   onChange={handleCountryChange}
-                  label={t('mentorship.countryLabel', { defaultValue: 'Country' }) as string}
+                  label={t('mentor.countryLabel', { defaultValue: 'Country' }) as string}
                   IconComponent={ArrowDownIcon}
                 >
                   {/* TODO: Move hardcoded country list to a configuration file or fetch from an API */}
-                  <MenuItem value="">{t('mentorship.allCountries', { defaultValue: 'All Countries' }) as string}</MenuItem>
-                  <MenuItem value="us">{t('mentorship.countries.us', { defaultValue: 'United States' }) as string}</MenuItem>
-                  <MenuItem value="uk">{t('mentorship.countries.uk', { defaultValue: 'United Kingdom' }) as string}</MenuItem>
-                  <MenuItem value="ca">{t('mentorship.countries.ca', { defaultValue: 'Canada' }) as string}</MenuItem>
-                  <MenuItem value="au">{t('mentorship.countries.au', { defaultValue: 'Australia' }) as string}</MenuItem>
-                  <MenuItem value="in">{t('mentorship.countries.in', { defaultValue: 'India' }) as string}</MenuItem>
+                  <MenuItem value="">{t('mentor.allCountries', { defaultValue: 'All Countries' }) as string}</MenuItem>
+                  <MenuItem value="us">{t('mentor.countries.us', { defaultValue: 'United States' }) as string}</MenuItem>
+                  <MenuItem value="uk">{t('mentor.countries.uk', { defaultValue: 'United Kingdom' }) as string}</MenuItem>
+                  <MenuItem value="ca">{t('mentor.countries.ca', { defaultValue: 'Canada' }) as string}</MenuItem>
+                  <MenuItem value="au">{t('mentor.countries.au', { defaultValue: 'Australia' }) as string}</MenuItem>
+                  <MenuItem value="in">{t('mentor.countries.in', { defaultValue: 'India' }) as string}</MenuItem>
                 </Select>
               </FilterSelect>
               
               <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentorship.languageLabel', { defaultValue: 'Language' }) as string}</InputLabel>
+                <InputLabel>{t('mentor.languageLabel', { defaultValue: 'Language' }) as string}</InputLabel>
                 <Select
                   value={language}
                   onChange={handleLanguageChange}
-                  label={t('mentorship.languageLabel', { defaultValue: 'Language' }) as string}
+                  label={t('mentor.languageLabel', { defaultValue: 'Language' }) as string}
                   IconComponent={ArrowDownIcon}
                 >
-                  <MenuItem value="">{t('mentorship.allLanguages', { defaultValue: 'All Languages' }) as string}</MenuItem>
-                  <MenuItem value="en">{t('mentorship.languages.English', { defaultValue: 'English' }) as string}</MenuItem>
-                  <MenuItem value="es">{t('mentorship.languages.Spanish', { defaultValue: 'Spanish' }) as string}</MenuItem>
-                  <MenuItem value="fr">{t('mentorship.languages.French', { defaultValue: 'French' }) as string}</MenuItem>
-                  <MenuItem value="de">{t('mentorship.languages.German', { defaultValue: 'German' }) as string}</MenuItem>
-                  <MenuItem value="zh">{t('mentorship.languages.Chinese', { defaultValue: 'Chinese' }) as string}</MenuItem>
+                  <MenuItem value="">{t('mentor.allLanguages', { defaultValue: 'All Languages' }) as string}</MenuItem>
+                  <MenuItem value="en">{t('mentor.languages.English', { defaultValue: 'English' }) as string}</MenuItem>
+                  <MenuItem value="es">{t('mentor.languages.Spanish', { defaultValue: 'Spanish' }) as string}</MenuItem>
+                  <MenuItem value="fr">{t('mentor.languages.French', { defaultValue: 'French' }) as string}</MenuItem>
+                  <MenuItem value="de">{t('mentor.languages.German', { defaultValue: 'German' }) as string}</MenuItem>
+                  <MenuItem value="zh">{t('mentor.languages.Chinese', { defaultValue: 'Chinese' }) as string}</MenuItem>
                 </Select>
               </FilterSelect>
             </FiltersRow>
@@ -443,20 +443,20 @@ export const MentorsList: React.FC = () => {
             <Box display="flex" flexDirection="column" alignItems="center" py={4}>
               <CircularProgress size={40} />
               <Typography mt={2} color="text.secondary">
-                {t('mentorship.loadingMentors', { defaultValue: 'Loading mentors...' }) as string}
+                {t('mentor.loadingMentors', { defaultValue: 'Loading mentors...' }) as string}
               </Typography>
             </Box>
           ) : error ? (
             <Alert severity="error" sx={{ width: '100%', mb: 3 }}>
-              {t('mentorship.error', { error, defaultValue: error }) as string}
+              {t('mentor.error', { error, defaultValue: error }) as string}
             </Alert>
           ) : displayedMentors.length === 0 ? (
             <Box textAlign="center" py={4}>
               <Typography variant="h6" color="text.secondary">
-                {t('mentorship.noMentorsFound', 'No mentors found matching your criteria')}
+                {t('mentor.noMentorsFound', 'No mentors found matching your criteria')}
               </Typography>
               <Typography color="text.secondary" mt={1}>
-                {t('mentorship.adjustFilters', 'Try adjusting your filters or search terms')}
+                {t('mentor.adjustFilters', 'Try adjusting your filters or search terms')}
               </Typography>
             </Box>
           ) : (

@@ -1111,6 +1111,7 @@
     "addToCalendar": "Ajouter au calendrier",
     "applicationForm": {
       "title": "Postuler pour devenir Mentor",
+      "selectCountry": "Sélectionner un pays",
       "step1Title": "Informations personnelles",
       "step2Title": "Parcours professionnel",
       "step3Title": "Détails du mentorat",

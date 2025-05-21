@@ -288,11 +288,11 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
           <Box display="flex" alignItems="center" gap={2}>
             {mentor.hourlyRate && (
               <Typography variant="h6" fontWeight="bold" color="primary">
-                {t('mentorship.hourlyRate', { rate: mentor.hourlyRate, defaultValue: `$${mentor.hourlyRate}/hr` }) as string}
+                {t('mentor.hourlyRate', { rate: mentor.hourlyRate, defaultValue: `$${mentor.hourlyRate}/hr` }) as string}
               </Typography>
             )}
             <BookButton variant="contained" onClick={handleBookSession}>
-              {t('mentorship.bookSessionButton', { defaultValue: 'Book a session' }) as string}
+              {t('mentor.bookSession', { defaultValue: 'Book a session' }) as string}
             </BookButton>
           </Box>
         </ButtonContainer>

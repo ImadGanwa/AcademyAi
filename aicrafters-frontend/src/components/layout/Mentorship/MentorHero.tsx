@@ -89,13 +89,13 @@ export const MentorHero: React.FC = () => {
         <HeroContainer maxWidth="lg">
           <TitleWrapper>
             <Title variant="h1">
-              {t('mentorship.heroTitle.firstPart', 'Find Your') as string}{' '}
-              <Highlight>{t('mentorship.heroTitle.highlight', 'Ideal') as string}</Highlight>{' '}
-              {t('mentorship.heroTitle.lastPart', 'Mentor') as string}
+              {t('mentor.heroTitle.firstPart', 'Find Your') as string}{' '}
+              <Highlight>{t('mentor.heroTitle.highlight', 'Ideal') as string}</Highlight>{' '}
+              {t('mentor.heroTitle.lastPart', 'Mentor') as string}
             </Title>
           </TitleWrapper>
           <Description>
-            {t('mentorship.heroDescription', 'Explore trusted experts ready to support your personal and professional growth.') as string}
+            {t('mentor.heroDescription', 'Explore trusted experts ready to support your personal and professional growth.') as string}
           </Description>
         </HeroContainer>
       </HeroSection>

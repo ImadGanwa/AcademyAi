@@ -89,7 +89,7 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
     return (
       <ListContainer>
         <NoResultsMessage variant="h6">
-          {t('mentorship.noMentorsFound', 'No mentors found matching your criteria. Try adjusting your filters.') as string} 
+          {t('mentor.noMentorsFound', 'No mentors found matching your criteria. Try adjusting your filters.') as string} 
         </NoResultsMessage>
       </ListContainer>
     );
