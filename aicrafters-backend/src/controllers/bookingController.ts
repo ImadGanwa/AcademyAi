@@ -575,7 +575,7 @@ export const bookingController = {
       const filter: any = { mentorId };
       
       // Add status filter if provided
-      if (status && ['scheduled', 'completed', 'cancelled', 'no-show'].includes(status as string)) {
+      if (status && ['pending', 'scheduled', 'completed', 'cancelled', 'no-show'].includes(status as string)) {
         filter.status = status;
       }
       

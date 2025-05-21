@@ -5,7 +5,7 @@ export interface IMentorshipBooking extends Document {
   menteeId: mongoose.Types.ObjectId;
   scheduledAt: Date;
   duration: number;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'no-show';
+  status: 'pending' | 'scheduled' | 'completed' | 'cancelled' | 'no-show';
   topic: string;
   notes: {
     mentorNotes?: string;
@@ -68,8 +68,8 @@ const MentorshipBookingSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['scheduled', 'completed', 'cancelled', 'no-show'],
-    default: 'scheduled',
+    enum: ['pending', 'scheduled', 'completed', 'cancelled', 'no-show'],
+    default: 'pending',
     required: true,
     index: true
   },
@@ -163,29 +163,19 @@ MentorshipBookingSchema.statics.checkForConflicts = async function(
   // Calculate session end time
   const sessionEndTime = new Date(scheduledAt.getTime() + duration * 60000);
   
-  // Check for overlapping bookings
+  console.log(`Checking for conflicts at time: ${scheduledAt.toISOString()} to ${sessionEndTime.toISOString()}`);
+  console.log(`Session duration: ${duration} minutes`);
+  
+  // Using a simpler approach with manual verification instead of complex MongoDB queries
+  // that might not work correctly with date calculations
   const query: any = {
     mentorId,
     status: 'scheduled',
-    $or: [
-      // Case 1: New booking starts during an existing booking
-      {
-        scheduledAt: { $lte: scheduledAt },
-        $expr: {
-          $gt: [
-            { $add: ['$scheduledAt', { $multiply: ['$duration', 60000] }] },
-            scheduledAt.getTime()
-          ]
-        }
-      },
-      // Case 2: New booking ends during an existing booking
-      {
-        $and: [
-          { scheduledAt: { $lt: sessionEndTime } },
-          { scheduledAt: { $gt: scheduledAt } }
-        ]
-      }
-    ]
+    scheduledAt: { 
+      // Look for bookings that start around the same time (within a larger window)
+      $gte: new Date(scheduledAt.getTime() - 2 * 60 * 60000), // 2 hours before
+      $lte: new Date(sessionEndTime.getTime() + 2 * 60 * 60000)  // 2 hours after
+    }
   };
   
   // Exclude the current booking if we're checking an update
@@ -193,8 +183,43 @@ MentorshipBookingSchema.statics.checkForConflicts = async function(
     query._id = { $ne: excludeBookingId };
   }
   
-  const conflictCount = await this.countDocuments(query);
-  return conflictCount > 0;
+  // Find all potential conflicts
+  const potentialConflicts = await this.find(query);
+  
+  console.log(`Found ${potentialConflicts.length} potential conflicts to check`);
+  
+  // Manually check each potential conflict
+  let hasConflict = false;
+  for (let i = 0; i < potentialConflicts.length; i++) {
+    const booking = potentialConflicts[i];
+    const bookingStart = new Date(booking.scheduledAt);
+    const bookingEnd = new Date(bookingStart.getTime() + booking.duration * 60000);
+    
+    console.log(`Examining potential conflict:
+      Booking: ${booking._id}
+      Start: ${bookingStart.toISOString()}
+      End: ${bookingEnd.toISOString()}
+    `);
+    
+    // Check for overlap
+    const overlaps = (
+      // Case 1: New booking starts during existing booking
+      (scheduledAt >= bookingStart && scheduledAt < bookingEnd) ||
+      // Case 2: New booking ends during existing booking
+      (sessionEndTime > bookingStart && sessionEndTime <= bookingEnd) ||
+      // Case 3: New booking completely contains existing booking
+      (scheduledAt <= bookingStart && sessionEndTime >= bookingEnd)
+    );
+    
+    if (overlaps) {
+      console.log(`CONFLICT DETECTED with booking ${booking._id}`);
+      hasConflict = true;
+      break;
+    }
+  }
+  
+  console.log(`Final conflict result: ${hasConflict}`);
+  return hasConflict;
 };
 
 // Static method to get upcoming sessions for a mentor

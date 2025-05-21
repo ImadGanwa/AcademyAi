@@ -292,46 +292,60 @@ export const Mentees: React.FC = () => {
       setError(null);
       
       try {
-        // Get pending bookings for mentor using the booking service
-        const response = await getMentorBookings('scheduled');
+        // Fetch both pending and scheduled bookings
+        const pendingResponse = await getMentorBookings('pending');
+        const scheduledResponse = await getMentorBookings('scheduled');
         
-        if (response.success && response.data.bookings) {
-          // Transform the booking data to match our Mentee interface
-          const menteesFromBookings = response.data.bookings.map((booking: any) => {
-            // Format date and time for display
-            const scheduledDate = new Date(booking.scheduledAt);
-            const formattedTime = scheduledDate.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            });
-            
-            const formattedDate = scheduledDate.toLocaleDateString('en-US', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            });
-            
-            return {
-              id: booking.menteeId._id,
-              name: booking.menteeId.fullName,
-              avatar: booking.menteeId.profileImage || '',
-              location: booking.menteeId.location || t('mentorship.mentees.locationNotProvided', 'Location not provided') as string,
-              sessionTime: `${formattedTime} / ${formattedDate}`,
-              status: booking.status === 'scheduled' ? 'accepted' : 'pending',
-              topic: booking.topic,
-              bookingId: booking._id
-            };
-          });
-          
-          setAllMentees(menteesFromBookings);
+        const bookingsData = [];
+        
+        // Process pending bookings
+        if (pendingResponse.success && pendingResponse.data.bookings) {
+          const pendingBookings = pendingResponse.data.bookings.map((booking: any) => mapBookingToMentee(booking, 'pending'));
+          bookingsData.push(...pendingBookings);
         }
+        
+        // Process scheduled bookings
+        if (scheduledResponse.success && scheduledResponse.data.bookings) {
+          const scheduledBookings = scheduledResponse.data.bookings.map((booking: any) => mapBookingToMentee(booking, 'accepted'));
+          bookingsData.push(...scheduledBookings);
+        }
+        
+        // Set all bookings combined
+        setAllMentees(bookingsData);
       } catch (err: any) {
         console.error('Error fetching mentee bookings:', err);
         setError(err.response?.data?.error || 'Failed to load mentee data');
       } finally {
         setLoading(false);
       }
+    };
+    
+    // Helper function to map booking data to mentee interface
+    const mapBookingToMentee = (booking: any, status: 'pending' | 'accepted'): Mentee => {
+      // Format date and time for display
+      const scheduledDate = new Date(booking.scheduledAt);
+      const formattedTime = scheduledDate.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+      
+      const formattedDate = scheduledDate.toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+      
+      return {
+        id: booking.menteeId._id,
+        name: booking.menteeId.fullName,
+        avatar: booking.menteeId.profileImage || '',
+        location: booking.menteeId.location || 'Location not provided',
+        sessionTime: `${formattedTime} / ${formattedDate}`,
+        status: status,
+        topic: booking.topic,
+        bookingId: booking._id
+      };
     };
     
     fetchMenteeBookings();
@@ -430,20 +444,35 @@ export const Mentees: React.FC = () => {
     return `https://zoom.us/j/8745${randomId}XXX`;
   };
 
-  const handleConfirmSchedule = () => {
+  const handleConfirmSchedule = async () => {
     // Here you would save the scheduled session to your backend
-    console.log('Scheduled session with:', selectedMentee);
-    console.log('Date:', selectedDate);
-    console.log('Time:', selectedTime);
-    console.log('Duration:', duration);
+    if (!selectedMentee) return;
     
-    // Generate meeting details
-    setConfirmationDetails(formatConfirmationDetails());
-    setMeetingLink(generateMeetingLink());
-    
-    // Close the scheduling dialog and open the confirmation
-    setOpenScheduleDialog(false);
-    setOpenConfirmationDialog(true);
+    try {
+      // First update the booking status to 'scheduled'
+      const response = await updateBooking(selectedMentee.bookingId!, {
+        status: 'scheduled'
+      });
+      
+      if (response.success) {
+        // Update the mentee status in local state
+        const updatedMentees = allMentees.map(m => 
+          m.id === selectedMentee.id ? { ...m, status: 'accepted' as const } : m
+        );
+        setAllMentees(updatedMentees);
+      
+        // Generate meeting details
+        setConfirmationDetails(formatConfirmationDetails());
+        setMeetingLink(generateMeetingLink());
+        
+        // Close the scheduling dialog and open the confirmation
+        setOpenScheduleDialog(false);
+        setOpenConfirmationDialog(true);
+      }
+    } catch (err: any) {
+      console.error('Error accepting booking:', err);
+      alert(err.response?.data?.error || 'Failed to accept booking');
+    }
   };
 
   const handleMessage = (mentee: Mentee) => {
@@ -491,37 +520,23 @@ export const Mentees: React.FC = () => {
 
   const handleAccept = async (mentee: Mentee) => {
     try {
-      // Call API to accept the booking request using the booking service
-      const response = await updateBooking(mentee.bookingId!, {
-        status: 'scheduled'
-      });
+      setSelectedMentee(mentee);
       
-      if (response.success) {
-        // Update the mentee status in our local state
-        const updatedMentees = allMentees.map(m => 
-          m.id === mentee.id ? { ...m, status: 'accepted' as const } : m
-        );
-        setAllMentees(updatedMentees);
-        
-        // Generate meeting details for confirmation
-        setSelectedMentee(mentee);
-        
-        // Generate a default date and time based on the booking
-        const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0];
-        setSelectedDate(formattedDate);
-        setSelectedTime('10:00');
-        setDuration('30');
-        
-        setTimeout(() => {
-          setConfirmationDetails(formatConfirmationDetails());
-          setMeetingLink(generateMeetingLink());
-          setOpenConfirmationDialog(true);
-        }, 0);
-      }
+      // Generate a default date and time for scheduling
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0];
+      setSelectedDate(formattedDate);
+      setSelectedTime('10:00');
+      setDuration('30');
+      
+      // Open the scheduling dialog without updating status yet
+      setOpenScheduleDialog(true);
+      
     } catch (err: any) {
       console.error('Error accepting booking:', err);
       alert(t('mentorship.mentees.error.acceptFailed', 'Failed to accept booking. Please try again.') as string);
+      console.error('Error preparing to accept booking:', err);
+      alert(err.response?.data?.error || 'Failed to prepare booking acceptance');
     }
   };
 
@@ -675,7 +690,7 @@ export const Mentees: React.FC = () => {
       {/* Schedule/Reschedule Session Dialogs */}
       <Dialog open={openScheduleDialog} onClose={handleCloseScheduleDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          {t('mentorship.mentees.dialog.scheduleTitle', 'Schedule Mentorship Session') as string}
+          {selectedMentee?.status === 'pending' ? 'Accept and Schedule Mentorship Session' : 'Schedule Mentorship Session'}
           <IconButton
             aria-label="close"
             onClick={handleCloseScheduleDialog}
@@ -697,9 +712,17 @@ export const Mentees: React.FC = () => {
                   {getInitials(selectedMentee.name)}
                 </Avatar>
                 <Typography variant="subtitle1">
-                  {t('mentorship.mentees.dialog.scheduleWith', { name: selectedMentee.name } as any) as string}
+                  {selectedMentee.status === 'pending' 
+                    ? `Accept and schedule a session with ${selectedMentee.name}` 
+                    : `Schedule a session with ${selectedMentee.name}`}
                 </Typography>
               </Stack>
+              
+              {selectedMentee.status === 'pending' && (
+                <Alert severity="info" sx={{ mb: 3 }}>
+                  You are accepting this mentee request. Please select a date and time for the session.
+                </Alert>
+              )}
               
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
@@ -767,7 +790,7 @@ export const Mentees: React.FC = () => {
             color="primary"
             disabled={!selectedDate || !selectedTime}
           >
-            {t('mentorship.mentees.button.scheduleSession', 'Schedule Session') as string}
+            {selectedMentee?.status === 'pending' ? 'Accept & Schedule' : 'Schedule Session'}
           </Button>
         </DialogActions>
       </Dialog>

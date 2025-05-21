@@ -264,11 +264,25 @@ const MentorshipBookSession: React.FC = () => {
         // Show confirmation popup
         setShowConfirmationPopup(true);
       } else {
-        setBookingError(t('mentorship.failedToCreateBooking') as string);
+        // Handle specific error cases with more helpful messages
+        if (response.error?.includes('time slot is already booked')) {
+          setBookingError(`The selected time slot (${selectedTime}) is no longer available. Please choose a different time.`);
+          // Clear the selected time to encourage the user to choose another
+          setSelectedTime(null);
+        } else {
+          setBookingError(response.error || 'Failed to create booking');
+        }
       }
     } catch (err: any) {
       console.error('Error creating booking:', err);
-      setBookingError(t('mentorship.bookingError') as string);
+      // Handle specific API error responses
+      if (err.response?.data?.error?.includes('time slot is already booked')) {
+        setBookingError(`The selected time slot (${selectedTime}) is no longer available. Please choose a different time.`);
+        // Clear the selected time to encourage the user to choose another
+        setSelectedTime(null);
+      } else {
+        setBookingError(err.response?.data?.error || 'An error occurred while booking the session');
+      }
     } finally {
       setBookingLoading(false);
     }
