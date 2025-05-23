@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ChoicePageContainer,
   PageTitle,
@@ -54,6 +55,7 @@ const TraceLogoSVG: React.FC = () => (
 
 const ChoicePage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleAdwinChoice = () => {
     sessionStorage.setItem(CHOICE_MADE_SESSION_KEY, 'true');
@@ -76,11 +78,11 @@ const ChoicePage: React.FC = () => {
       <FloatingParticle />
       
       <PageTitle variant="h1" as="h1">
-        Choose Your Learning Path
+        {t('choice.title', { defaultValue: 'Choose Your Learning Path' }) as string}
       </PageTitle>
       
       <PageSubtitle variant="h6" as="p">
-        Select the platform that best fits your educational journey and unlock a world of possibilities
+        {t('choice.subtitle', { defaultValue: 'Select the platform that best fits your educational journey and unlock a world of possibilities' }) as string}
       </PageSubtitle>
       
       <CardsContainer>
@@ -88,11 +90,10 @@ const ChoicePage: React.FC = () => {
           <CardContentWrapper>
             <LogoImage src={AdwinLogo} alt="Adwin.ai Academy Logo" />
             <CardTitle variant="h4" as="h2">
-              Adwin.ai Academy
+              {t('choice.adwin.title', { defaultValue: 'Adwin.ai Academy' }) as string}
             </CardTitle>
             <CardDescription variant="body1">
-              Dive into our comprehensive learning ecosystem featuring AI-powered courses, 
-              interactive workshops, and personalized learning paths designed to accelerate your growth.
+              {t('choice.adwin.description', { defaultValue: 'Dive into our comprehensive learning ecosystem featuring AI-powered courses, interactive workshops, and personalized learning paths designed to accelerate your growth.' }) as string}
             </CardDescription>
           </CardContentWrapper>
           <AdwinButton 
@@ -100,7 +101,7 @@ const ChoicePage: React.FC = () => {
             onClick={handleAdwinChoice}
             size="large"
           >
-            Start Your Journey
+            {t('choice.adwin.button', { defaultValue: 'Start Your Journey' }) as string}
           </AdwinButton>
         </AdwinCard>
 
@@ -110,11 +111,10 @@ const ChoicePage: React.FC = () => {
               <TraceLogoSVG />
             </TraceLogo>
             <CardTitle variant="h4" as="h2">
-              Trace+ Platform
+              {t('choice.trace.title', { defaultValue: 'Trace+ Platform' }) as string}
             </CardTitle>
             <CardDescription variant="body1">
-              Access premium streaming content, educational resources, and specialized courses 
-              curated by your institution through the Trace+ ecosystem.
+              {t('choice.trace.description', { defaultValue: 'Access premium streaming content, educational resources, and specialized courses curated by your institution through the Trace+ ecosystem.' }) as string}
             </CardDescription>
           </CardContentWrapper>
           <TraceButton 
@@ -122,7 +122,7 @@ const ChoicePage: React.FC = () => {
             onClick={handleTraceChoice}
             size="large"
           >
-            Explore Trace+
+            {t('choice.trace.button', { defaultValue: 'Explore Trace+' }) as string}
           </TraceButton>
         </TraceCard>
       </CardsContainer>

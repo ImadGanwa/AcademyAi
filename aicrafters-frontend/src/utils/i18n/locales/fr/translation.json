@@ -1787,5 +1787,19 @@
     "60min": "1 heure",
     "90min": "1,5 heures",
     "120min": "2 heures"
+  },
+  "choice": {
+    "title": "Choisissez Votre Parcours d'Apprentissage",
+    "subtitle": "Sélectionnez la plateforme qui correspond le mieux à votre parcours éducatif et découvrez un monde de possibilités",
+    "adwin": {
+      "title": "Adwin.ai Academy",
+      "description": "Plongez dans notre écosystème d'apprentissage complet proposant des cours alimentés par l'IA, des ateliers interactifs et des parcours d'apprentissage personnalisés conçus pour accélérer votre progression.",
+      "button": "Commencer Votre Parcours"
+    },
+    "trace": {
+      "title": "Plateforme Trace+",
+      "description": "Accédez à du contenu premium en streaming, des ressources éducatives et des cours spécialisés organisés par votre institution via l'écosystème Trace+.",
+      "button": "Explorer Trace+"
+    }
   }
 }
