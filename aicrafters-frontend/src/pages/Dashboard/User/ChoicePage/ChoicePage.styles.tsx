@@ -50,47 +50,53 @@ const particleFloat = keyframes`
 
 // Main container with subtle background
 export const ChoicePageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: ${({ theme }) => theme.spacing(4)};
-  background: 
-    radial-gradient(circle at 25% 75%, rgba(15, 15, 35, 0.8) 0%, transparent 50%),
-    radial-gradient(circle at 75% 25%, rgba(26, 26, 46, 0.8) 0%, transparent 50%),
-    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #2d1b4e 75%, #1e1e3f 100%);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  && {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100vw;
+    padding: ${({ theme }) => theme.spacing(4)};
     background: 
-      radial-gradient(circle at 30% 70%, rgba(215, 16, 193, 0.04) 0%, transparent 50%),
-      radial-gradient(circle at 70% 30%, rgba(255, 111, 0, 0.04) 0%, transparent 50%);
-    pointer-events: none;
-    animation: ${subtleGlow} 8s ease-in-out infinite;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
+      radial-gradient(circle at 25% 75%, rgba(15, 15, 35, 0.8) 0%, transparent 50%),
+      radial-gradient(circle at 75% 25%, rgba(26, 26, 46, 0.8) 0%, transparent 50%),
+      linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #2d1b4e 75%, #1e1e3f 100%);
+    position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      radial-gradient(1px 1px at 25px 35px, rgba(255, 255, 255, 0.05), transparent),
-      radial-gradient(1px 1px at 45px 75px, rgba(255, 255, 255, 0.03), transparent);
-    background-repeat: repeat;
-    background-size: 150px 150px;
-    pointer-events: none;
-    opacity: 0.3;
+    overflow-y: auto;
+    z-index: 1400;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 30% 70%, rgba(215, 16, 193, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(255, 111, 0, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      animation: ${subtleGlow} 8s ease-in-out infinite;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(1px 1px at 25px 35px, rgba(255, 255, 255, 0.05), transparent),
+        radial-gradient(1px 1px at 45px 75px, rgba(255, 255, 255, 0.03), transparent);
+      background-repeat: repeat;
+      background-size: 150px 150px;
+      pointer-events: none;
+      opacity: 0.3;
+    }
   }
 `;
 

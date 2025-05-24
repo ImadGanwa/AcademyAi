@@ -80,9 +80,10 @@
       "business": "Adwin Business",
       "teach": "Teach on Adwin",
       "businessLink": "Business",
-      "teachLink": "Teach",
+      "studyLink": "Win Skills",
+      "teachLink": "Teach on Adwin",
       "becomeAMentor": "Become a Mentor",
-      "mentorship": "Mentorship",
+      "mentorship": "Win Confidence",
       "searchPlaceholder": "Search for anything"
     },
     "languages": {

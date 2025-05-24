@@ -613,7 +613,7 @@ export const Navbar: React.FC = () => {
   const handleTeachClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const currentLang = i18n.language;
-    navigate(`/${currentLang}/teach`, { replace: true });
+    navigate(`/${currentLang}/`, { replace: true });
   };
 
   const handleMentorshipClick = (e: React.MouseEvent) => {
@@ -632,11 +632,11 @@ export const Navbar: React.FC = () => {
         </LogoContainer>
      
         <NavLinks>
-          <NavLink to="/business" onClick={handleBusinessClick}>
+          {/* <NavLink to="/business" onClick={handleBusinessClick}>
             {t('common.navigation.businessLink')}
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/teach" onClick={handleTeachClick}>
-            {t('common.navigation.teachLink')}
+            {t('common.navigation.studyLink')}
           </NavLink>
           <NavLink to="/mentorship" onClick={handleMentorshipClick}>
             {t('common.navigation.mentorship')}
@@ -732,7 +732,7 @@ export const Navbar: React.FC = () => {
               handleTeachClick(e);
               toggleMobileMenu();
             }}>
-              {t('common.navigation.teachLink')}
+              {t('common.navigation.studyLink')}
             </MobileNavLink>
             <MobileNavLink to="/mentorship" onClick={(e) => {
               e.preventDefault();

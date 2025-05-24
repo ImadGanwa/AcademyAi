@@ -36,7 +36,7 @@ import BecomeMentor from '../pages/Mentorship/BecomeMentor';
 import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplicationConfirmation';
 import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
 import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
-import ChoicePage from '../pages/ChoicePage/ChoicePage';
+import ChoicePage from '../pages/Dashboard/User/ChoicePage/ChoicePage';
 import MyBookingPage from '../pages/Dashboard/User/Booking/MyBookingPage';
 
 

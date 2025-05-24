@@ -18,7 +18,7 @@ import {
   FloatingParticle,
 } from './ChoicePage.styles';
 
-import AdwinLogo from '../../assets/images/logo.svg';
+import AdwinLogo from '../../../../assets/images/logo.svg';
 
 const CHOICE_MADE_SESSION_KEY = 'userChoiceMade';
 
