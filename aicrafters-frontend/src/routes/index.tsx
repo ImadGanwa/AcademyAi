@@ -37,6 +37,8 @@ import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplication
 import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
 import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
 import ChoicePage from '../pages/ChoicePage/ChoicePage';
+import MyBookingPage from '../pages/Dashboard/User/Booking/MyBookingPage';
+
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -97,11 +99,13 @@ const UserDashboardRoutes = () => {
         <Route path="learning" element={<MyLearningPage />} />
         <Route path="learning/:courseId" element={<CourseLearningPage />} />
         <Route path="certificate/:courseId" element={<CourseCertificatePage />} />
+        <Route path="booking" element={<MyBookingPage />} />
         <Route path="settings/*" element={<AccountSettingsPage />} />
       </Routes>
     </UserRouteGuard>
   );
 };
+
 
 // Trainer dashboard routes
 const TrainerDashboardRoutes = () => {

@@ -149,6 +149,12 @@ export const LoginPage: React.FC = () => {
     if (code) {
       handleLinkedInCallback(code);
     }
+    
+    // Check for expired token notification
+    const expired = urlParams.get('expired');
+    if (expired === 'true') {
+      toast.warning(t('auth.sessionExpired', 'Your session has expired. Please log in again.') as string);
+    }
   }, [location]);
 
   const handleSubmit = async (event: React.FormEvent) => {

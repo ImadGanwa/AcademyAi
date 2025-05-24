@@ -70,7 +70,6 @@ export const MentorInfoCard: React.FC<MentorInfoCardProps> = ({ mentor }) => {
         <BookingDescription>
           {t('mentorship.booking.description', 'Choose a date and time that works for you. Once confirmed, your mentor will receive the request and you\'ll both get a calendar invite.') as string}
         </BookingDescription>
-        // TODO: add internalisation for Mentor Dashboard
 
         <SessionDetails>
           <DetailItem>
