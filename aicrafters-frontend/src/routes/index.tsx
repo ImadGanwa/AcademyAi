@@ -36,85 +36,178 @@ import BecomeMentor from '../pages/Mentorship/BecomeMentor';
 import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplicationConfirmation';
 import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
 import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
+import ChoicePage from '../pages/ChoicePage/ChoicePage';
 import MyBookingPage from '../pages/Dashboard/User/Booking/MyBookingPage';
+
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isLoading, user } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const currentLang = location.pathname.split('/')[1];
+
+  // For use in this component
+  const checkChoiceAndGetPath = () => {
+    const choiceMade = sessionStorage.getItem('userChoiceMade');
+    console.log('DEBUG - ProtectedRoute - userChoiceMade:', choiceMade);
+    
+    if (!isAuthenticated) {
+      return `/${currentLang}/login`;
+    }
+    
+    if (choiceMade !== 'true') {
+      console.log('DEBUG - ProtectedRoute - Redirecting to choice page');
+      return `/${currentLang}/choice`;
+    }
+    
+    // User is authenticated and has made a choice, proceed normally
+    return null;
+  };
 
   // If still loading auth state, show nothing
   if (isLoading) {
     return null;
   }
 
-  if (!isAuthenticated) {
-    // Preserve the attempted URL in the state
-    return <Navigate to={`/${currentLang}/login`} state={{ from: location }} replace />;
+  // Check if user needs to be redirected
+  const redirectPath = checkChoiceAndGetPath();
+  if (redirectPath) {
+    console.log('DEBUG - ProtectedRoute - Redirecting to:', redirectPath);
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
 };
 
 // User dashboard routes
-const UserDashboardRoutes = () => (
-  <UserRouteGuard>
-    <Routes>
-      <Route path="/" element={<Navigate to="learning" replace />} />
-      <Route path="learning" element={<MyLearningPage />} />
-      <Route path="learning/:courseId" element={<CourseLearningPage />} />
-      <Route path="certificate/:courseId" element={<CourseCertificatePage />} />
-      <Route path="booking" element={<MyBookingPage />} />
-      <Route path="settings/*" element={<AccountSettingsPage />} />
-    </Routes>
-  </UserRouteGuard>
-);
+const UserDashboardRoutes = () => {
+  const location = useLocation(); 
+  const currentLang = location.pathname.split('/')[1];
+  const choiceMade = sessionStorage.getItem('userChoiceMade');
+  
+  console.log('DEBUG - UserDashboardRoutes - userChoiceMade:', choiceMade);
+  
+  if (choiceMade !== 'true') {
+    console.log('DEBUG - UserDashboardRoutes - Redirecting to choice page');
+    return <Navigate to={`/${currentLang}/choice`} replace />;
+  }
+  
+  return (
+    <UserRouteGuard>
+      <Routes>
+        <Route path="/" element={<Navigate to="learning" replace />} />
+        <Route path="learning" element={<MyLearningPage />} />
+        <Route path="learning/:courseId" element={<CourseLearningPage />} />
+        <Route path="certificate/:courseId" element={<CourseCertificatePage />} />
+        <Route path="booking" element={<MyBookingPage />} />
+        <Route path="settings/*" element={<AccountSettingsPage />} />
+      </Routes>
+    </UserRouteGuard>
+  );
+};
+
 
 // Trainer dashboard routes
-const TrainerDashboardRoutes = () => (
-  <TrainerRouteGuard>
-    <Routes>
-      <Route path="/" element={<Navigate to="courses" replace />} />
-      <Route path="/*" element={<TrainerDashboard />} />
-    </Routes>
-  </TrainerRouteGuard>
-);
+const TrainerDashboardRoutes = () => {
+  const location = useLocation(); 
+  const currentLang = location.pathname.split('/')[1];
+  const choiceMade = sessionStorage.getItem('userChoiceMade');
+  
+  console.log('DEBUG - TrainerDashboardRoutes - userChoiceMade:', choiceMade);
+  
+  if (choiceMade !== 'true') {
+    console.log('DEBUG - TrainerDashboardRoutes - Redirecting to choice page');
+    return <Navigate to={`/${currentLang}/choice`} replace />;
+  }
+  
+  return (
+    <TrainerRouteGuard>
+      <Routes>
+        <Route path="/" element={<Navigate to="courses" replace />} />
+        <Route path="/*" element={<TrainerDashboard />} />
+      </Routes>
+    </TrainerRouteGuard>
+  );
+};
 
 // Mentor dashboard routes
-const MentorDashboardRoutes = () => (
-  <MentorRouteGuard>
-    <Routes>
-      <Route path="/" element={<Navigate to="mentees" replace />} />
-      <Route path="/*" element={<MentorDashboard />} />
-    </Routes>
-  </MentorRouteGuard>
-);
+const MentorDashboardRoutes = () => {
+  const location = useLocation(); 
+  const currentLang = location.pathname.split('/')[1];
+  const choiceMade = sessionStorage.getItem('userChoiceMade');
+  
+  console.log('DEBUG - MentorDashboardRoutes - userChoiceMade:', choiceMade);
+  
+  if (choiceMade !== 'true') {
+    console.log('DEBUG - MentorDashboardRoutes - Redirecting to choice page');
+    return <Navigate to={`/${currentLang}/choice`} replace />;
+  }
+  
+  return (
+    <MentorRouteGuard>
+      <Routes>
+        <Route path="/" element={<Navigate to="mentees" replace />} />
+        <Route path="/*" element={<MentorDashboard />} />
+      </Routes>
+    </MentorRouteGuard>
+  );
+};
 
 // Admin dashboard routes
-const AdminDashboardRoutes = () => (
-  <AdminRouteGuard>
-    <Routes>
-      <Route path="/*" element={<AdminDashboard />} />
-    </Routes>
-  </AdminRouteGuard>
-);
+const AdminDashboardRoutes = () => {
+  const location = useLocation(); 
+  const currentLang = location.pathname.split('/')[1];
+  const choiceMade = sessionStorage.getItem('userChoiceMade');
+  
+  console.log('DEBUG - AdminDashboardRoutes - userChoiceMade:', choiceMade);
+  
+  if (choiceMade !== 'true') {
+    console.log('DEBUG - AdminDashboardRoutes - Redirecting to choice page');
+    return <Navigate to={`/${currentLang}/choice`} replace />;
+  }
+  
+  return (
+    <AdminRouteGuard>
+      <Routes>
+        <Route path="/*" element={<AdminDashboard />} />
+      </Routes>
+    </AdminRouteGuard>
+  );
+};
 
 export const AppRoutes: React.FC = () => {
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { t, i18n } = useTranslation();
+  const location = useLocation();
 
-  const { t } = useTranslation();
   const getDashboardPath = () => {
+    const lang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
     switch (user?.role) {
       case 'admin':
-        return '/dashboard/admin';
+        return `/${lang}/dashboard/admin`;
       case 'trainer':
-        return '/dashboard/trainer/courses';
+        return `/${lang}/dashboard/trainer/courses`;
       case 'mentor':
-        return '/dashboard/mentor/mentees';
+        return `/${lang}/dashboard/mentor/mentees`;
       default:
-        return '/dashboard/user/learning';
+        return `/${lang}/dashboard/user/learning`;
     }
+  };
+
+  const getPostLoginPath = () => {
+    const lang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
+    const choiceMade = sessionStorage.getItem('userChoiceMade');
+    console.log('DEBUG - userChoiceMade in sessionStorage:', choiceMade);
+    console.log('DEBUG - isAuthenticated:', isAuthenticated);
+    console.log('DEBUG - user:', user);
+    
+    if (choiceMade === 'true') {
+      console.log('DEBUG - Choice made, redirecting to dashboard:', getDashboardPath());
+      return getDashboardPath();
+    }
+    
+    console.log('DEBUG - No choice made, redirecting to choice page:', `/${lang}/choice`);
+    return `/${lang}/choice`;
   };
 
   return (
@@ -140,44 +233,45 @@ export const AppRoutes: React.FC = () => {
         <Route path="mentorship/booking-confirmation" element={<MentorshipConfirmation />} />
         <Route path="mentorship/become-mentor" element={<BecomeMentor />} />
         <Route path="mentorship/application-confirmation" element={<MentorApplicationConfirmation />} />
-        <Route path="app" element={<PlaceholderPage pageName={t('placeholder.titles.app')} />} />
-        <Route path="affiliate" element={<PlaceholderPage pageName={t('placeholder.titles.affiliate')} />} />
-        <Route path="investors" element={<PlaceholderPage pageName={t('placeholder.titles.investors')} />} />
-        <Route path="cookie-settings" element={<PlaceholderPage pageName={t('placeholder.titles.cookieSettings')} />} />
-        <Route path="sitemap" element={<PlaceholderPage pageName={t('placeholder.titles.sitemap')} />} />
-        <Route path="accessibility" element={<PlaceholderPage pageName={t('placeholder.titles.accessibility')} />} />
+        <Route path="app" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.app')} />} />
+        <Route path="affiliate" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.affiliate')} />} />
+        <Route path="investors" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.investors')} />} />
+        <Route path="cookie-settings" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.cookieSettings')} />} />
+        <Route path="sitemap" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.sitemap')} />} />
+        <Route path="accessibility" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.accessibility')} />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="contact" element={<ContactPage />} />
-        <Route path="blog" element={<PlaceholderPage pageName={t('placeholder.titles.blog')} />} />
-        <Route path="help" element={<PlaceholderPage pageName={t('placeholder.titles.help')} />} />
-        <Route path="terms" element={<PlaceholderPage pageName={t('placeholder.titles.terms')} />} />
-        <Route path="privacy" element={<PlaceholderPage pageName={t('placeholder.titles.privacy')} />} />
+        <Route path="blog" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.blog')} />} />
+        <Route path="help" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.help')} />} />
+        <Route path="terms" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.terms')} />} />
+        <Route path="privacy" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.privacy')} />} />
+        <Route path="choice" element={<ChoicePage />} />
 
         {/* Auth routes */}
         <Route path="login" element={
           isAuthenticated ? (
-            <Navigate to={`/${DEFAULT_LANGUAGE}${getDashboardPath()}`} replace />
+            <Navigate to={getPostLoginPath()} replace />
           ) : (
             <LoginPage />
           )
         } />
         <Route path="signup" element={
           isAuthenticated ? (
-            <Navigate to={`/${DEFAULT_LANGUAGE}${getDashboardPath()}`} replace />
+            <Navigate to={getPostLoginPath()} replace />
           ) : (
             <SignUpPage />
           )
         } />
         <Route path="forgot-password" element={
           isAuthenticated ? (
-            <Navigate to={`/${DEFAULT_LANGUAGE}${getDashboardPath()}`} replace />
+            <Navigate to={getPostLoginPath()} replace />
           ) : (
             <ForgotPasswordPage />
           )
         } />
         <Route path="reset-password/:token" element={
           isAuthenticated ? (
-            <Navigate to={`/${DEFAULT_LANGUAGE}${getDashboardPath()}`} replace />
+            <Navigate to={getPostLoginPath()} replace />
           ) : (
             <ResetPasswordPage />
           )

@@ -1773,10 +1773,24 @@
     "daysAgo": "days ago",
     "noNotifications": "No notifications to display"
   },
+  "choice": {
+    "title": "Choose Your Learning Path",
+    "subtitle": "Select the platform that best fits your educational journey and unlock a world of possibilities",
+    "adwin": {
+      "title": "Adwin.ai Academy",
+      "description": "Dive into our comprehensive learning ecosystem featuring AI-powered courses, interactive workshops, and personalized learning paths designed to accelerate your growth.",
+      "button": "Start Your Journey"
+    },
+    "trace": {
+      "title": "Trace+ Platform",
+      "description": "Access premium streaming content, educational resources, and specialized courses curated by your institution through the Trace+ ecosystem.",
+      "button": "Explore Trace+"
+    }
+  },
   "timezones": {
     "casablanca": "Casablanca (GMT+1)",
     "london": "London (GMT+0)",
-    "newYork": "New York (GMT-5)",
+    "newYork": "New York (GMT-5)", 
     "losAngeles": "Los Angeles (GMT-8)",
     "tokyo": "Tokyo (GMT+9)"
   },

@@ -3,6 +3,8 @@ node_modules/
 /.pnp
 .pnp.js
 
+.github/copilot-instructions.md
+
 # Environment variables
 .env
 .env.local
