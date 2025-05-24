@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { store } from '../store';
+import { logout } from '../store/slices/authSlice';
 
 const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 // TODO: Move hardcoded fallback URL to a central config file
@@ -59,6 +61,21 @@ axiosInstance.interceptors.response.use(
       headers: error.config?.headers,
       data: error.config?.data
     });
+    
+    // Handle authentication errors
+    if (error.response && error.response.status === 401) {
+      console.log('Authentication error detected - logging out user');
+      
+      // Dispatch logout action to clear auth state
+      store.dispatch(logout());
+      
+      // Clear token from localStorage
+      localStorage.removeItem('token');
+      
+      // Redirect to login page
+      const currentLang = localStorage.getItem('i18nextLng') || 'en';
+      window.location.href = `/${currentLang}/login?expired=true`;
+    }
     
     return Promise.reject(error);
   }

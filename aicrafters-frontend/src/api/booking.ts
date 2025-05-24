@@ -28,8 +28,22 @@ export const createBooking = async (bookingData: BookingData) => {
 
 // Get all bookings for the current user (mentee view)
 export const getUserBookings = async () => {
-  const response = await axiosInstance.get('/api/bookings');
-  return response.data;
+  try {
+    console.log('Fetching user bookings...');
+    const response = await axiosInstance.get('/api/bookings');
+    console.log('User bookings API response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error in getUserBookings:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    
+    // Return a structured error for better handling
+    throw {
+      message: error.response?.data?.message || error.message || 'Failed to fetch bookings',
+      status: error.response?.status || 500,
+      isAxiosError: true
+    };
+  }
 };
 
 // Get specific booking details (mentee view)

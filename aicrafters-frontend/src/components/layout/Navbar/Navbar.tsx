@@ -573,6 +573,9 @@ export const Navbar: React.FC = () => {
         <DropdownItem to={`/${currentLanguage}/dashboard/user/learning`} onClick={handleDropdownItemClick} style={{fontWeight: 'bold'}}>
           {t('user.navbar.myLearning')}
         </DropdownItem>
+        <DropdownItem to={`/${currentLanguage}/dashboard/user/booking`} onClick={handleDropdownItemClick}>
+          {t('user.navbar.myBookings', 'My Bookings') as string}
+        </DropdownItem>
         <DropdownItem to={`/${currentLanguage}/dashboard/user/settings`} onClick={handleDropdownItemClick}>
           {t('user.navbar.accountSettings')}
         </DropdownItem>
