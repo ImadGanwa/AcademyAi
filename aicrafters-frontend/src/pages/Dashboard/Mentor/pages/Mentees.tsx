@@ -28,14 +28,12 @@ import {
 } from '@mui/material';
 import styled from 'styled-components';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import MessageIcon from '@mui/icons-material/Message';
 import CloseIcon from '@mui/icons-material/Close';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ChatIcon from '@mui/icons-material/Chat';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import DoneIcon from '@mui/icons-material/Done';
 import { getMentorBookings, updateBooking, cancelMentorBooking } from '../../../../api/booking';
 import { useTranslation } from 'react-i18next';
 

@@ -31,10 +31,19 @@ function isTextContent(content: any): content is TextContentBlock {
 /**
  * Get or create a conversation thread for a user
  */
-async function getOrCreateThreadForUser(userId: string): Promise<string> {
+async function getOrCreateThreadForUser(userId: string, context?: string): Promise<string> {
   if (!threadsByUser.has(userId)) {
     const thread = await openai.beta.threads.create();
     threadsByUser.set(userId, thread.id);
+    
+    // Add context as a user message if provided
+    if (context) {
+      await openai.beta.threads.messages.create(thread.id, {
+        role: "user",
+        content: context
+      });
+    }
+    
     return thread.id;
   }
   return threadsByUser.get(userId)!;
@@ -53,7 +62,7 @@ async function buildContext(courseId: mongoose.Types.ObjectId, videoUrl: string)
     return "No transcription data available for this video.";
   }
 
-  let context = "";
+  let context = "Context about the video:\n";
 
   // Add video transcription if available
   if (transcriptionData.transcription) {
@@ -79,31 +88,6 @@ async function buildContext(courseId: mongoose.Types.ObjectId, videoUrl: string)
 }
 
 /**
- * Initialize the assistant with course context
- */
-async function initializeAssistant(courseId: mongoose.Types.ObjectId, videoUrl: string): Promise<string> {
-  const context = await buildContext(courseId, videoUrl);
-  
-  const assistant = await openai.beta.assistants.create({
-    name: "Trainer Coach",
-    instructions: `You are the Trainer Coach, an educational assistant for an online course platform. Your role is to help students understand the course content and answer their questions based on the video they are currently watching.
-
-You have access to the following information:
-${context}
-
-Instructions:
-1. Answer questions based on the video content and transcription.
-2. If the question is about something not covered in the current video, use the section and course summaries to provide context.
-3. Keep answers concise, clear, and educational in tone.
-4. If you don't know the answer, admit it rather than making up information.
-5. Don't discuss the fact that you're an AI or mention that your answers are based on transcriptions - just provide helpful answers directly.`,
-    model: "gpt-4-turbo-preview",
-  });
-
-  return assistant.id;
-}
-
-/**
  * Chat with the trainer coach
  */
 export async function chatWithTrainer(
@@ -117,11 +101,11 @@ export async function chatWithTrainer(
     // Convert courseId to ObjectId
     const courseObjectId = new mongoose.Types.ObjectId(courseId);
     
-    // Get or create a thread for this user
-    const actualThreadId = threadId || await getOrCreateThreadForUser(userId);
+    // Build context
+    const context = await buildContext(courseObjectId, videoUrl);
     
-    // Initialize assistant with context
-    const assistantId = await initializeAssistant(courseObjectId, videoUrl);
+    // Get or create a thread for this user
+    const actualThreadId = threadId || await getOrCreateThreadForUser(userId, context);
     
     // Add the user message to the thread
     await openai.beta.threads.messages.create(actualThreadId, {
@@ -131,7 +115,7 @@ export async function chatWithTrainer(
     
     // Run the assistant on the thread
     const run = await openai.beta.threads.runs.create(actualThreadId, {
-      assistant_id: assistantId
+      assistant_id: process.env.OPENAI_ASSISTANT_ID as string
     });
     
     // Poll for completion

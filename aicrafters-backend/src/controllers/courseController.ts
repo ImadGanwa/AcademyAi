@@ -1429,7 +1429,8 @@ export const courseController = {
           for (const course of orgCourses) {
             // Check if user already has this course
             const existingCourse = userDoc.courses?.find(c => 
-              c.courseId._id.toString() === (course as any)._id.toString()
+              c.courseId && c.courseId._id && course && 
+              c.courseId._id.toString() === (course as any)?._id?.toString()
             );
 
             if (!existingCourse) {
