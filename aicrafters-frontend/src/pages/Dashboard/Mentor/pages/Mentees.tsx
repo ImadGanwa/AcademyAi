@@ -257,8 +257,8 @@ const getInitials = (name: string): string => {
 
 export const Mentees: React.FC = () => {
   const theme = useTheme();
-  const { t, i18n } = useTranslation();
-  const currentLocale = i18n.language;
+  const { t } = useTranslation();
+  // const currentLocale = i18n.language;
   const [openScheduleDialog, setOpenScheduleDialog] = useState(false);
   const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);

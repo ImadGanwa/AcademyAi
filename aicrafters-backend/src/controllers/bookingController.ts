@@ -2,6 +2,16 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { MentorshipBooking } from '../models/MentorshipBooking';
 import { User } from '../models/User';
+import { 
+  sendMentorBookingNotificationEmail, 
+  sendMenteeBookingConfirmationEmail,
+  sendMenteeBookingCancelledEmail,
+  sendMentorBookingCancelledEmail,
+  sendBookingUpdateEmail,
+  sendSessionCompletionEmail,
+  sendMentorBookingConfirmationEmail,
+  sendMenteeBookingConfirmedEmail
+} from '../utils/email';
 
 // Helper function to get the Monday of a week for a given date
 const getMondayOfWeek = (date: Date | string): string => {
@@ -205,9 +215,43 @@ export const bookingController = {
       // Populate mentor details for response
       const populatedBooking = await MentorshipBooking.findById(booking._id)
         .populate('mentorId', 'fullName email profileImage')
+        .populate('menteeId', 'fullName email')
         .exec();
       
-      // TODO: Send notification to mentor about new booking
+      // Send email notifications
+      try {
+        const mentorData = populatedBooking?.mentorId as any;
+        const menteeData = populatedBooking?.menteeId as any;
+        const bookingDate = scheduledAt.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+
+        // Send notification to mentor
+        await sendMentorBookingNotificationEmail(
+          mentorData.email,
+          mentorData.fullName,
+          menteeData.fullName,
+          populatedBooking?._id?.toString() || '',
+          topic,
+          bookingDate,
+          startTime,
+          endTime
+        );
+
+        // Send confirmation to mentee - use regular booking confirmation
+        await sendMenteeBookingConfirmationEmail(
+          menteeData.email,
+          menteeData.fullName,
+          mentorData.fullName,
+          populatedBooking?._id?.toString() || '',
+          topic,
+          bookingDate,
+          startTime,
+          endTime,
+          price
+        );
+      } catch (emailError) {
+        console.error('Error sending booking notification emails:', emailError);
+        // Continue anyway since this is not critical to the booking process
+      }
       
       res.status(201).json({
         success: true,
@@ -409,9 +453,57 @@ export const bookingController = {
           } 
         },
         { new: true }
-      ).populate('mentorId', 'fullName email profileImage');
+      ).populate('mentorId', 'fullName email profileImage')
+        .populate('menteeId', 'fullName email').exec();
       
-      // TODO: Send notification to mentor about cancellation
+      // Send cancellation emails
+      try {
+        const mentorData = cancelledBooking?.mentorId as any;
+        const menteeData = cancelledBooking?.menteeId as any;
+        const bookingDate = new Date(cancelledBooking?.scheduledAt || '').toISOString().split('T')[0];
+        
+        // Extract time information from scheduledAt
+        const scheduledDate = new Date(cancelledBooking?.scheduledAt || '');
+        const startHour = scheduledDate.getHours().toString().padStart(2, '0');
+        const startMinute = scheduledDate.getMinutes().toString().padStart(2, '0');
+        const startTime = `${startHour}:${startMinute}`;
+        
+        // Calculate end time based on duration
+        const endDate = new Date(scheduledDate.getTime() + (cancelledBooking?.duration || 0) * 60 * 1000);
+        const endHour = endDate.getHours().toString().padStart(2, '0');
+        const endMinute = endDate.getMinutes().toString().padStart(2, '0');
+        const endTime = `${endHour}:${endMinute}`;
+
+        // Send notification to mentor about cancellation
+        await sendMentorBookingCancelledEmail(
+          mentorData.email,
+          mentorData.fullName,
+          menteeData.fullName,
+          cancelledBooking?.topic || '',
+          bookingDate,
+          startTime,
+          endTime,
+          'mentee',
+          reason
+        );
+
+        // Send confirmation to mentee
+        await sendMenteeBookingCancelledEmail(
+          menteeData.email,
+          menteeData.fullName,
+          mentorData.fullName,
+          cancelledBooking?.topic || '',
+          bookingDate,
+          startTime,
+          endTime,
+          'mentee',
+          reason
+        );
+      } catch (emailError) {
+        console.error('Error sending cancellation emails:', emailError);
+        // Continue anyway since this is not critical to the cancellation process
+      }
+      
       // TODO: Initiate refund process if payment was made
       
       res.status(200).json({
@@ -727,7 +819,75 @@ export const bookingController = {
         bookingId,
         { $set: updateFields },
         { new: true, runValidators: true }
-      ).populate('menteeId', 'fullName email profileImage');
+      ).populate('menteeId', 'fullName email profileImage')
+        .populate('mentorId', 'fullName email').exec();
+      
+      // Send email notifications
+      if (meetingLink || (notes?.sharedNotes)) {
+        try {
+          const menteeData = updatedBooking?.menteeId as any;
+          const mentorData = updatedBooking?.mentorId as any;
+          const bookingDate = new Date(updatedBooking?.scheduledAt || '').toISOString().split('T')[0];
+          
+          // Extract time information from scheduledAt
+          const scheduledDate = new Date(updatedBooking?.scheduledAt || '');
+          const startHour = scheduledDate.getHours().toString().padStart(2, '0');
+          const startMinute = scheduledDate.getMinutes().toString().padStart(2, '0');
+          const startTime = `${startHour}:${startMinute}`;
+          
+          // Calculate end time based on duration
+          const endDate = new Date(scheduledDate.getTime() + (updatedBooking?.duration || 0) * 60 * 1000);
+          const endHour = endDate.getHours().toString().padStart(2, '0');
+          const endMinute = endDate.getMinutes().toString().padStart(2, '0');
+          const endTime = `${endHour}:${endMinute}`;
+
+          // If meeting link was added, send confirmation emails with calendar integration
+          if (meetingLink) {
+            // Send confirmation to mentor with calendar
+            await sendMentorBookingConfirmationEmail(
+              mentorData.email,
+              mentorData.fullName,
+              menteeData.fullName,
+              updatedBooking?._id?.toString() || '',
+              updatedBooking?.topic || '',
+              bookingDate,
+              startTime,
+              endTime,
+              updatedBooking?.meetingLink
+            );
+
+            // Send confirmation to mentee with calendar
+            await sendMenteeBookingConfirmedEmail(
+              menteeData.email,
+              menteeData.fullName,
+              mentorData.fullName,
+              updatedBooking?._id?.toString() || '',
+              updatedBooking?.topic || '',
+              bookingDate,
+              startTime,
+              endTime,
+              updatedBooking?.meetingLink
+            );
+          } else {
+            // If just notes were updated, send regular update email
+            await sendBookingUpdateEmail(
+              menteeData.email,
+              menteeData.fullName,
+              mentorData.fullName,
+              updatedBooking?._id?.toString() || '',
+              updatedBooking?.topic || '',
+              bookingDate,
+              startTime,
+              endTime,
+              updatedBooking?.meetingLink,
+              updatedBooking?.notes?.sharedNotes
+            );
+          }
+        } catch (emailError) {
+          console.error('Error sending booking update/confirmation emails:', emailError);
+          // Continue anyway since this is not critical
+        }
+      }
       
       res.status(200).json({
         success: true,
@@ -810,7 +970,8 @@ export const bookingController = {
         bookingId,
         { $set: updateFields },
         { new: true }
-      ).populate('menteeId', 'fullName email profileImage');
+      ).populate('menteeId', 'fullName email profileImage')
+        .populate('mentorId', 'fullName email').exec();
       
       // Increment sessions count for mentor
       await User.findByIdAndUpdate(
@@ -818,7 +979,25 @@ export const bookingController = {
         { $inc: { 'mentorProfile.sessionsCount': 1 } }
       );
       
-      // TODO: Send notification to mentee about session completion
+      // Send email notification to mentee about session completion
+      try {
+        const menteeData = completedBooking?.menteeId as any;
+        const mentorData = completedBooking?.mentorId as any;
+        const bookingDate = new Date(completedBooking?.scheduledAt || '').toISOString().split('T')[0];
+        
+        await sendSessionCompletionEmail(
+          menteeData.email,
+          menteeData.fullName,
+          mentorData.fullName,
+          completedBooking?._id?.toString() || '',
+          completedBooking?.topic || '',
+          bookingDate,
+          completedBooking?.notes?.sharedNotes
+        );
+      } catch (emailError) {
+        console.error('Error sending session completion email:', emailError);
+        // Continue anyway since this is not critical
+      }
       
       res.status(200).json({
         success: true,
@@ -916,9 +1095,57 @@ export const bookingController = {
           } 
         },
         { new: true }
-      ).populate('menteeId', 'fullName email profileImage');
+      ).populate('menteeId', 'fullName email profileImage')
+        .populate('mentorId', 'fullName email').exec();
       
-      // TODO: Send notification to mentee about cancellation
+      // Send cancellation emails
+      try {
+        const mentorData = cancelledBooking?.mentorId as any;
+        const menteeData = cancelledBooking?.menteeId as any;
+        const bookingDate = new Date(cancelledBooking?.scheduledAt || '').toISOString().split('T')[0];
+        
+        // Extract time information from scheduledAt
+        const scheduledDate = new Date(cancelledBooking?.scheduledAt || '');
+        const startHour = scheduledDate.getHours().toString().padStart(2, '0');
+        const startMinute = scheduledDate.getMinutes().toString().padStart(2, '0');
+        const startTime = `${startHour}:${startMinute}`;
+        
+        // Calculate end time based on duration
+        const endDate = new Date(scheduledDate.getTime() + (cancelledBooking?.duration || 0) * 60 * 1000);
+        const endHour = endDate.getHours().toString().padStart(2, '0');
+        const endMinute = endDate.getMinutes().toString().padStart(2, '0');
+        const endTime = `${endHour}:${endMinute}`;
+
+        // Send notification to mentee about cancellation
+        await sendMenteeBookingCancelledEmail(
+          menteeData.email,
+          menteeData.fullName,
+          mentorData.fullName,
+          cancelledBooking?.topic || '',
+          bookingDate,
+          startTime,
+          endTime,
+          'mentor',
+          cancelReason
+        );
+
+        // Send confirmation to mentor
+        await sendMentorBookingCancelledEmail(
+          mentorData.email,
+          mentorData.fullName,
+          menteeData.fullName,
+          cancelledBooking?.topic || '',
+          bookingDate,
+          startTime,
+          endTime,
+          'mentor',
+          cancelReason
+        );
+      } catch (emailError) {
+        console.error('Error sending cancellation emails:', emailError);
+        // Continue anyway since this is not critical to the cancellation process
+      }
+      
       // TODO: Initiate refund process if payment was made
       
       res.status(200).json({
@@ -1108,5 +1335,4 @@ export const bookingController = {
       });
     }
   }
-
 }; 

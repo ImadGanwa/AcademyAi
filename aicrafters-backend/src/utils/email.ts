@@ -716,4 +716,754 @@ export const sendMentorWelcomeEmail = async (email: string, fullName: string, pa
     }
     throw error;
   }
+};
+
+// Booking related emails
+
+export const sendMentorBookingNotificationEmail = async (
+  mentorEmail: string, 
+  mentorName: string,
+  menteeName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: mentorEmail,
+      subject: 'New Mentorship Session Booked - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">New Mentorship Session Booked</h2>
+          <p>Hello ${mentorName},</p>
+          <p>You have a new mentorship session booking from ${menteeName}.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>You can view the complete details and manage this booking through your mentor dashboard.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/mentor/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Booking
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Next Steps:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Review the session details</li>
+              <li>Add a meeting link for the session</li>
+              <li>Prepare any necessary materials</li>
+              <li>Contact the mentee if you need more information</li>
+            </ul>
+          </div>
+
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor booking notification email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: mentorEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMenteeBookingConfirmationEmail = async (
+  menteeEmail: string, 
+  menteeName: string,
+  mentorName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  price: number
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: menteeEmail,
+      subject: 'Mentorship Session Booking Confirmation - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Booking Confirmation</h2>
+          <p>Hello ${menteeName},</p>
+          <p>Your mentorship session with ${mentorName} has been successfully booked.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentor:</strong> ${mentorName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            <p style="margin: 10px 0 0;"><strong>Price:</strong> $${price.toFixed(2)}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>You can view the complete details of your booking through your dashboard.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Booking
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Important Information:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Your mentor will provide a meeting link closer to the session time</li>
+              <li>You can cancel this booking up to 24 hours before the scheduled time</li>
+              <li>Prepare any questions or topics you'd like to discuss in advance</li>
+            </ul>
+          </div>
+
+          <p>We hope you have a productive mentorship session!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentee booking confirmation email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: menteeEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMenteeBookingCancelledEmail = async (
+  menteeEmail: string, 
+  menteeName: string,
+  mentorName: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  cancelledBy: 'mentor' | 'mentee',
+  reason: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const cancelMessage = cancelledBy === 'mentor' 
+      ? `Your mentorship session with ${mentorName} has been cancelled by the mentor.` 
+      : 'You have cancelled your mentorship session.';
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: menteeEmail,
+      subject: 'Mentorship Session Cancelled - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Booking Cancellation</h2>
+          <p>Hello ${menteeName},</p>
+          <p>${cancelMessage}</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentor:</strong> ${mentorName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+          </div>
+
+          <div style="background-color: #fff4e5; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #ffd699;">
+            <h3 style="color: #663c00; margin-top: 0;">Cancellation Reason:</h3>
+            <p style="color: #663c00; margin: 0;">${reason}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>You can book another session with the same or a different mentor through our platform.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/mentors" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Find Mentors
+              </a>
+            </div>
+          </div>
+
+          <p>If you have any questions, please don't hesitate to contact our support team.</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentee booking cancellation email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: menteeEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMentorBookingCancelledEmail = async (
+  mentorEmail: string, 
+  mentorName: string,
+  menteeName: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  cancelledBy: 'mentor' | 'mentee',
+  reason: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const cancelMessage = cancelledBy === 'mentee' 
+      ? `A mentorship session with ${menteeName} has been cancelled by the mentee.` 
+      : 'You have cancelled a mentorship session.';
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: mentorEmail,
+      subject: 'Mentorship Session Cancelled - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Booking Cancellation</h2>
+          <p>Hello ${mentorName},</p>
+          <p>${cancelMessage}</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentee:</strong> ${menteeName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+          </div>
+
+          <div style="background-color: #fff4e5; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #ffd699;">
+            <h3 style="color: #663c00; margin-top: 0;">Cancellation Reason:</h3>
+            <p style="color: #663c00; margin: 0;">${reason}</p>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>This time slot is now available for other bookings.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/mentor/availability" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Manage Availability
+              </a>
+            </div>
+          </div>
+
+          <p>If you have any questions, please don't hesitate to contact our support team.</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor booking cancellation email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: mentorEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendBookingUpdateEmail = async (
+  menteeEmail: string, 
+  menteeName: string,
+  mentorName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  meetingLink?: string,
+  sharedNotes?: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const updateType = meetingLink ? 'Meeting Link Added' : 'Session Notes Updated';
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: menteeEmail,
+      subject: `Mentorship Session Update: ${updateType} - AiCrafters`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Mentorship Session Update</h2>
+          <p>Hello ${menteeName},</p>
+          <p>Your upcoming mentorship session with ${mentorName} has been updated.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentor:</strong> ${mentorName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            ${meetingLink ? `<p style="margin: 10px 0 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>` : ''}
+          </div>
+
+          ${sharedNotes ? `
+          <div style="background-color: #edf7ed; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c8e6c9;">
+            <h3 style="color: #1b5e20; margin-top: 0;">Session Notes:</h3>
+            <p style="color: #1b5e20; margin: 0;">${sharedNotes}</p>
+          </div>
+          ` : ''}
+
+          <div style="margin: 20px 0;">
+            <p>You can view the complete details of your booking through your dashboard.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Booking
+              </a>
+            </div>
+          </div>
+
+          <p>We hope you have a productive mentorship session!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending booking update email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: menteeEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendSessionCompletionEmail = async (
+  menteeEmail: string, 
+  menteeName: string,
+  mentorName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  sharedNotes?: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: menteeEmail,
+      subject: 'Mentorship Session Completed - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Mentorship Session Completed</h2>
+          <p>Hello ${menteeName},</p>
+          <p>Your mentorship session with ${mentorName} has been marked as completed.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentor:</strong> ${mentorName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+          </div>
+
+          ${sharedNotes ? `
+          <div style="background-color: #edf7ed; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c8e6c9;">
+            <h3 style="color: #1b5e20; margin-top: 0;">Session Notes:</h3>
+            <p style="color: #1b5e20; margin: 0;">${sharedNotes}</p>
+          </div>
+          ` : ''}
+
+          <div style="margin: 20px 0;">
+            <p><strong>Please take a moment to rate your session experience.</strong></p>
+            <p>Your feedback is valuable and helps other users find quality mentors.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Rate Your Session
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Want to continue learning?</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Book another session with ${mentorName} or explore other mentors</li>
+              <li>Check out our courses related to your interests</li>
+              <li>Join our community forums to discuss what you've learned</li>
+            </ul>
+          </div>
+
+          <p>Thank you for using AiCrafters for your mentorship needs!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending session completion email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: menteeEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMentorBookingConfirmationEmail = async (
+  mentorEmail: string, 
+  mentorName: string,
+  menteeName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  meetingLink?: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Create ICS calendar event data
+    const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
+    const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
+    
+    // Format dates for ICS file
+    const formatICSDate = (date: Date) => {
+      return date.toISOString().replace(/-|:|\.\d+/g, '');
+    };
+    
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AiCrafters//Mentorship Session//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:Mentorship Session with ${menteeName}
+DTSTART:${formatICSDate(eventStartDate)}
+DTEND:${formatICSDate(eventEndDate)}
+DESCRIPTION:Topic: ${topic}\\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link will be provided soon'}
+LOCATION:Online
+STATUS:CONFIRMED
+SEQUENCE:0
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+
+    // Generate Google Calendar link
+    const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Mentorship Session with ${menteeName}`)}&dates=${formatICSDate(eventStartDate)}/${formatICSDate(eventEndDate)}&details=${encodeURIComponent(`Topic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link will be provided soon'}`)}&location=${encodeURIComponent('Online')}&sf=true&output=xml`;
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: mentorEmail,
+      subject: 'Mentorship Session Confirmed - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Your Mentorship Session is Confirmed</h2>
+          <p>Hello ${mentorName},</p>
+          <p>This is a confirmation for your upcoming mentorship session with <strong>${menteeName}</strong>.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentee:</strong> ${menteeName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            ${meetingLink ? `<p style="margin: 10px 0 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>` : ''}
+          </div>
+
+          <div style="background-color: #edf7ed; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c8e6c9;">
+            <h3 style="color: #1b5e20; margin-top: 0;">Add to Calendar:</h3>
+            <p style="margin: 10px 0 0;">Add this session to your calendar to make sure you don't miss it:</p>
+            <div style="margin-top: 15px;">
+              <a href="${googleCalendarLink}" style="display: inline-block; background-color: #4285F4; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px;">
+                Add to Google Calendar
+              </a>
+              <a href="data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}" download="mentorship-session.ics" style="display: inline-block; background-color: #0078D4; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px;">
+                Download ICS File
+              </a>
+            </div>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>You can view the complete details and manage this booking through your mentor dashboard.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/mentor/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Booking
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Preparing for the Session:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Review the mentee's questions and topic</li>
+              <li>${!meetingLink ? 'Add a meeting link for the session' : 'Test your meeting link before the session'}</li>
+              <li>Prepare any necessary materials</li>
+              <li>Ensure you have a stable internet connection and quiet environment</li>
+            </ul>
+          </div>
+
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: 'mentorship-session.ics',
+          content: icsContent,
+          contentType: 'text/calendar'
+        }
+      ],
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentor booking confirmation email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: mentorEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
+};
+
+export const sendMenteeBookingConfirmedEmail = async (
+  menteeEmail: string, 
+  menteeName: string,
+  mentorName: string,
+  bookingId: string,
+  topic: string,
+  scheduledDate: string,
+  startTime: string,
+  endTime: string,
+  meetingLink?: string
+) => {
+  try {
+    // Format date for display
+    const formattedDate = new Date(scheduledDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Create ICS calendar event data
+    const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
+    const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
+    
+    // Format dates for ICS file
+    const formatICSDate = (date: Date) => {
+      return date.toISOString().replace(/-|:|\.\d+/g, '');
+    };
+    
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//AiCrafters//Mentorship Session//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+SUMMARY:Mentorship Session with ${mentorName}
+DTSTART:${formatICSDate(eventStartDate)}
+DTEND:${formatICSDate(eventEndDate)}
+DESCRIPTION:Topic: ${topic}\\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link will be provided by your mentor'}
+LOCATION:Online
+STATUS:CONFIRMED
+SEQUENCE:0
+BEGIN:VALARM
+TRIGGER:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Reminder
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+
+    // Generate Google Calendar link
+    const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Mentorship Session with ${mentorName}`)}&dates=${formatICSDate(eventStartDate)}/${formatICSDate(eventEndDate)}&details=${encodeURIComponent(`Topic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link will be provided by your mentor'}`)}&location=${encodeURIComponent('Online')}&sf=true&output=xml`;
+
+    await transporter.sendMail({
+      from: 'AiCrafters <no-reply@aicrafters.com>',
+      to: menteeEmail,
+      subject: 'Your Mentorship Session is Confirmed - AiCrafters',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Your Mentorship Session is Confirmed</h2>
+          <p>Hello ${menteeName},</p>
+          <p>Your mentorship session with <strong>${mentorName}</strong> has been confirmed.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Session Details:</h3>
+            <p style="margin: 0;"><strong>Mentor:</strong> ${mentorName}</p>
+            <p style="margin: 10px 0 0;"><strong>Topic:</strong> ${topic}</p>
+            <p style="margin: 10px 0 0;"><strong>Date:</strong> ${formattedDate}</p>
+            <p style="margin: 10px 0 0;"><strong>Time:</strong> ${startTime} - ${endTime}</p>
+            ${meetingLink ? `<p style="margin: 10px 0 0;"><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>` : '<p style="margin: 10px 0 0;"><strong>Meeting Link:</strong> Your mentor will provide the meeting link before the session</p>'}
+          </div>
+
+          <div style="background-color: #edf7ed; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c8e6c9;">
+            <h3 style="color: #1b5e20; margin-top: 0;">Add to Calendar:</h3>
+            <p style="margin: 10px 0 0;">Add this session to your calendar to make sure you don't miss it:</p>
+            <div style="margin-top: 15px;">
+              <a href="${googleCalendarLink}" style="display: inline-block; background-color: #4285F4; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px; margin-right: 10px;">
+                Add to Google Calendar
+              </a>
+              <a href="data:text/calendar;charset=utf8,${encodeURIComponent(icsContent)}" download="mentorship-session.ics" style="display: inline-block; background-color: #0078D4; color: white; padding: 8px 15px; text-decoration: none; border-radius: 3px;">
+                Download ICS File
+              </a>
+            </div>
+          </div>
+
+          <div style="margin: 20px 0;">
+            <p>You can view the complete details of your booking through your dashboard.</p>
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}" 
+                 style="background-color: #4CAF50; color: white; padding: 14px 28px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Booking
+              </a>
+            </div>
+          </div>
+
+          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3 style="color: #333; margin-top: 0;">Preparing for the Session:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              <li>Prepare specific questions or topics you'd like to discuss</li>
+              <li>Research any background information that might be helpful</li>
+              <li>Test your audio/video setup before the session</li>
+              <li>Find a quiet place with a stable internet connection</li>
+              <li>Be on time - sessions start promptly at the scheduled time</li>
+            </ul>
+          </div>
+
+          <p>We hope you have a productive mentorship session!</p>
+          <p>Best regards,<br>The AiCrafters Team</p>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: 'mentorship-session.ics',
+          content: icsContent,
+          contentType: 'text/calendar'
+        }
+      ],
+      replyTo: 'hello@aicrafters.com'
+    });
+
+  } catch (error) {
+    console.error('Error sending mentee booking confirmed email:', error);
+    if (error instanceof Error) {
+      console.error('Detailed error:', {
+        message: error.message,
+        stack: error.stack,
+        email: menteeEmail
+      });
+    } else {
+      console.error('Unknown email error:', error);
+    }
+    throw error;
+  }
 }; 
