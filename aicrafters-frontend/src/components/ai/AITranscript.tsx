@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Typography, Paper, CircularProgress, Alert } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, Alert, Button } from '@mui/material';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
 const TranscriptContainer = styled(Paper)`
@@ -36,9 +36,11 @@ const TranscriptContent = styled(Box)`
 
 const LoadingContainer = styled(Box)`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 200px;
+  gap: 16px;
 `;
 
 interface AITranscriptProps {
@@ -58,16 +60,35 @@ export const AITranscript: React.FC<AITranscriptProps> = ({
       return (
         <LoadingContainer>
           <CircularProgress size={30} />
+          <Typography variant="body2" color="textSecondary">
+            Loading transcript...
+          </Typography>
         </LoadingContainer>
       );
     }
     
     if (error) {
+      const isProcessing = error.toLowerCase().includes('processing') || 
+                           error.toLowerCase().includes('check back');
+      
       return (
         <Box sx={{ p: 3 }}>
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
+          <Alert 
+            severity={isProcessing ? "info" : "error"} 
+            sx={{ mb: 2 }}
+          >
+            {error.includes('token') ? 
+              'Authentication error: Please log in again or contact support.' : 
+              error}
           </Alert>
+          
+          {isProcessing && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Typography variant="body2" color="textSecondary">
+                This video transcript is being generated. Please check back soon.
+              </Typography>
+            </Box>
+          )}
         </Box>
       );
     }

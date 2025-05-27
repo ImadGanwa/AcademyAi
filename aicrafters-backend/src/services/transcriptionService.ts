@@ -72,7 +72,7 @@ export class TranscriptionService {
     return [...new Set(videoUrls)]; // Remove duplicates
   }
 
-  private static async processVideo(courseId: string, videoUrl: string, accessToken: string): Promise<void> {
+  static async processVideo(courseId: string, videoUrl: string, accessToken: string): Promise<void> {
     try {
       // Check if transcription already exists
       let transcription = await VideoTranscription.findOne({ courseId, videoUrl });

@@ -33,7 +33,8 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'https://aicrafters.aicademy.com',
-    'https://aicrafters-backend.onrender.com'
+    'https://aicrafters-backend.onrender.com',
+    'https://adwin-frontend.onrender.com'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

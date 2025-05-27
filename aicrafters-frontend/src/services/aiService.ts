@@ -16,11 +16,18 @@ interface ChatResponse {
 // Helper function to get the auth token
 const getAuthToken = () => {
   // Try different possible token keys used in the application
-  return localStorage.getItem('token') || 
+  const token = localStorage.getItem('token') || 
          localStorage.getItem('authToken') || 
          localStorage.getItem('auth_token') || 
          sessionStorage.getItem('token') || 
          sessionStorage.getItem('authToken');
+
+  // Log token status for debugging (remove in production)
+  if (!token) {
+    console.warn('No auth token found in storage');
+  }
+  
+  return token;
 };
 
 /**
@@ -71,22 +78,41 @@ export const aiService = {
         throw new Error('Authentication token not found. Please log in again.');
       }
       
+      // Create request with timeout to prevent hanging requests
       const response = await axios.get(
         `${config.API_URL}/api/transcriptions/courses/${courseId}/videos/${encodeURIComponent(videoUrl)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          timeout: 10000, // 10 second timeout
         }
       );
+
+      // Handle empty response
+      if (!response.data || !response.data.transcription) {
+        throw new Error('No transcription data received from server');
+      }
 
       return response.data.transcription;
     } catch (error: any) {
       console.error('Error fetching transcript:', error);
+      
+      // More descriptive error messages based on error type
       if (error.response?.status === 401) {
         throw new Error('Authentication failed. Please log in again.');
+      } else if (error.response?.status === 404) {
+        throw new Error('Transcript not found for this video.');
+      } else if (error.response?.status === 202) {
+        // Handle processing status (202 Accepted)
+        throw new Error('Transcription is being processed. Please check back in a few moments.');
+      } else if (error.code === 'ECONNABORTED') {
+        throw new Error('Request timed out. Please try again later.');
+      } else if (!navigator.onLine) {
+        throw new Error('No internet connection. Please check your network.');
       }
-      throw new Error(error.response?.data?.message || 'Failed to fetch transcript');
+      
+      throw new Error(error.response?.data?.message || error.message || 'Failed to fetch transcript');
     }
   },
 

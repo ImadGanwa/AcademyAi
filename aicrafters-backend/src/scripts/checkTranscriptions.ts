@@ -10,23 +10,26 @@ async function checkTranscriptions() {
     await mongoose.connect(process.env.MONGODB_URI || '');
     console.log('Connected to MongoDB');
 
-    // Find all transcriptions
-    const transcriptions = await VideoTranscription.find();
-    console.log('\nFound transcriptions:', transcriptions.length);
+    const courseId = '67c3e57e754c83ca019ea97e'; // Course ID to check
     
-    // Print each transcription
-    transcriptions.forEach((transcription, index) => {
-      console.log(`\nTranscription ${index + 1}:`);
-      console.log('Course ID:', transcription.courseId);
-      console.log('Video URL:', transcription.videoUrl);
-      console.log('Status:', transcription.status);
-      console.log('Last Attempt:', transcription.lastAttempt);
-      if (transcription.error) {
-        console.log('Error:', transcription.error);
-      }
-      console.log('Transcription length:', transcription.transcription.length);
-    });
-
+    console.log(`Checking transcriptions for course: ${courseId}`);
+    
+    const transcriptions = await VideoTranscription.find({ courseId });
+    
+    if (transcriptions.length === 0) {
+      console.log('No transcriptions found for this course.');
+    } else {
+      transcriptions.forEach((t, i) => {
+        console.log(`\nTranscription ${i+1}:`);
+        console.log(`Course ID: ${t.courseId}`);
+        console.log(`Video URL: ${t.videoUrl}`);
+        console.log(`Status: ${t.status}`);
+        console.log(`Last Attempt: ${t.lastAttempt}`);
+        console.log(`Error: ${t.error || 'None'}`);
+        console.log(`Retry Count: ${t.retryCount || 0}`);
+        console.log(`Transcription length: ${t.transcription ? t.transcription.length : 0}`);
+      });
+    }
   } catch (error) {
     console.error('Error:', error);
   } finally {

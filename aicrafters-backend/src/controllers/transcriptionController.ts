@@ -41,13 +41,58 @@ export const transcriptionController = {
       const decodedVideoUrl = decodeURIComponent(videoUrl);
       logger.info(`Fetching transcription for course: ${courseId}, video: ${decodedVideoUrl}`);
       
-      const transcription = await TranscriptionService.getTranscription(courseId, decodedVideoUrl);
+      // Try to get existing transcription
+      let transcription = await TranscriptionService.getTranscription(courseId, decodedVideoUrl);
       
+      // If transcription not found in database or cache
       if (!transcription) {
-        return res.status(404).json({ error: 'Transcription not found' });
+        logger.info(`Transcription not found in database, trying to fetch from Vimeo: ${decodedVideoUrl}`);
+        
+        // Use VIMEO_ACCESS_TOKEN from environment
+        const vimeoToken = process.env.VIMEO_ACCESS_TOKEN;
+        
+        if (!vimeoToken) {
+          logger.error('VIMEO_ACCESS_TOKEN not found in environment variables');
+          return res.status(500).json({ 
+            error: 'Server configuration error',
+            message: 'Vimeo access token not configured on the server' 
+          });
+        }
+        
+        // Only try to process Vimeo videos
+        if (decodedVideoUrl.includes('vimeo.com')) {
+          try {
+            // Process the video to fetch and save transcription
+            await TranscriptionService.processVideo(courseId, decodedVideoUrl, `Bearer ${vimeoToken}`);
+            
+            // Try to get the transcription again after processing
+            transcription = await TranscriptionService.getTranscription(courseId, decodedVideoUrl);
+            
+            // If still not found, return processing status
+            if (!transcription) {
+              return res.status(202).json({ 
+                message: 'Transcription processing has started. Please try again in a few moments.',
+                status: 'processing' 
+              });
+            }
+          } catch (processError) {
+            logger.error(`Error processing video for transcription:`, processError);
+            return res.status(500).json({ 
+              error: 'Failed to process video',
+              message: 'An error occurred while fetching the transcription from Vimeo' 
+            });
+          }
+        } else {
+          return res.status(404).json({ 
+            error: 'Transcription not found',
+            message: 'This video URL is not supported for automatic transcription' 
+          });
+        }
       }
-
+      
+      // At this point, we either have a transcription or we've returned an error/status already
       res.json({ transcription });
+      
     } catch (error) {
       logger.error(`Error getting transcription:`, error);
       if (error instanceof Error) {

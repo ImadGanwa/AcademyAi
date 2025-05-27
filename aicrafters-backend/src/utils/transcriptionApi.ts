@@ -9,11 +9,31 @@ interface VimeoResponse {
 }
 
 export async function getTranscription(videoUrl: string, accessToken: string): Promise<string> {
-  // Extract video ID from Vimeo URL
-  const videoId = videoUrl.split('/').pop()?.split('?')[0];
-  if (!videoId) {
-    throw new Error('Invalid Vimeo URL');
+  // Extract video ID from Vimeo URL - always use the ID right after vimeo.com/
+  let videoId;
+  
+  try {
+    // Parse the URL to extract the video ID
+    const url = new URL(videoUrl);
+    const pathParts = url.pathname.split('/').filter(part => part);
+    
+    // The first part after vimeo.com/ is always the video ID
+    videoId = pathParts[0];
+    console.log(`Extracted video ID: ${videoId} from URL: ${videoUrl} using URL parser`);
+  } catch (error) {
+    // Fallback to simpler extraction if URL parsing fails
+    const match = videoUrl.match(/vimeo\.com\/(\d+)/);
+    if (match && match[1]) {
+      videoId = match[1];
+      console.log(`Extracted video ID: ${videoId} from URL: ${videoUrl} using regex fallback`);
+    }
   }
+  
+  if (!videoId) {
+    throw new Error(`Invalid Vimeo URL: ${videoUrl}`);
+  }
+
+  console.log(`Final video ID: ${videoId} from URL: ${videoUrl}`);
 
   const url = `https://api.vimeo.com/videos/${videoId}/texttracks`;
   const headers = {
@@ -42,7 +62,8 @@ export async function getTranscription(videoUrl: string, accessToken: string): P
     }
 
     const data = await response.json() as VimeoResponse;
-
+    console.log(`Data: ${JSON.stringify(data)}`);
+    
     if (data.data && data.data.length > 0) {
       const trackUrl = data.data[0].link;
       const vttResponse = await fetch(trackUrl);

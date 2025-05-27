@@ -110,23 +110,23 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
     fetchMindMap,
   } = useAIFeatures({ courseId, videoUrl });
   
-  // When component mounts, fetch transcript for first tab
+  // When component mounts, fetch transcript for first tab only if not already fetched or loading
   useEffect(() => {
-    if (!transcript && !transcriptLoading) {
+    if (!transcript && !transcriptLoading && !transcriptError) {
       fetchTranscript();
     }
-  }, [transcript, transcriptLoading, fetchTranscript]);
+  }, [transcript, transcriptLoading, transcriptError, fetchTranscript]);
   
   // Handle tab change and fetch data if needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     
-    // Fetch data based on selected tab if not already loaded
-    if (newValue === 0 && !transcript && !transcriptLoading) {
+    // Fetch data based on selected tab if not already loaded or errored
+    if (newValue === 0 && !transcript && !transcriptLoading && !transcriptError) {
       fetchTranscript();
-    } else if (newValue === 1 && !summaries.videoSummary && !summariesLoading) {
+    } else if (newValue === 1 && !summaries.videoSummary && !summariesLoading && !summariesError) {
       fetchSummaries();
-    } else if (newValue === 2 && !mindMap && !mindMapLoading) {
+    } else if (newValue === 2 && !mindMap && !mindMapLoading && !mindMapError) {
       fetchMindMap();
     }
   };

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { aiService } from '../services/aiService';
 
 interface Message {
@@ -45,6 +45,11 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   const [mindMapLoading, setMindMapLoading] = useState(false);
   const [mindMapError, setMindMapError] = useState<string | null>(null);
 
+  // Add retry tracking
+  const [hasFailedTranscriptFetch, setHasFailedTranscriptFetch] = useState(false);
+  const transcriptRetryCount = useRef(0);
+  const MAX_RETRY_ATTEMPTS = 2; // Maximum number of retry attempts
+
   // Check if we have a cached mind map for this video when video URL changes
   useEffect(() => {
     const cacheKey = `${courseId}:${videoUrl}`;
@@ -71,6 +76,10 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     setSummariesError(null);
     setMindMapError(null);
     setChatError(null);
+    
+    // Reset retry tracking
+    setHasFailedTranscriptFetch(false);
+    transcriptRetryCount.current = 0;
   }, [videoUrl]);
 
   // Send message to AI coach
@@ -128,21 +137,38 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   const fetchTranscript = useCallback(async () => {
     if (!courseId || !videoUrl) return;
     
+    // Skip if already failed and exceeded retry attempts
+    if (hasFailedTranscriptFetch && transcriptRetryCount.current >= MAX_RETRY_ATTEMPTS) {
+      console.warn(`Skipping transcript fetch after ${MAX_RETRY_ATTEMPTS} failed attempts`);
+      return false;
+    }
+    
     try {
       setTranscriptLoading(true);
       setTranscriptError(null);
       
       const data = await aiService.getTranscript(courseId, videoUrl);
       setTranscript(data);
+      
+      // Reset failure tracking on success
+      setHasFailedTranscriptFetch(false);
+      transcriptRetryCount.current = 0;
+      
       return true;
     } catch (err: any) {
-      setTranscriptError(err.message || 'Failed to fetch transcript');
-      console.error('Error in useAIFeatures.fetchTranscript:', err);
+      // Track failure
+      setHasFailedTranscriptFetch(true);
+      transcriptRetryCount.current += 1;
+      
+      const errorMessage = err.message || 'Failed to fetch transcript';
+      setTranscriptError(errorMessage);
+      console.error(`Error in useAIFeatures.fetchTranscript (attempt ${transcriptRetryCount.current}):`, err);
+      
       return false;
     } finally {
       setTranscriptLoading(false);
     }
-  }, [courseId, videoUrl]);
+  }, [courseId, videoUrl, hasFailedTranscriptFetch]);
 
   // Fetch summaries
   const fetchSummaries = useCallback(async () => {

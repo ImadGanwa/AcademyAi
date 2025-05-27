@@ -10,7 +10,7 @@ async function triggerTranscription() {
     await mongoose.connect(process.env.MONGODB_URI || '');
     console.log('Connected to MongoDB');
 
-    const courseId = '67f92f8db05f25155fe50ca1'; // Your course ID
+    const courseId = '67c3e57e754c83ca019ea97e'; // Your course ID
     const accessToken = process.env.VIMEO_ACCESS_TOKEN; // Make sure this is set in your .env
 
     if (!accessToken) {
