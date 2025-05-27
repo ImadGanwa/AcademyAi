@@ -65,7 +65,7 @@ const generateMindMapForVideo = async (req: Request, res: Response, next: NextFu
         let transcriptionDoc = await VideoTranscription.findOne({
             courseId: new mongoose.Types.ObjectId(courseId),
             videoUrl: processedVideoUrl
-        }).select('status');
+        });
 
         if (!transcriptionDoc) {
             // Try alternative URL formats in case of URL format differences
@@ -87,7 +87,7 @@ const generateMindMapForVideo = async (req: Request, res: Response, next: NextFu
                 const altDoc = await VideoTranscription.findOne({
                     courseId: new mongoose.Types.ObjectId(courseId),
                     videoUrl: altUrl
-                }).select('status');
+                });
                 
                 if (altDoc) {
                     logger.info(`Found transcription with alternative URL: ${altUrl}`);
@@ -105,9 +105,17 @@ const generateMindMapForVideo = async (req: Request, res: Response, next: NextFu
             }
         }
 
-        if (transcriptionDoc.status !== 'completed') {
+        // MODIFIED: Check if status is completed OR if there's actual transcription content regardless of status
+        if (transcriptionDoc.status !== 'completed' && (!transcriptionDoc.transcription || transcriptionDoc.transcription.trim() === '')) {
             logger.warn(`Transcription not ready for course ${courseId}, video: ${processedVideoUrl}. Status: ${transcriptionDoc.status}`);
             return next(new AppError(`Transcription is not yet complete (Status: ${transcriptionDoc.status})`, 409)); // 409 Conflict
+        }
+
+        // If we have transcription content but status is still pending, update it to completed
+        if (transcriptionDoc.status === 'pending' && transcriptionDoc.transcription && transcriptionDoc.transcription.trim() !== '') {
+            logger.info(`Found transcription with content but status is still pending. Updating status to completed.`);
+            transcriptionDoc.status = 'completed';
+            await transcriptionDoc.save();
         }
 
         // Now get the transcription text using the service with the matched URL format

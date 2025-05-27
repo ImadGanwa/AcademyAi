@@ -27,7 +27,7 @@ mongoose.connect(process.env.MONGODB_URI)
 async function triggerSummaries() {
   try {
     // Get course ID from command line arguments
-    const courseId = process.argv[2];
+    const courseId = process.argv[2] || '67c3e57e754c83ca019ea97e';
     
     if (!courseId) {
       console.error('Please provide a course ID as an argument');
