@@ -63,9 +63,17 @@ const LoadingContainer = styled(Box)`
   gap: 16px;
 `;
 
+const MessageContainer = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 16px;
+`;
+
 interface AISummaryProps {
   summaries: {
-    videoSummary: string;
+    videoSummary: string | null;
     sectionSummary: string;
     courseSummary: string;
   };
@@ -114,10 +122,23 @@ export const AISummary: React.FC<AISummaryProps> = ({
     
     if (!currentSummary) {
       const tabNames = ['video', 'section', 'course'];
+      const tabName = tabNames[activeTab];
+      
+      // Special handling for video summary
+      if (activeTab === 0) {
+        return (
+          <MessageContainer>
+            <Alert severity="info" sx={{ width: '100%' }}>
+              No video summary available. 
+            </Alert>
+          </MessageContainer>
+        );
+      }
+      
       return (
         <Box sx={{ p: 3 }}>
           <Alert severity="info">
-            No {tabNames[activeTab]} summary available.
+            No {tabName} summary available.
           </Alert>
         </Box>
       );

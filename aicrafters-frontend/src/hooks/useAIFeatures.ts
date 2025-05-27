@@ -15,6 +15,13 @@ interface UseAIFeaturesProps {
 // Create a cache for mind maps
 const mindMapCache: Record<string, string> = {};
 
+// Create a summary cache
+const summaryCache: Record<string, {
+  videoSummary: string | null;
+  sectionSummary: string;
+  courseSummary: string;
+}> = {};
+
 export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
@@ -29,11 +36,11 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
 
   // Summary state
   const [summaries, setSummaries] = useState<{
-    videoSummary: string;
+    videoSummary: string | null;
     sectionSummary: string;
     courseSummary: string;
   }>({
-    videoSummary: '',
+    videoSummary: null,
     sectionSummary: '',
     courseSummary: '',
   });
@@ -52,17 +59,26 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   // Add retry tracking for summaries
   const [hasFailedSummariesFetch, setHasFailedSummariesFetch] = useState(false);
   const summariesRetryCount = useRef(0);
+  const [summariesFetchAttempted, setSummariesFetchAttempted] = useState(false);
 
-  const MAX_RETRY_ATTEMPTS = 2; // Maximum number of retry attempts
+  const MAX_RETRY_ATTEMPTS = 3; // Maximum number of retry attempts
 
   // Check if we have a cached mind map for this video when video URL changes
   useEffect(() => {
     const cacheKey = `${courseId}:${videoUrl}`;
+    
+    // Check mind map cache
     if (mindMapCache[cacheKey]) {
       setMindMap(mindMapCache[cacheKey]);
     } else {
       // Reset mind map if not cached
       setMindMap('');
+    }
+    
+    // Check summary cache
+    if (summaryCache[cacheKey]) {
+      setSummaries(summaryCache[cacheKey]);
+      setSummariesFetchAttempted(true); // Mark as attempted if we have cached data
     }
   }, [courseId, videoUrl]);
 
@@ -71,7 +87,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     // Don't clear chat history or mind map, only other features
     setTranscript('');
     setSummaries({
-      videoSummary: '',
+      videoSummary: null,
       sectionSummary: '',
       courseSummary: '',
     });
@@ -87,6 +103,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     transcriptRetryCount.current = 0;
     setHasFailedSummariesFetch(false);
     summariesRetryCount.current = 0;
+    setSummariesFetchAttempted(false);
   }, [videoUrl]);
 
   // Send message to AI coach
@@ -187,12 +204,18 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
       return false;
     }
     
+    const cacheKey = `${courseId}:${videoUrl}`;
+    
     try {
       setSummariesLoading(true);
       setSummariesError(null);
+      setSummariesFetchAttempted(true);
       
       const data = await aiService.getSummaries(courseId, videoUrl);
+      
+      // Store in both state and cache
       setSummaries(data);
+      summaryCache[cacheKey] = data;
       
       // Reset failure tracking on success
       setHasFailedSummariesFetch(false);
@@ -206,7 +229,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
       
       const errorMessage = err.message || 'Failed to fetch summaries';
       setSummariesError(errorMessage);
-      console.error(`Error in useAIFeatures.fetchSummaries (attempt ${summariesRetryCount.current}):`, err);
+      console.error(`Error in useAIFeatures.fetchSummaries (attempt ${summariesRetryCount.current}/${MAX_RETRY_ATTEMPTS}):`, err);
       
       return false;
     } finally {
@@ -243,6 +266,26 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
       setMindMapLoading(false);
     }
   }, [courseId, videoUrl, mindMap]);
+
+  // Generate summary from transcript if video summary is null - with better controls
+  useEffect(() => {
+    // Only attempt if:
+    // 1. We have transcript
+    // 2. No video summary exists
+    // 3. Not currently loading
+    // 4. No error state
+    // 5. Haven't exceeded retry attempts
+    // 6. Haven't already attempted for this video
+    if (transcript && 
+        !summaries.videoSummary && 
+        !summariesLoading && 
+        !summariesError &&
+        summariesRetryCount.current < MAX_RETRY_ATTEMPTS &&
+        !summariesFetchAttempted) {
+      console.log("Attempting to fetch summaries after transcript was loaded");
+      fetchSummaries();
+    }
+  }, [transcript, summaries.videoSummary, summariesLoading, summariesError, summariesFetchAttempted, fetchSummaries]);
 
   return {
     // Chat

@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI)
 async function checkSummaries() {
   try {
     // Get course ID from command line arguments or use default
-    const courseId = process.argv[2] || '67f92f8db05f25155fe50ca1';
+    const courseId = process.argv[2] || '67c3e57e754c83ca019ea97e';
     
     console.log(`Checking summaries for course ${courseId}...`);
     
@@ -36,7 +36,7 @@ async function checkSummaries() {
     
     if (transcriptions.length > 0) {
       // Print the first summary as an example
-      const example = transcriptions[0];
+      const example = transcriptions[1];
       console.log('\nExample summaries for video:', example.videoUrl);
       console.log('\nVideo Summary:', example.videoSummary);
       console.log('\nSection Summary:', example.sectionSummary);
