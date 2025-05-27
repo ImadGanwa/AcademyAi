@@ -207,10 +207,25 @@ Course description: ${course.description}`;
    */
   static async getVideoTranscriptionWithSummaries(courseId: string, videoUrl: string): Promise<IVideoTranscription | null> {
     try {
-      const transcription = await VideoTranscription.findOne({
+      // Clean the videoUrl by trimming whitespace and decoding URL-encoded spaces
+      const cleanedVideoUrl = decodeURIComponent(videoUrl).trim();
+      
+      // First try exact match
+      let transcription = await VideoTranscription.findOne({
         courseId,
-        videoUrl
+        videoUrl: cleanedVideoUrl
       }) as IVideoTranscription | null;
+      
+      // If not found, try a more flexible search (URL contains the video ID)
+      if (!transcription) {
+        const vimeoId = cleanedVideoUrl.split('/').pop()?.trim();
+        if (vimeoId) {
+          transcription = await VideoTranscription.findOne({
+            courseId,
+            videoUrl: { $regex: vimeoId, $options: 'i' }
+          }) as IVideoTranscription | null;
+        }
+      }
       
       return transcription;
     } catch (error) {

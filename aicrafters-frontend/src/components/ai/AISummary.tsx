@@ -115,11 +115,18 @@ export const AISummary: React.FC<AISummaryProps> = ({
       );
     }
     
-    const currentSummary = 
-      activeTab === 0 ? summaries.videoSummary :
-      activeTab === 1 ? summaries.sectionSummary :
-      summaries.courseSummary;
+    // Get the current summary based on the active tab
+    let currentSummary: string | null = null;
     
+    if (activeTab === 0) {
+      currentSummary = summaries.videoSummary;
+    } else if (activeTab === 1) {
+      currentSummary = summaries.sectionSummary || null;
+    } else {
+      currentSummary = summaries.courseSummary || null;
+    }
+    
+    // Check if the summary is empty or null
     if (!currentSummary) {
       const tabNames = ['video', 'section', 'course'];
       const tabName = tabNames[activeTab];

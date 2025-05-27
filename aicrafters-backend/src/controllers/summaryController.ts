@@ -33,9 +33,9 @@ export const summaryController = {
       }
 
       res.json({ 
-        videoSummary: videoTranscription.videoSummary,
-        sectionSummary: videoTranscription.sectionSummary,
-        courseSummary: videoTranscription.courseSummary
+        videoSummary: videoTranscription.videoSummary || null,
+        sectionSummary: videoTranscription.sectionSummary || '',
+        courseSummary: videoTranscription.courseSummary || ''
       });
     } catch (error) {
       if (error instanceof Error) {

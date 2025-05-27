@@ -120,7 +120,7 @@ export const aiService = {
    * Get video summaries
    */
   async getSummaries(courseId: string, videoUrl: string): Promise<{
-    videoSummary: string;
+    videoSummary: string | null;
     sectionSummary: string;
     courseSummary: string;
   }> {
@@ -140,8 +140,9 @@ export const aiService = {
         }
       );
 
+      // Handle the case where videoSummary might be null
       return {
-        videoSummary: response.data.videoSummary || '',
+        videoSummary: response.data.videoSummary,
         sectionSummary: response.data.sectionSummary || '',
         courseSummary: response.data.courseSummary || '',
       };
