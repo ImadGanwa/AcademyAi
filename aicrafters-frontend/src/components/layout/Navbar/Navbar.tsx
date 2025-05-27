@@ -71,6 +71,7 @@ const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   font-size: 1.1rem;
   padding-bottom: 8px;
   position: relative;
+  font-family: 'Gayathri', sans-serif;
   
   &:hover {
     opacity: 0.8;
@@ -91,13 +92,15 @@ const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
 
 const WinText = styled.span`
   color: #D710C1;
-  font-weight: bold;
+  font-weight: 700;
   margin-right: 4px;
+  font-family: 'Gayathri', sans-serif;
 `;
 
 const SkillsText = styled.span`
   color: white;
-  font-weight: normal;
+  font-weight: 400;
+  font-family: 'Gayathri', sans-serif;
 `;
 
 const NavButtons = styled(Box)`
@@ -125,6 +128,7 @@ const LoginButton = styled(NavButton)`
     border-radius: 30px;
     font-weight: 600;
     font-size: 1.1rem;
+    font-family: 'Gayathri', sans-serif;
     
     &:hover {
       border-color: white;
@@ -142,6 +146,7 @@ const SignUpButton = styled(NavButton)`
     border-radius: 30px;
     font-weight: 600;
     font-size: 1.1rem;
+    font-family: 'Gayathri', sans-serif;
 
     &:hover {
       background: #b0009c;
@@ -298,29 +303,25 @@ const MobileNavLinks = styled(Box)`
 `;
 
 const MobileNavLink = styled(RouterLink)<{ $isActive?: boolean }>`
-  color: ${props => props.theme.palette.text.primary};
   text-decoration: none;
+  color: #000;
   font-size: 1.2rem;
-  padding: 12px 0;
-  display: block;
-  font-weight: 500;
+  padding: 8px 0;
+  font-weight: 600;
   position: relative;
+  font-family: 'Gayathri', sans-serif;
   
   ${props => props.$isActive && `
     &:after {
       content: '';
       position: absolute;
-      bottom: 8px;
+      bottom: 0;
       left: 0;
-      width: 30px;
+      width: 100%;
       height: 2px;
       background-color: #D710C1;
     }
   `}
-  
-  &:hover {
-    color: ${props => props.theme.palette.primary.main};
-  }
 `;
 
 const LanguageTitle = styled(Box)`

@@ -44,41 +44,41 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Gayathri", sans-serif',
+    fontFamily: '"Poppins", sans-serif',
     h1: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     h2: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     h3: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     h4: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     h5: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     h6: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 600,
     },
     body1: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 400,
     },
     body2: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 400,
     },
     button: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Poppins", sans-serif',
       fontWeight: 500,
       textTransform: 'none',
     },
