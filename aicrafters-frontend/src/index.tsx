@@ -7,7 +7,6 @@ import './utils/i18n/i18n';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { HelmetProvider } from 'react-helmet-async';
 import { StatsProvider } from './contexts/StatsContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { Provider } from 'react-redux';

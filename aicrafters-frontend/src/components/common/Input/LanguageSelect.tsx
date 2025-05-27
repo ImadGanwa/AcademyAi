@@ -148,7 +148,6 @@ export const LanguageSelect: React.FC<LanguageSelectProps> = ({
   const languageOptions: LanguageOption[] = [
     { code: 'en', name: t('common.languages.en'), flag: USFlag },
     { code: 'fr', name: t('common.languages.fr'), flag: FRFlag },
-    { code: 'ar', name: t('common.languages.ar'), flag: MAFlag },
   ].filter(lang => languageCodes.includes(lang.code as typeof languageCodes[number]));
 
   const handleChange = (event: SelectChangeEvent) => {

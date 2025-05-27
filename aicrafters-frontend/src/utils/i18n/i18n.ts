@@ -4,18 +4,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import enTranslations from './locales/en/translation.json';
 import frTranslations from './locales/fr/translation.json';
-import arTranslations from './locales/ar/translation.json';
 
-export const languages = ['en', 'fr', 'ar'] as const;
+export const languages = ['en', 'fr'] as const;
 export type Language = typeof languages[number];
 
 // Define RTL languages
-export const rtlLanguages = ['ar'];
+export const rtlLanguages: string[] = [];
 
 // Helper function to check if a language is RTL
 export const isRTL = (language: string): boolean => {
-  const rtlLanguages = ['ar', 'he', 'fa']; // Add any other RTL languages you support
-  return rtlLanguages.includes(language);
+  // None of our currently supported languages are RTL
+  return false;
 };
 
 i18n
@@ -28,9 +27,6 @@ i18n
       },
       fr: {
         translation: frTranslations,
-      },
-      ar: {
-        translation: arTranslations,
       },
     },
     fallbackLng: 'en',

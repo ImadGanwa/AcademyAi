@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE, SupportedLanguage } from '../utils/constants';
+import { isRTL } from '../utils/i18n/i18n';
 
 export const LanguageWrapper: React.FC = () => {
   const { lang } = useParams<{ lang: string }>();
@@ -16,7 +17,7 @@ export const LanguageWrapper: React.FC = () => {
   useEffect(() => {
     if (isSupportedLanguage(lang)) {
       i18n.changeLanguage(lang);
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.dir = isRTL(lang) ? 'rtl' : 'ltr';
       document.documentElement.lang = lang;
     }
   }, [lang, i18n]);

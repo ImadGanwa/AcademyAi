@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, useLocation } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar/Navbar';
 import { AppRoutes } from './routes';
 import { ScrollToTop } from './components/common/ScrollToTop/ScrollToTop';
@@ -13,15 +13,12 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'react-hot-toast';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 
-// Wrapper component to handle conditional navbar rendering
+// Wrapper component to handle navbar rendering
 const AppContent: React.FC = () => {
-  const location = useLocation();
-  const isChoicePage = location.pathname.includes('/choice');
-
   return (
     <>
       <ScrollToTop />
-      {!isChoicePage && <Navbar />}
+      <Navbar />
       <AppRoutes />
       <ToastContainer position="top-right" autoClose={3000} />
     </>

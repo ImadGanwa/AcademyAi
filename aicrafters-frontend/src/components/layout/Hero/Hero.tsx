@@ -200,12 +200,19 @@ export const Hero: React.FC = () => {
             {t('home.hero.description')}
           </Description>
           <InputWrapper>
-            <StyledButton
-              variant="contained"
-              disabled={loading}
+            <a 
+              href="https://adwin.global/join-adwin/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
             >
-              {loading ? t('common.loading') : t('home.hero.connectToday')}
-            </StyledButton>
+              <StyledButton
+                variant="contained"
+                disabled={loading}
+              >
+                {loading ? t('common.loading') : t('home.hero.connectToday')}
+              </StyledButton>
+            </a>
           </InputWrapper>
         </ContentWrapper>
         <StyledLogo />

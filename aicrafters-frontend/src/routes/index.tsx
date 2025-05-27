@@ -36,33 +36,13 @@ import BecomeMentor from '../pages/Mentorship/BecomeMentor';
 import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplicationConfirmation';
 import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
 import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
-import ChoicePage from '../pages/Dashboard/User/ChoicePage/ChoicePage';
 import MyBookingPage from '../pages/Dashboard/User/Booking/MyBookingPage';
-
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading, user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
   const currentLang = location.pathname.split('/')[1];
-
-  // For use in this component
-  const checkChoiceAndGetPath = () => {
-    const choiceMade = sessionStorage.getItem('userChoiceMade');
-    console.log('DEBUG - ProtectedRoute - userChoiceMade:', choiceMade);
-    
-    if (!isAuthenticated) {
-      return `/${currentLang}/login`;
-    }
-    
-    if (choiceMade !== 'true') {
-      console.log('DEBUG - ProtectedRoute - Redirecting to choice page');
-      return `/${currentLang}/choice`;
-    }
-    
-    // User is authenticated and has made a choice, proceed normally
-    return null;
-  };
 
   // If still loading auth state, show nothing
   if (isLoading) {
@@ -70,10 +50,8 @@ const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ chil
   }
 
   // Check if user needs to be redirected
-  const redirectPath = checkChoiceAndGetPath();
-  if (redirectPath) {
-    console.log('DEBUG - ProtectedRoute - Redirecting to:', redirectPath);
-    return <Navigate to={redirectPath} state={{ from: location }} replace />;
+  if (!isAuthenticated) {
+    return <Navigate to={`/${currentLang}/login`} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
@@ -81,17 +59,6 @@ const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ chil
 
 // User dashboard routes
 const UserDashboardRoutes = () => {
-  const location = useLocation(); 
-  const currentLang = location.pathname.split('/')[1];
-  const choiceMade = sessionStorage.getItem('userChoiceMade');
-  
-  console.log('DEBUG - UserDashboardRoutes - userChoiceMade:', choiceMade);
-  
-  if (choiceMade !== 'true') {
-    console.log('DEBUG - UserDashboardRoutes - Redirecting to choice page');
-    return <Navigate to={`/${currentLang}/choice`} replace />;
-  }
-  
   return (
     <UserRouteGuard>
       <Routes>
@@ -106,20 +73,8 @@ const UserDashboardRoutes = () => {
   );
 };
 
-
 // Trainer dashboard routes
 const TrainerDashboardRoutes = () => {
-  const location = useLocation(); 
-  const currentLang = location.pathname.split('/')[1];
-  const choiceMade = sessionStorage.getItem('userChoiceMade');
-  
-  console.log('DEBUG - TrainerDashboardRoutes - userChoiceMade:', choiceMade);
-  
-  if (choiceMade !== 'true') {
-    console.log('DEBUG - TrainerDashboardRoutes - Redirecting to choice page');
-    return <Navigate to={`/${currentLang}/choice`} replace />;
-  }
-  
   return (
     <TrainerRouteGuard>
       <Routes>
@@ -132,17 +87,6 @@ const TrainerDashboardRoutes = () => {
 
 // Mentor dashboard routes
 const MentorDashboardRoutes = () => {
-  const location = useLocation(); 
-  const currentLang = location.pathname.split('/')[1];
-  const choiceMade = sessionStorage.getItem('userChoiceMade');
-  
-  console.log('DEBUG - MentorDashboardRoutes - userChoiceMade:', choiceMade);
-  
-  if (choiceMade !== 'true') {
-    console.log('DEBUG - MentorDashboardRoutes - Redirecting to choice page');
-    return <Navigate to={`/${currentLang}/choice`} replace />;
-  }
-  
   return (
     <MentorRouteGuard>
       <Routes>
@@ -155,17 +99,6 @@ const MentorDashboardRoutes = () => {
 
 // Admin dashboard routes
 const AdminDashboardRoutes = () => {
-  const location = useLocation(); 
-  const currentLang = location.pathname.split('/')[1];
-  const choiceMade = sessionStorage.getItem('userChoiceMade');
-  
-  console.log('DEBUG - AdminDashboardRoutes - userChoiceMade:', choiceMade);
-  
-  if (choiceMade !== 'true') {
-    console.log('DEBUG - AdminDashboardRoutes - Redirecting to choice page');
-    return <Navigate to={`/${currentLang}/choice`} replace />;
-  }
-  
   return (
     <AdminRouteGuard>
       <Routes>
@@ -192,22 +125,6 @@ export const AppRoutes: React.FC = () => {
       default:
         return `/${lang}/dashboard/user/learning`;
     }
-  };
-
-  const getPostLoginPath = () => {
-    const lang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
-    const choiceMade = sessionStorage.getItem('userChoiceMade');
-    console.log('DEBUG - userChoiceMade in sessionStorage:', choiceMade);
-    console.log('DEBUG - isAuthenticated:', isAuthenticated);
-    console.log('DEBUG - user:', user);
-    
-    if (choiceMade === 'true') {
-      console.log('DEBUG - Choice made, redirecting to dashboard:', getDashboardPath());
-      return getDashboardPath();
-    }
-    
-    console.log('DEBUG - No choice made, redirecting to choice page:', `/${lang}/choice`);
-    return `/${lang}/choice`;
   };
 
   return (
@@ -245,33 +162,32 @@ export const AppRoutes: React.FC = () => {
         <Route path="help" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.help')} />} />
         <Route path="terms" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.terms')} />} />
         <Route path="privacy" element={<PlaceholderPage pageName={i18n.t('placeholder.titles.privacy')} />} />
-        <Route path="choice" element={<ChoicePage />} />
 
         {/* Auth routes */}
         <Route path="login" element={
           isAuthenticated ? (
-            <Navigate to={getPostLoginPath()} replace />
+            <Navigate to={getDashboardPath()} replace />
           ) : (
             <LoginPage />
           )
         } />
         <Route path="signup" element={
           isAuthenticated ? (
-            <Navigate to={getPostLoginPath()} replace />
+            <Navigate to={getDashboardPath()} replace />
           ) : (
             <SignUpPage />
           )
         } />
         <Route path="forgot-password" element={
           isAuthenticated ? (
-            <Navigate to={getPostLoginPath()} replace />
+            <Navigate to={getDashboardPath()} replace />
           ) : (
             <ForgotPasswordPage />
           )
         } />
         <Route path="reset-password/:token" element={
           isAuthenticated ? (
-            <Navigate to={getPostLoginPath()} replace />
+            <Navigate to={getDashboardPath()} replace />
           ) : (
             <ResetPasswordPage />
           )

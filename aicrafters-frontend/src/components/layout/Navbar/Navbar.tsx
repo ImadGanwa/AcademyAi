@@ -65,14 +65,39 @@ const NavLinks = styled(Box)`
   }
 `;
 
-const NavLink = styled(RouterLink)`
+const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   color: white;
   text-decoration: none;
   font-size: 1.1rem;
+  padding-bottom: 8px;
+  position: relative;
   
   &:hover {
     opacity: 0.8;
   }
+
+  ${props => props.$isActive && `
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: white;
+    }
+  `}
+`;
+
+const WinText = styled.span`
+  color: #D710C1;
+  font-weight: bold;
+  margin-right: 4px;
+`;
+
+const SkillsText = styled.span`
+  color: white;
+  font-weight: normal;
 `;
 
 const NavButtons = styled(Box)`
@@ -272,18 +297,29 @@ const MobileNavLinks = styled(Box)`
   }
 `;
 
-const MobileNavLink = styled(RouterLink)`
-  && {
-    color: ${({ theme }) => theme.palette.text.title};
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: 600;
-    padding: 16px 20px;
-    border-radius: 8px;
-    
-    &:hover {
-      opacity: 0.8;
+const MobileNavLink = styled(RouterLink)<{ $isActive?: boolean }>`
+  color: ${props => props.theme.palette.text.primary};
+  text-decoration: none;
+  font-size: 1.2rem;
+  padding: 12px 0;
+  display: block;
+  font-weight: 500;
+  position: relative;
+  
+  ${props => props.$isActive && `
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background-color: #D710C1;
     }
+  `}
+  
+  &:hover {
+    color: ${props => props.theme.palette.primary.main};
   }
 `;
 
@@ -460,6 +496,10 @@ export const Navbar: React.FC = () => {
   // Check if current page is cart or checkout
   const showCurrencySwitcher = location.pathname.includes('/cart') || location.pathname.includes('/checkout');
 
+  // Check active path for skills vs confidence sections
+  const isSkillsActive = location.pathname.includes('/teach') || location.pathname.includes('/courses');
+  const isConfidenceActive = location.pathname.includes('/mentorship');
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -604,11 +644,6 @@ export const Navbar: React.FC = () => {
     navigate(`/${currentLang}/`, { replace: true });
   };
 
-  const handleBusinessClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const currentLang = i18n.language;
-    navigate(`/${currentLang}/business`, { replace: true });
-  };
 
   const handleTeachClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -632,14 +667,19 @@ export const Navbar: React.FC = () => {
         </LogoContainer>
      
         <NavLinks>
-          {/* <NavLink to="/business" onClick={handleBusinessClick}>
-            {t('common.navigation.businessLink')}
-          </NavLink> */}
-          <NavLink to="/teach" onClick={handleTeachClick}>
-            {t('common.navigation.studyLink')}
+          <NavLink 
+            to="/teach" 
+            onClick={handleTeachClick}
+            $isActive={isSkillsActive}
+          >
+            <WinText>Win</WinText><SkillsText>Skills</SkillsText>
           </NavLink>
-          <NavLink to="/mentorship" onClick={handleMentorshipClick}>
-            {t('common.navigation.mentorship')}
+          <NavLink 
+            to="/mentorship" 
+            onClick={handleMentorshipClick}
+            $isActive={isConfidenceActive}
+          >
+            <WinText>Win</WinText><SkillsText>Confidence</SkillsText>
           </NavLink>
         </NavLinks>
 
@@ -720,27 +760,29 @@ export const Navbar: React.FC = () => {
         </MobileMenuHeader>
         <MobileMenuContent>
           <MobileNavLinks>
-            <MobileNavLink to="/business" onClick={(e) => {
-              e.preventDefault();
-              handleBusinessClick(e);
-              toggleMobileMenu();
-            }}>
-              {t('common.navigation.businessLink')}
+            <MobileNavLink 
+              to="/teach" 
+              onClick={(e) => {
+                e.preventDefault();
+                handleTeachClick(e);
+                toggleMobileMenu();
+              }}
+              $isActive={isSkillsActive}
+            >
+              <WinText>Win</WinText><SkillsText style={{color: '#000'}}>Skills</SkillsText>
             </MobileNavLink>
-            <MobileNavLink to="/teach" onClick={(e) => {
-              e.preventDefault();
-              handleTeachClick(e);
-              toggleMobileMenu();
-            }}>
-              {t('common.navigation.studyLink')}
+            <MobileNavLink 
+              to="/mentorship" 
+              onClick={(e) => {
+                e.preventDefault();
+                handleMentorshipClick(e);
+                toggleMobileMenu();
+              }}
+              $isActive={isConfidenceActive}
+            >
+              <WinText>Win</WinText><SkillsText style={{color: '#000'}}>Confidence</SkillsText>
             </MobileNavLink>
-            <MobileNavLink to="/mentorship" onClick={(e) => {
-              e.preventDefault();
-              handleMentorshipClick(e);
-              toggleMobileMenu();
-            }}>
-              {t('common.navigation.mentorship')}
-            </MobileNavLink>
+            
             <LanguageTitle 
               onClick={() => setIsLanguageListOpen(!isLanguageListOpen)}
               className={isLanguageListOpen ? 'active' : ''}
