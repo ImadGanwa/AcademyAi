@@ -56,9 +56,11 @@ const SummaryContent = styled(Box)`
 
 const LoadingContainer = styled(Box)`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 200px;
+  gap: 16px;
 `;
 
 interface AISummaryProps {
@@ -88,6 +90,9 @@ export const AISummary: React.FC<AISummaryProps> = ({
       return (
         <LoadingContainer>
           <CircularProgress size={30} />
+          <Typography variant="body2" color="textSecondary">
+            Loading summary...
+          </Typography>
         </LoadingContainer>
       );
     }
@@ -108,12 +113,11 @@ export const AISummary: React.FC<AISummaryProps> = ({
       summaries.courseSummary;
     
     if (!currentSummary) {
+      const tabNames = ['video', 'section', 'course'];
       return (
         <Box sx={{ p: 3 }}>
           <Alert severity="info">
-            {activeTab === 0 ? 'No video summary available.' :
-             activeTab === 1 ? 'No section summary available.' :
-             'No course summary available.'}
+            No {tabNames[activeTab]} summary available.
           </Alert>
         </Box>
       );

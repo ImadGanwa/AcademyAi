@@ -45,9 +45,14 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   const [mindMapLoading, setMindMapLoading] = useState(false);
   const [mindMapError, setMindMapError] = useState<string | null>(null);
 
-  // Add retry tracking
+  // Add retry tracking for transcript
   const [hasFailedTranscriptFetch, setHasFailedTranscriptFetch] = useState(false);
   const transcriptRetryCount = useRef(0);
+
+  // Add retry tracking for summaries
+  const [hasFailedSummariesFetch, setHasFailedSummariesFetch] = useState(false);
+  const summariesRetryCount = useRef(0);
+
   const MAX_RETRY_ATTEMPTS = 2; // Maximum number of retry attempts
 
   // Check if we have a cached mind map for this video when video URL changes
@@ -80,6 +85,8 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     // Reset retry tracking
     setHasFailedTranscriptFetch(false);
     transcriptRetryCount.current = 0;
+    setHasFailedSummariesFetch(false);
+    summariesRetryCount.current = 0;
   }, [videoUrl]);
 
   // Send message to AI coach
@@ -170,9 +177,15 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     }
   }, [courseId, videoUrl, hasFailedTranscriptFetch]);
 
-  // Fetch summaries
+  // Fetch summaries with retry mechanism
   const fetchSummaries = useCallback(async () => {
     if (!courseId || !videoUrl) return;
+    
+    // Skip if already failed and exceeded retry attempts
+    if (hasFailedSummariesFetch && summariesRetryCount.current >= MAX_RETRY_ATTEMPTS) {
+      console.warn(`Skipping summaries fetch after ${MAX_RETRY_ATTEMPTS} failed attempts`);
+      return false;
+    }
     
     try {
       setSummariesLoading(true);
@@ -180,15 +193,26 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
       
       const data = await aiService.getSummaries(courseId, videoUrl);
       setSummaries(data);
+      
+      // Reset failure tracking on success
+      setHasFailedSummariesFetch(false);
+      summariesRetryCount.current = 0;
+      
       return true;
     } catch (err: any) {
-      setSummariesError(err.message || 'Failed to fetch summaries');
-      console.error('Error in useAIFeatures.fetchSummaries:', err);
+      // Track failure
+      setHasFailedSummariesFetch(true);
+      summariesRetryCount.current += 1;
+      
+      const errorMessage = err.message || 'Failed to fetch summaries';
+      setSummariesError(errorMessage);
+      console.error(`Error in useAIFeatures.fetchSummaries (attempt ${summariesRetryCount.current}):`, err);
+      
       return false;
     } finally {
       setSummariesLoading(false);
     }
-  }, [courseId, videoUrl]);
+  }, [courseId, videoUrl, hasFailedSummariesFetch]);
 
   // Fetch mind map - now with caching
   const fetchMindMap = useCallback(async () => {
