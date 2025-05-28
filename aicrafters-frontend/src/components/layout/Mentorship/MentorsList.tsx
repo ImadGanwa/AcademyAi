@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, TextField, Grid, MenuItem, Select, FormControl, InputLabel, CircularProgress, Typography, Alert } from '@mui/material';
+import { Box, Container, TextField, FormControl,  CircularProgress, Typography, Alert } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { MentorCardList } from './card/MentorCardList';
 import { Mentor } from './card/MentorCard';
-import { KeyboardArrowDown as ArrowDownIcon } from '@mui/icons-material';
 import { CustomPagination } from './Pagination';
 import { getPublicMentorList } from '../../../api/mentor';
-// Import mockMentors for fallback only
-import { mockMentors } from './card/mentorsMock';
+import { DynamicFilters } from './filters/DynamicFilters';
 
 const SearchAndFiltersWrapper = styled.div`
   background-color: ${props => props.theme.palette.background.default};
@@ -120,64 +118,7 @@ const SearchIconWrapper = styled(Box)`
   justify-content: center;
 `;
 
-const FiltersRow = styled(Box)`
-  display: flex;
-  gap: 16px;
-  width: 100%;
-  justify-content: center;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 12px;
-  }
-`;
 
-const FilterSelect = styled(FormControl)`
-  flex: 1;
-  max-width: 280px;
-  
-  .MuiOutlinedInput-root {
-    background-color: #fff;
-    border-radius: 50px;
-    height: 48px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-    .MuiSelect-select {
-      padding: 12px 20px;
-      padding-right: 40px !important;
-      font-size: 1rem;
-      color: #424242;
-    }
-
-    .MuiOutlinedInput-notchedOutline {
-      border: 1px solid #E0E0E0;
-    }
-
-    .MuiSelect-icon {
-      right: 12px;
-      color: #757575;
-    }
-
-    &:hover, &.Mui-focused {
-      .MuiOutlinedInput-notchedOutline {
-        border-color: ${props => props.theme.palette.primary.main};
-      }
-    }
-  }
-
-  .MuiInputLabel-root {
-    color: #757575;
-    font-size: 1rem;
-    
-    &.Mui-focused {
-      color: ${props => props.theme.palette.primary.main};
-    }
-
-    &.MuiInputLabel-shrink {
-      display: none;
-    }
-  }
-`;
 
 export const MentorsList: React.FC = () => {
   const { t } = useTranslation();
@@ -187,7 +128,6 @@ export const MentorsList: React.FC = () => {
   const [country, setCountry] = useState('');
   const [language, setLanguage] = useState('');
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -215,15 +155,17 @@ export const MentorsList: React.FC = () => {
       });
       
       try {
-        const filters = {
-          search: searchTerm,
-          category,
-          skill,
-          country,
-          language,
+        // Ensure we only include non-empty filter values
+        const filters: any = {
           page,
           limit: mentorsPerPage
         };
+        
+        if (searchTerm) filters.search = searchTerm;
+        if (category) filters.category = category;
+        if (skill) filters.skill = skill;
+        if (country) filters.country = country;
+        if (language) filters.language = language;
         
         console.log('Calling getPublicMentorList API with filters:', filters);
         const response = await getPublicMentorList(filters);
@@ -234,10 +176,65 @@ export const MentorsList: React.FC = () => {
           const { mentors, pagination } = response.data;
           console.log('Mentors received from API:', mentors);
           console.log('Pagination data:', pagination);
+          console.log('Active filters:', { searchTerm, category, skill, country, language });
+          
+          // In development, let's manually filter the mentors for now
+          // This is a temporary solution until the API filtering is fixed
+          if (process.env.NODE_ENV === 'development') {
+            let filteredResults = [...mentors];
+            
+            if (searchTerm) {
+              const search = searchTerm.toLowerCase();
+              filteredResults = filteredResults.filter(mentor => 
+                mentor.fullName.toLowerCase().includes(search) || 
+                mentor.title.toLowerCase().includes(search) ||
+                mentor.bio.toLowerCase().includes(search)
+              );
+            }
+            
+            if (category) {
+              filteredResults = filteredResults.filter(mentor => 
+                mentor.title.toLowerCase().replace(/\s+/g, '').includes(category)
+              );
+            }
+            
+            if (skill) {
+              filteredResults = filteredResults.filter(mentor => 
+                mentor.skills.some((s: { name: string }) => s.name.toLowerCase().replace(/\s+/g, '').includes(skill))
+              );
+            }
+            
+            if (country) {
+              filteredResults = filteredResults.filter(mentor => {
+                if (!mentor.countryFlag) return false;
+                const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
+                return countryCode === country;
+              });
+            }
+            
+            if (language) {
+              filteredResults = filteredResults.filter(mentor => 
+                mentor.languages.some((l: { name: string }) => l.name.toLowerCase().replace(/\s+/g, '').includes(language))
+              );
+            }
+            
+            console.log('Client-side filtered mentors:', filteredResults);
+            
+            // Always use the client-side filtered results in development
+            setMentors(mentors); // Keep original mentors for filter options
+            setDisplayedMentors(filteredResults);
+            setTotalItems(filteredResults.length);
+            setTotalPages(Math.ceil(filteredResults.length / mentorsPerPage));
+            
+            // If no results, set appropriate message but don't show error
+            if (filteredResults.length === 0) {
+              setError(null);
+            }
+            return;
+          }
           
           if (mentors && mentors.length > 0) {
             setMentors(mentors);
-            setFilteredMentors(mentors);
             setDisplayedMentors(mentors);
             
             // Check if pagination data exists
@@ -249,53 +246,35 @@ export const MentorsList: React.FC = () => {
               setTotalItems(mentors.length);
               setTotalPages(Math.ceil(mentors.length / mentorsPerPage));
               console.log(`No pagination data, calculated: ${mentors.length} total items, ${Math.ceil(mentors.length / mentorsPerPage)} pages`);
+              setError(null); // Don't show an error alert
             }
-            return; // Exit early if we have real data
           } else {
+            // No mentors found in the API response
             console.log('API returned success but no mentors in the data');
+            setMentors([]);
+            setDisplayedMentors([]);
+            setTotalItems(0);
+            setTotalPages(0);
+            setError(null); // Don't show an error alert
           }
         } else {
           console.error('API response invalid structure:', response);
-        }
-        
-        // Only use mock data during development
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Using mock data since API returned no mentors');
-          setMentors(mockMentors);
-          setFilteredMentors(mockMentors);
-          setDisplayedMentors(mockMentors.slice(0, mentorsPerPage));
-          setTotalItems(mockMentors.length);
-          setTotalPages(Math.ceil(mockMentors.length / mentorsPerPage));
-        } else {
-          // In production, show no results instead of mock data
-          console.log('No mentors found and in production environment, showing empty state');
           setMentors([]);
-          setFilteredMentors([]);
           setDisplayedMentors([]);
           setTotalItems(0);
           setTotalPages(0);
-          setError('No mentors found. Please try adjusting your filters.');
+          setError('Failed to load mentors. Please try again later.');
         }
       } catch (err: any) {
         console.error('Error fetching mentors:', err);
         console.error('Error details:', err.response?.data || err.message);
         setError(err.response?.data?.message || 'Failed to load mentors. Please try again later.');
         
-        // Only use mock data in development
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Using mock data due to API error');
-          setMentors(mockMentors);
-          setFilteredMentors(mockMentors);
-          setDisplayedMentors(mockMentors.slice(0, mentorsPerPage));
-          setTotalItems(mockMentors.length);
-          setTotalPages(Math.ceil(mockMentors.length / mentorsPerPage));
-        } else {
-          // In production, show empty state
-          console.log('API error in production environment, showing empty state');
-          setMentors([]);
-          setFilteredMentors([]);
-          setDisplayedMentors([]);
-        }
+        // Show empty state on error
+        setMentors([]);
+        setDisplayedMentors([]);
+        setTotalItems(0);
+        setTotalPages(0);
       } finally {
         setLoading(false);
       }
@@ -311,27 +290,27 @@ export const MentorsList: React.FC = () => {
     setPage(1); // Reset to page 1 when search term changes
   };
   
-  const handleCategoryChange = (event: any) => {
-    console.log('Category changed to:', event.target.value);
-    setCategory(event.target.value);
+  const handleCategoryChange = (value: string) => {
+    console.log('Category changed to:', value);
+    setCategory(value);
     setPage(1);
   };
   
-  const handleSkillChange = (event: any) => {
-    console.log('Skill changed to:', event.target.value);
-    setSkill(event.target.value);
+  const handleSkillChange = (value: string) => {
+    console.log('Skill changed to:', value);
+    setSkill(value);
     setPage(1);
   };
   
-  const handleCountryChange = (event: any) => {
-    console.log('Country changed to:', event.target.value);
-    setCountry(event.target.value);
+  const handleCountryChange = (value: string) => {
+    console.log('Country changed to:', value);
+    setCountry(value);
     setPage(1);
   };
   
-  const handleLanguageChange = (event: any) => {
-    console.log('Language changed to:', event.target.value);
-    setLanguage(event.target.value);
+  const handleLanguageChange = (value: string) => {
+    console.log('Language changed to:', value);
+    setLanguage(value);
     setPage(1);
   };
   
@@ -363,76 +342,17 @@ export const MentorsList: React.FC = () => {
               />
             </SearchContainer>
             
-            <FiltersRow>
-              <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentor.categoryLabel', { defaultValue: 'Category' }) as string}</InputLabel>
-                <Select
-                  value={category}
-                  onChange={handleCategoryChange}
-                  label={t('mentor.categoryLabel', { defaultValue: 'Category' }) as string}
-                  IconComponent={ArrowDownIcon}
-                >
-                  <MenuItem value="">{t('mentor.allCategories', { defaultValue: 'All Categories' }) as string}</MenuItem>
-                  <MenuItem value="webdev">{t('mentor.categories.webdev', { defaultValue: 'Web Development' }) as string}</MenuItem>
-                  <MenuItem value="mobiledev">{t('mentor.categories.mobiledev', { defaultValue: 'Mobile Development' }) as string}</MenuItem>
-                  <MenuItem value="ai">{t('mentor.categories.ai', { defaultValue: 'Artificial Intelligence' }) as string}</MenuItem>
-                  <MenuItem value="datascience">{t('mentor.categories.datascience', { defaultValue: 'Data Science' }) as string}</MenuItem>
-                  <MenuItem value="devops">{t('mentor.categories.devops', { defaultValue: 'DevOps' }) as string}</MenuItem>
-                </Select>
-              </FilterSelect>
-              
-              <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}</InputLabel>
-                <Select
-                  value={skill}
-                  onChange={handleSkillChange}
-                  label={t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}
-                  IconComponent={ArrowDownIcon}
-                >
-                  <MenuItem value="">{t('mentor.allSkills', { defaultValue: 'All Skills' }) as string}</MenuItem>
-                  <MenuItem value="javascript">{t('mentor.skills.javascript', { defaultValue: 'JavaScript' }) as string}</MenuItem>
-                  <MenuItem value="python">{t('mentor.skills.python', { defaultValue: 'Python' }) as string}</MenuItem>
-                  <MenuItem value="react">{t('mentor.skills.react', { defaultValue: 'React' }) as string}</MenuItem>
-                  <MenuItem value="nodejs">{t('mentor.skills.nodejs', { defaultValue: 'Node.js' }) as string}</MenuItem>
-                  <MenuItem value="machinelearning">{t('mentor.skills.machinelearning', { defaultValue: 'Machine Learning' }) as string}</MenuItem>
-                </Select>
-              </FilterSelect>
-              
-              <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentor.countryLabel', { defaultValue: 'Country' }) as string}</InputLabel>
-                <Select
-                  value={country}
-                  onChange={handleCountryChange}
-                  label={t('mentor.countryLabel', { defaultValue: 'Country' }) as string}
-                  IconComponent={ArrowDownIcon}
-                >
-                  {/* TODO: Move hardcoded country list to a configuration file or fetch from an API */}
-                  <MenuItem value="">{t('mentor.allCountries', { defaultValue: 'All Countries' }) as string}</MenuItem>
-                  <MenuItem value="us">{t('mentor.countries.us', { defaultValue: 'United States' }) as string}</MenuItem>
-                  <MenuItem value="uk">{t('mentor.countries.uk', { defaultValue: 'United Kingdom' }) as string}</MenuItem>
-                  <MenuItem value="ca">{t('mentor.countries.ca', { defaultValue: 'Canada' }) as string}</MenuItem>
-                  <MenuItem value="au">{t('mentor.countries.au', { defaultValue: 'Australia' }) as string}</MenuItem>
-                  <MenuItem value="in">{t('mentor.countries.in', { defaultValue: 'India' }) as string}</MenuItem>
-                </Select>
-              </FilterSelect>
-              
-              <FilterSelect variant="outlined" fullWidth>
-                <InputLabel>{t('mentor.languageLabel', { defaultValue: 'Language' }) as string}</InputLabel>
-                <Select
-                  value={language}
-                  onChange={handleLanguageChange}
-                  label={t('mentor.languageLabel', { defaultValue: 'Language' }) as string}
-                  IconComponent={ArrowDownIcon}
-                >
-                  <MenuItem value="">{t('mentor.allLanguages', { defaultValue: 'All Languages' }) as string}</MenuItem>
-                  <MenuItem value="en">{t('mentor.languages.English', { defaultValue: 'English' }) as string}</MenuItem>
-                  <MenuItem value="es">{t('mentor.languages.Spanish', { defaultValue: 'Spanish' }) as string}</MenuItem>
-                  <MenuItem value="fr">{t('mentor.languages.French', { defaultValue: 'French' }) as string}</MenuItem>
-                  <MenuItem value="de">{t('mentor.languages.German', { defaultValue: 'German' }) as string}</MenuItem>
-                  <MenuItem value="zh">{t('mentor.languages.Chinese', { defaultValue: 'Chinese' }) as string}</MenuItem>
-                </Select>
-              </FilterSelect>
-            </FiltersRow>
+            <DynamicFilters 
+              mentors={mentors}
+              onCategoryChange={handleCategoryChange}
+              onSkillChange={handleSkillChange}
+              onCountryChange={handleCountryChange}
+              onLanguageChange={handleLanguageChange}
+              category={category}
+              skill={skill}
+              country={country}
+              language={language}
+            />
           </FilterContainer>
         </Container>
       </SearchAndFiltersWrapper>
@@ -451,12 +371,15 @@ export const MentorsList: React.FC = () => {
               {t('mentor.error', { error, defaultValue: error }) as string}
             </Alert>
           ) : displayedMentors.length === 0 ? (
-            <Box textAlign="center" py={4}>
-              <Typography variant="h6" color="text.secondary">
-                {t('mentor.noMentorsFound', 'No mentors found matching your criteria')}
+            <Box textAlign="center" py={6}>
+              <Typography variant="h5" color="primary" gutterBottom fontWeight="500">
+                {t('mentor.noMentorsTitle', 'No Mentors Found')}
               </Typography>
-              <Typography color="text.secondary" mt={1}>
-                {t('mentor.adjustFilters', 'Try adjusting your filters or search terms')}
+              <Typography variant="body1" color="text.secondary" mb={2}>
+                {t('mentor.noMentorsMessage', 'We couldn\'t find any mentors matching your current filters.')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('mentor.tryAdjustingFilters', 'Try adjusting your search criteria or removing some filters to see more results.')}
               </Typography>
             </Box>
           ) : (

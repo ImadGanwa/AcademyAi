@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Container, Typography, Skeleton, CircularProgress } from '@mui/material';
+import { Box, Typography, Skeleton} from '@mui/material';
 import { MentorCard, Mentor } from './MentorCard';
-import { mockMentors } from './mentorsMock';
 import { useTranslation } from 'react-i18next';
 
 const ListContainer = styled(Box)`
@@ -23,11 +22,11 @@ const CardWrapper = styled(Box)`
   }
 `;
 
-const NoResultsMessage = styled(Typography)`
-  text-align: center;
-  color: #666;
-  margin: 40px 0;
-`;
+// const NoResultsMessage = styled(Typography)`
+//   text-align: center;
+//   color: #666;
+//   margin: 40px 0;
+// `;
 
 const LoadingContainer = styled(Box)`
   display: flex;
@@ -88,9 +87,17 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
   if (mentors.length === 0) {
     return (
       <ListContainer>
-        <NoResultsMessage variant="h6">
-          {t('mentor.noMentorsFound', 'No mentors found matching your criteria. Try adjusting your filters.') as string} 
-        </NoResultsMessage>
+        <Box textAlign="center" py={6}>
+          <Typography variant="h5" color="primary" gutterBottom fontWeight="500">
+            {t('mentor.noMentorsTitle', 'No Mentors Found')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mb={2}>
+            {t('mentor.noMentorsMessage', 'We couldn\'t find any mentors matching your current filters.')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t('mentor.tryAdjustingFilters', 'Try adjusting your search criteria or removing some filters to see more results.')}
+          </Typography>
+        </Box>
       </ListContainer>
     );
   }

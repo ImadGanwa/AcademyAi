@@ -1228,7 +1228,10 @@
     "countryLabel": "Country",
     "languageLabel": "Language",
     "errorLoadingMentors": "Failed to load mentors. Please try again later.",
-    "noMentorsFound": "No mentors found matching your criteria."
+    "noMentorsFound": "No mentors found matching your criteria.",
+    "noMentorsTitle": "No Mentors Found",
+    "noMentorsMessage": "We couldn't find any mentors matching your current filters.",
+    "tryAdjustingFilters": "Try adjusting your search criteria or removing some filters to see more results."
   },
   "mentorship": {
     "pageTitle": "Mentorship - Find Your AI Mentor",

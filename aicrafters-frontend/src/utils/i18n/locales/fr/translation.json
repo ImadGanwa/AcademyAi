@@ -1228,7 +1228,10 @@
     "countryLabel": "Pays",
     "languageLabel": "Langue",
     "errorLoadingMentors": "Échec du chargement des mentors. Veuillez réessayer plus tard.",
-    "noMentorsFound": "Aucun mentor trouvé correspondant à vos critères."
+    "noMentorsFound": "Aucun mentor trouvé correspondant à vos critères.",
+    "noMentorsTitle": "Aucun Mentor Trouvé",
+    "noMentorsMessage": "Nous n'avons pas trouvé de mentor correspondant à vos critères.",
+    "tryAdjustingFilters": "Essayez de modifier vos critères de recherche ou d'enlever certains filtres pour voir plus de résultats."
   },
   "mentorship": {
     "pageTitle": "Mentorat - Trouvez votre Mentor IA",
