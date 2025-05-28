@@ -44,42 +44,42 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Poppins", sans-serif',
+    fontFamily: '"Manjari", sans-serif',
     h1: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     h2: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     h3: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     h4: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     h5: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     h6: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 600,
+      fontFamily: '"Gayathri", sans-serif',
+      fontWeight: 700,
     },
     body1: {
-      fontFamily: '"Poppins", sans-serif',
+      fontFamily: '"Manjari", sans-serif',
       fontWeight: 400,
     },
     body2: {
-      fontFamily: '"Poppins", sans-serif',
+      fontFamily: '"Manjari", sans-serif',
       fontWeight: 400,
     },
     button: {
-      fontFamily: '"Poppins", sans-serif',
-      fontWeight: 500,
+      fontFamily: '"Manjari", sans-serif',
+      fontWeight: 700,
       textTransform: 'none',
     },
   },
@@ -119,14 +119,32 @@ declare module '@mui/material/styles' {
 
 // Global styles using styled-components
 export const GlobalStyles = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&family=Gayathri:wght@100;400;700&display=swap');
+
   * {
     box-sizing: border-box;
+    font-family: 'Manjari', sans-serif;
   }
 
   body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    font-family: 'Manjari', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Gayathri', sans-serif;
+    line-height: 1.5;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+
+  /* Vertically center text in buttons */
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   img {
