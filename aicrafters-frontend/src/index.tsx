@@ -4,7 +4,7 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { theme, GlobalStyles } from './assets/styles/theme';
 import './utils/i18n/i18n';
-import './index.css';
+// import './index.css';  // Removing this import as we want to use styles from theme.ts
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { StatsProvider } from './contexts/StatsContext';

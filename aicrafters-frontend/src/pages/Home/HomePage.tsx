@@ -85,7 +85,7 @@ const ImagesGrid = styled(Box)`
 
 const ImageItem = styled(Box)`
   position: relative;
-  height: 180px;
+  height: 215px;
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease;

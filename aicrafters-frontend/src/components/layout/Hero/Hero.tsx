@@ -128,9 +128,6 @@ const StyledButton = styled(Button)`
     border-radius: 30px;
     font-weight: 600;
 
-    & span {
-      margin-top: 6px;
-    }
 
     @media (max-width: 768px) {
       padding: 14px 0;

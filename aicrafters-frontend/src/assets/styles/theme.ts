@@ -44,41 +44,41 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Manjari", sans-serif',
+      fontFamily: '"Lato", sans-serif',
     h1: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     h2: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     h3: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     h4: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     h5: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     h6: {
-      fontFamily: '"Gayathri", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
     },
     body1: {
-      fontFamily: '"Manjari", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 400,
     },
     body2: {
-      fontFamily: '"Manjari", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 400,
     },
     button: {
-      fontFamily: '"Manjari", sans-serif',
+      fontFamily: '"Lato", sans-serif',
       fontWeight: 700,
       textTransform: 'none',
     },
@@ -119,22 +119,22 @@ declare module '@mui/material/styles' {
 
 // Global styles using styled-components
 export const GlobalStyles = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&family=Gayathri:wght@100;400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
 
   * {
     box-sizing: border-box;
-    font-family: 'Manjari', sans-serif;
+    font-family: 'Lato', sans-serif;
   }
 
   body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    font-family: 'Manjari', sans-serif;
+    font-family: 'Lato', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Gayathri', sans-serif;
+    font-family: 'Lato', sans-serif;
     line-height: 1.5;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
