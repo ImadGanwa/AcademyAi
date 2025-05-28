@@ -157,6 +157,49 @@ export const LoginPage: React.FC = () => {
     }
   }, [location]);
 
+  const redirectAfterLogin = (user: any) => {
+    // Check if there's a mentor booking redirect
+    const bookingMentorId = localStorage.getItem('bookingMentorId');
+    if (bookingMentorId) {
+      localStorage.removeItem('bookingMentorId');
+      const currentLang = location.pathname.split('/')[1] || 'en';
+      navigate(`/mentorship/book/${bookingMentorId}`);
+      return;
+    }
+
+    // Check if we need to redirect to trace section
+    const redirectToTrace = localStorage.getItem('redirectAfterLogin') === 'traceSection';
+    
+    // Determine dashboard path based on user role
+    let dashboardPath;
+    switch (user.role) {
+      case 'admin':
+        dashboardPath = '/dashboard/admin';
+        break;
+      case 'trainer':
+        dashboardPath = '/dashboard/trainer';
+        break;
+      case 'mentor':
+        dashboardPath = '/dashboard/mentor';
+        break;
+      default:
+        dashboardPath = '/dashboard/user/learning';
+    }
+
+    // Get the current language from the URL
+    const lang = location.pathname.split('/')[1] || 'en';
+    
+    if (redirectToTrace) {
+      localStorage.removeItem('redirectAfterLogin');
+      // Use setItem to pass the information that we want to scroll to trace section
+      localStorage.setItem('scrollToTrace', 'true');
+      // Redirect to home
+      navigate(`/${lang}`);
+    } else {
+      navigate(`/${lang}${dashboardPath}`);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
@@ -173,31 +216,7 @@ export const LoginPage: React.FC = () => {
           return;
         }
 
-        // Check if there's a mentor booking redirect
-        const bookingMentorId = localStorage.getItem('bookingMentorId');
-        if (bookingMentorId) {
-          localStorage.removeItem('bookingMentorId');
-          const currentLang = location.pathname.split('/')[1] || 'en';
-          navigate(`/mentorship/book/${bookingMentorId}`);
-          return;
-        }
-
-        // Normal dashboard redirect if no booking redirect
-        let dashboardPath;
-        switch (response.user.role) {
-          case 'admin':
-            dashboardPath = '/dashboard/admin';
-            break;
-          case 'trainer':
-            dashboardPath = '/dashboard/trainer';
-            break;
-          case 'mentor':
-            dashboardPath = '/dashboard/mentor';
-            break;
-          default:
-            dashboardPath = '/dashboard/user/learning';
-        }
-        navigate(dashboardPath);
+        redirectAfterLogin(response.user);
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'An error occurred during login';
@@ -220,35 +239,7 @@ export const LoginPage: React.FC = () => {
       
       if (response.user) {
         toast.success(response.message || 'Successfully logged in with Google');
-        
-        // Check if there's a mentor booking redirect
-        const bookingMentorId = localStorage.getItem('bookingMentorId');
-        if (bookingMentorId) {
-          localStorage.removeItem('bookingMentorId');
-          const currentLang = location.pathname.split('/')[1] || 'en';
-          navigate(`/mentorship/book/${bookingMentorId}`);
-          return;
-        }
-        
-        // Determine dashboard path based on user role
-        let dashboardPath;
-        switch (response.user.role) {
-          case 'admin':
-            dashboardPath = '/dashboard/admin';
-            break;
-          case 'trainer':
-            dashboardPath = '/dashboard/trainer';
-            break;
-          case 'mentor':
-            dashboardPath = '/dashboard/mentor';
-            break;
-          default:
-            dashboardPath = '/dashboard/user/learning';
-        }
-
-        // Get the current language from the URL
-        const lang = location.pathname.split('/')[1] || 'en';
-        navigate(`/${lang}${dashboardPath}`);
+        redirectAfterLogin(response.user);
       }
     } catch (error: any) {
       console.error('Google login error:', error);
@@ -276,35 +267,7 @@ export const LoginPage: React.FC = () => {
       
       if (response.user) {
         toast.success(t('auth.linkedinLoginSuccess'));
-        
-        // Check if there's a mentor booking redirect
-        const bookingMentorId = localStorage.getItem('bookingMentorId');
-        if (bookingMentorId) {
-          localStorage.removeItem('bookingMentorId');
-          const currentLang = location.pathname.split('/')[1] || 'en';
-          navigate(`/mentorship/book/${bookingMentorId}`);
-          return;
-        }
-        
-        // Determine dashboard path based on user role
-        let dashboardPath;
-        switch (response.user.role) {
-          case 'admin':
-            dashboardPath = '/dashboard/admin';
-            break;
-          case 'trainer':
-            dashboardPath = '/dashboard/trainer';
-            break;
-          case 'mentor':
-            dashboardPath = '/dashboard/mentor';
-            break;
-          default:
-            dashboardPath = '/dashboard/user/learning';
-        }
-
-        // Get the current language from the URL
-        const lang = location.pathname.split('/')[1] || 'en';
-        navigate(`/${lang}${dashboardPath}`);
+        redirectAfterLogin(response.user);
       }
     } catch (error) {
       toast.error(t('auth.linkedinLoginFailed'));

@@ -4,7 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#643A8D',
+      main: '#6D4794',
       light: '#835EAB',
       dark: '#522F76',
     },
@@ -14,9 +14,9 @@ export const theme = createTheme({
       dark: '#b0009c',
     },
     background: {
-      default: '#643A8D',
+      default: '#6D4794',
       paper: '#FFFFFF',
-      secondary: '#643A8D',
+      secondary: '#6D4794',
     },
     text: {
       primary: '#081D3F',

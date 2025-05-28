@@ -352,7 +352,6 @@ const MentorshipConfirmation: React.FC = () => {
             <SessionHeader>{t('mentorship.sessionWith', 'Book a Session with')} {mentorName}</SessionHeader>
             
             <InfoRow>
-              // TODO: figure out another solution other than adding a span here to fix children lint error. 
               <span>
                 <CalendarMonthIcon /> 
                 {formattedDate}

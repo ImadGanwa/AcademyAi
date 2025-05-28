@@ -286,11 +286,11 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
             ))}
           </LanguagesContainer>
           <Box display="flex" alignItems="center" gap={2}>
-            {mentor.hourlyRate && (
+            {/* {mentor.hourlyRate && (
               <Typography variant="h6" fontWeight="bold" color="primary">
                 {t('mentor.hourlyRate', { rate: mentor.hourlyRate, defaultValue: `$${mentor.hourlyRate}/hr` }) as string}
               </Typography>
-            )}
+            )} */}
             <BookButton variant="contained" onClick={handleBookSession}>
               {t('mentor.bookSession', { defaultValue: 'Book a session' }) as string}
             </BookButton>

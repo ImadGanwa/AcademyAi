@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout/Layout';
 import { Hero } from '../../components/layout/Hero/Hero';
 import { CoursesSection } from '../../components/layout/Courses/CoursesSection';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Course } from '../../types/course';
 import { Container, Typography, Box, Button } from '@mui/material';
@@ -109,8 +109,24 @@ const ImageItem = styled(Box)`
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { i18n} = useTranslation();
+  const location = useLocation();
+  const { i18n } = useTranslation();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const tracePlusSectionRef = useRef<HTMLDivElement>(null);
+
+  // Handle scrolling to trace section after login
+  useEffect(() => {
+    // Check if there's a localStorage flag to scroll to trace section
+    const shouldScrollToTrace = localStorage.getItem('scrollToTrace') === 'true';
+    
+    if (shouldScrollToTrace && tracePlusSectionRef.current) {
+      // Scroll to the trace section
+      tracePlusSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      
+      // Clear the localStorage flag to prevent scrolling on subsequent renders
+      localStorage.removeItem('scrollToTrace');
+    }
+  }, []);
 
   const handleCourseClick = (courseData: Course) => {
     navigate(`/${i18n.language}/courses/${courseData.id}`, {
@@ -118,11 +134,21 @@ export const HomePage: React.FC = () => {
     });
   };
 
+  const handleTraceImageClick = () => {
+    if (isAuthenticated) {
+      window.open('https://trace.plus/en/', '_blank');
+    } else {
+      // Store info that we should scroll to trace section after login
+      localStorage.setItem('redirectAfterLogin', 'traceSection');
+      navigate(`/${i18n.language}/login`);
+    }
+  };
+
   return (
     <Layout title="Home">
       <Hero />
       
-      <TracePlusSection maxWidth="lg">
+      <TracePlusSection maxWidth="lg" ref={tracePlusSectionRef} id="traceSection">
         <SectionHeader>
           <Title variant="h2">Free Access to Trace+</Title>
           {isAuthenticated && (
@@ -142,31 +168,31 @@ export const HomePage: React.FC = () => {
         </SectionHeader>
         
         <ImagesGrid>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/AFD.jpg" alt="AFD" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/For_Girls_in_Science.jpg" alt="For Girls in Science" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/afd1.jpg" alt="AFD 1" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/afd2.jpg" alt="AFD 2" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/afreximbank.jpg" alt="Afreximbank" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/visa.jpg" alt="VISA" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/smart-reporter.jpg" alt="Smart Reporter" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/sacem.jpg" alt="SACEM" />
           </ImageItem>
-          <ImageItem onClick={() => window.open('https://trace.plus/en/', '_blank')}>
+          <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/canalplus.jpg" alt="Canal Plus" />
           </ImageItem>
         </ImagesGrid>

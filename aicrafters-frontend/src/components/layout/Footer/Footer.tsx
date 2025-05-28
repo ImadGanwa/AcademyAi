@@ -7,7 +7,7 @@ import { languages } from '../../../utils/i18n/i18n';
 import { Logo } from '../../common/Logo/Logo';
 
 const FooterWrapper = styled.footer`
-  background-color: ${({ theme }) => theme.palette.background.secondary};
+  background-color: ${({ theme }) => theme.palette.primary.main};
   padding: 48px 0 24px;
   margin-top: auto;
   position: relative;
@@ -49,7 +49,7 @@ const FooterLink = styled(RouterLink)`
     font-size: 14px;
     
     &:hover {
-      color: ${({ theme }) => theme.palette.primary.main};
+      color: ${({ theme }) => theme.palette.secondary.main};
     }
   }
 `;
