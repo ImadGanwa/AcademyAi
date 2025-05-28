@@ -135,6 +135,7 @@
     "linkedinLoginFailed": "فشل تسجيل الدخول باستخدام LinkedIn. يرجى المحاولة مرة أخرى.",
     "linkedinSignupSuccess": "تم إنشاء حساب LinkedIn بنجاح.",
     "linkedinSignupFailed": "فشل إنشاء حساب LinkedIn. يرجى المحاولة مرة أخرى.",
+    "linkedinConfigError": "إعدادات LinkedIn غير متوفرة. يرجى المحاولة لاحقاً.",
     "loginWithLinkedin": "تسجيل الدخول باستخدام LinkedIn",
     "signupWithLinkedin": "إنشاء حساب باستخدام LinkedIn",
     "popupBlocked": "تم إيقاف النافذة. يرجى المحاولة مرة أخرى.",
@@ -865,7 +866,7 @@
       "usersWillReceiveAnEmailWithTheirLoginCredentials": "سيتم إرسال بريد إلكتروني إلى المستخدمين مع بيانات تسجيل الدخول الخاصة بهم",
       "deleteOrganization": "حذف المؤسسة",
       "deleteOrganizationConfirmation": "تأكيد حذف المؤسسة",
-      "deleteOrganizationWarning": "هل أنت متأكد أنك تريد حذف هذه المؤسسة؟ لا يمكن التراجع",
+      "deleteOrganizationWarning": "هل أنت متأكد أنك تريد حذف هذه المؤسسة؟ لا يمكن التراجع عن هذا الإجراء.",
       "usersWillNeedToBeNotifiedManuallyOfTheirAccounts": "يجب إعلام المستخدمين بإرسال بريد إلكتروني إلى المستخدمين مع بيانات تسجيل الدخول الخاصة بهم",
       "userWillNeedToBeNotifiedManuallyOfTheirAccount": "يجب إعلام المستخدم بإرسال بريد إلكتروني إلى المستخدم مع بيانات تسجيل الدخول الخاصة به"
     },

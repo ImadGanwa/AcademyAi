@@ -271,6 +271,7 @@ export interface Translations {
     linkedinSignupSuccess: string;
     linkedinSignupFailed: string;
     signupWithLinkedin: string;
+    linkedinConfigError: string;
     popupBlocked: string;
     errors: {
       passwordLength: string;

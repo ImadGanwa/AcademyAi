@@ -157,6 +157,7 @@
     "linkedinLoginFailed": "Échec de la connexion avec LinkedIn. Veuillez réessayer.",
     "linkedinSignupSuccess": "Inscrit avec succès avec LinkedIn",
     "linkedinSignupFailed": "Échec de l'inscription avec LinkedIn. Veuillez réessayer.",
+    "linkedinConfigError": "La configuration LinkedIn est manquante. Veuillez réessayer plus tard.",
     "popupBlocked": "Popup bloqué. Veuillez réessayer.",
     "signin": {
       "title": "Se connecter",

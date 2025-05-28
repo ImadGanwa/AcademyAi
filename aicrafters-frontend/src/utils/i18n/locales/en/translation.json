@@ -157,6 +157,7 @@
     "linkedinLoginFailed": "Failed to sign in with LinkedIn. Please try again.",
     "linkedinSignupSuccess": "Successfully signed up with LinkedIn",
     "linkedinSignupFailed": "Failed to sign up with LinkedIn. Please try again.",
+    "linkedinConfigError": "LinkedIn configuration is missing. Please try again later.",
     "popupBlocked": "Popup blocked. Please try again.",
     "signin": {
       "title": "Sign In",

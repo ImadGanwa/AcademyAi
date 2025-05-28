@@ -12,16 +12,13 @@ import { OAuth2Client } from 'google-auth-library';
 // Load environment variables
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = '7d';
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const LINKEDIN_CLIENT_ID = process.env.LINKEDIN_CLIENT_ID;
 const LINKEDIN_CLIENT_SECRET = process.env.LINKEDIN_CLIENT_SECRET;
-const LINKEDIN_REDIRECT_URI = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:3000/auth/linkedin/callback'
-  : process.env.LINKEDIN_REDIRECT_URI || 'https://aicrafters.aicademy.com/auth/linkedin/callback';
-
+const LINKEDIN_REDIRECT_URI = process.env.LINKEDIN_REDIRECT_URI 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is missing');
 }
