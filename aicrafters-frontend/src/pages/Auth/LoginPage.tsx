@@ -315,10 +315,15 @@ export const LoginPage: React.FC = () => {
 
   const handleLinkedInLogin = () => {
     const clientId = process.env.REACT_APP_LINKEDIN_CLIENT_ID;
-    const redirectUri = 'https://adwin-frontend.onrender.com/auth/linkedin/callback'
-    const scope = 'openid profile email';
-    const state = Math.random().toString(36).substring(7);
+    const redirectUri = process.env.REACT_APP_LINKEDIN_REDIRECT_URI;
 
+    if (!clientId || !redirectUri) {
+      toast.error(t('auth.linkedinConfigError', 'LinkedIn configuration is missing'));
+      return;
+    }
+    
+    const scope = 'r_liteprofile r_emailaddress';
+    const state = Math.random().toString(36).substring(7);
     
     const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
 
