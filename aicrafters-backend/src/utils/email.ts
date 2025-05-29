@@ -1,10 +1,7 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
-const logo = readFileSync(join(__dirname, '../assets/logo/logo.svg'), 'utf-8');
 
 dotenv.config();
 
