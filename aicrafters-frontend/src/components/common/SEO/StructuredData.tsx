@@ -11,8 +11,8 @@ interface Props {
 
 export const StructuredData: React.FC<Props> = ({
   pageType = 'Website',
-  title = 'AIcrafters',
-  description = 'Learn AI and Machine Learning',
+  title = 'ADWIN',
+  description = 'ADWIN is a platform for our to pillars Win Skills and Win Confidence where we empower women to build their skills and confidence.',
   image,
   structuredData
 }) => {

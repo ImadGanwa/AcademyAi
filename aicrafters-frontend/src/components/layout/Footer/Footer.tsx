@@ -18,12 +18,12 @@ const FooterLogoContainer = styled.div`
   
   @media (max-width: 900px) {
     text-align: center;
-    margin-bottom: 32px;
+    margin-bottom: 55px;
   }
 `;
 
 const FooterLogo = styled(Logo)`
-  height: 32px;
+  height: auto;
   width: auto;
 `;
 

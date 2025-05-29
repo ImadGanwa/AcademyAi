@@ -38,6 +38,7 @@ const NavbarWrapper = styled(AppBar)`
 const NavContainer = styled(Box)`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
@@ -48,7 +49,23 @@ const NavContainer = styled(Box)`
 `;
 
 const LogoContainer = styled(Box)`
-  flex: 0 0 auto;
+  && {
+    height: 100px;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    margin-top: -10px;
+    
+    svg {
+      height: 75px;
+      width: auto;
+      transition: transform 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
 `;
 
 const NavLinks = styled(Box)`
@@ -72,9 +89,13 @@ const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   padding-bottom: 8px;
   position: relative;
   font-family: 'Gayathri', sans-serif;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
   
   &:hover {
     opacity: 0.8;
+    transform: translateY(-2px);
   }
 
   ${props => props.$isActive && `
@@ -86,21 +107,26 @@ const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
       width: 100%;
       height: 2px;
       background-color: white;
+      transition: width 0.3s ease;
     }
   `}
 `;
 
 const WinText = styled.span`
-  color: #D710C1;
+  color: ${({ theme }) => theme.palette.secondary.main};
   font-weight: 700;
   margin-right: 4px;
-  font-family: 'Gayathri', sans-serif;
+  font-family: 'Lato', sans-serif;
+  font-size: 1.3rem;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 `;
 
 const SkillsText = styled.span`
   color: white;
   font-weight: 400;
-  font-family: 'Gayathri', sans-serif;
+  font-family: 'Lato', sans-serif;
+  font-size: 1.3rem;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 `;
 
 const NavButtons = styled(Box)`
@@ -129,17 +155,20 @@ const LoginButton = styled(NavButton)`
     font-weight: 600;
     font-size: 1.1rem;
     font-family: 'Gayathri', sans-serif;
+    transition: all 0.3s ease;
     
     &:hover {
       border-color: white;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   }
 `;
 
 const SignUpButton = styled(NavButton)`
   && {
-    background: #D710C1;
+    background: ${({ theme }) => theme.palette.secondary.main};
     color: white;
     white-space: nowrap;
     padding: 10px 34px 4px;
@@ -147,9 +176,13 @@ const SignUpButton = styled(NavButton)`
     font-weight: 600;
     font-size: 1.1rem;
     font-family: 'Gayathri', sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     &:hover {
-      background: #b0009c;
+      background: ${({ theme }) => theme.palette.secondary.dark};
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
   }
 `;

@@ -391,7 +391,7 @@ export const ComponentsPage: React.FC = () => {
         <Typography variant="h2">Logos</Typography>
         <LogoContainer>
           <Box>
-            <Typography variant="subtitle1" gutterBottom>Default Size (32px)</Typography>
+            <Typography variant="subtitle1" gutterBottom>Default Size (50px)</Typography>
             <LogoIcon />
           </Box>
           <Box>
