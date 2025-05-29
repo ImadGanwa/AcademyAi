@@ -26,7 +26,7 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, title }) => {
-  const pageTitle = title ? `AiCrafters - ${title}` : 'AiCrafters';
+  const pageTitle = title ? `ADWIN - ${title}` : 'ADWIN';
   
   return (
     <LayoutContainer>

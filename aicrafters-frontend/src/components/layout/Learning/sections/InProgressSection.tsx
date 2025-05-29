@@ -17,7 +17,7 @@ export const InProgressSection: React.FC<InProgressSectionProps> = ({ courses })
 
   const handleShare = (course: CourseData) => {
     // Create the sharing text with proper formatting
-    const shareText = `I'm learning ${course.title} on AiCrafters!\n\nJoin me: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#aicrafters #learning`;
+    const shareText = `I'm learning ${course.title} on ADWIN!\n\nJoin me: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#ADWIN #learning`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;

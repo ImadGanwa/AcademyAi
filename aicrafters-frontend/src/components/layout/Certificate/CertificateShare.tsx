@@ -359,7 +359,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
 
   const handleShare = () => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #aicrafters`;
+    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #ADWIN`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
@@ -376,7 +376,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
     <>
       <MetaTags
         title={courseTitle}
-        description={`${courseSubtitle}\n\n${categories.map(category => `#${category.toLowerCase()}`).join(' ')} #aicrafters`}
+        description={`${courseSubtitle}\n\n${categories.map(category => `#${category.toLowerCase()}`).join(' ')} #ADWIN`}
         image={certificateImage || defaultCertificateImage}
         url={`${config.FRONTEND_URL}/en/courses/${courseId}`}
       />
@@ -413,7 +413,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
               Check out my achievement: <span>{config.FRONTEND_URL}/en/courses/{courseId}</span>
             </ShareLink>
             <ShareTags>
-              #aicrafters {categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')}
+              #ADWIN {categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')}
             </ShareTags>
           </ShareText>
 

@@ -474,7 +474,7 @@ export const CourseLearningPage: React.FC = () => {
 
   const handleShare = () => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${courseTitle}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n#aicrafters`;
+    const shareText = `I just completed ${courseTitle}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n#ADWIN`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;

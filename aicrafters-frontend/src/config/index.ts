@@ -4,7 +4,7 @@ const config = {
   MAX_FILE_SIZE: 1.5 * 1024 * 1024,
   CLOUDINARY: {
     CLOUD_NAME: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME || 'dhx01wyfd',
-    UPLOAD_PRESET: process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'aicrafters',
+    UPLOAD_PRESET: process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET || 'ADWIN',
   },
   FRONTEND_URL: process.env.REACT_APP_FRONTEND_URL 
 };

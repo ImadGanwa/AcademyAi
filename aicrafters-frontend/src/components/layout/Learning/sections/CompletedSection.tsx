@@ -17,7 +17,7 @@ export const CompletedSection: React.FC<CompletedSectionProps> = ({ courses }) =
 
   const handleShare = (course: CourseData) => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${course.title}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#aicrafters`;
+    const shareText = `I just completed ${course.title}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#ADWIN`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;

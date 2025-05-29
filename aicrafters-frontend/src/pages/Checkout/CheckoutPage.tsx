@@ -464,7 +464,7 @@ export const CheckoutPage: React.FC = () => {
                 <SelectArrow />
               </SelectWrapper>
               <SmallText>
-              AIcrafters is required by law to collect applicable transaction taxes for purchases made in certain tax jurisdictions.
+              ADWIN is required by law to collect applicable transaction taxes for purchases made in certain tax jurisdictions.
               </SmallText>
             </FormField>
           </Section>

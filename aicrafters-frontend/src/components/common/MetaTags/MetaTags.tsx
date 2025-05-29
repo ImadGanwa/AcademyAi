@@ -26,7 +26,7 @@ export const MetaTags: React.FC<MetaTagsProps> = ({ title, description, image, u
       <meta property="linkedin:title" content={title} />
       <meta property="linkedin:description" content={description} />
       <meta property="linkedin:image" content={image} />
-      <meta name="author" content="AiCrafters" />
+      <meta name="author" content="ADWIN" />
     </Helmet>
   );
 }; 

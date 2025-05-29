@@ -351,7 +351,7 @@ export const CourseDetailsPage: React.FC = () => {
       "description": course.description,
       "provider": {
         "@type": "Organization",
-        "name": "AiCrafters",
+        "name": "ADWIN",
         "sameAs": config.FRONTEND_URL
       },
       "timeRequired": `PT${Math.ceil(totalDuration)}H`,
@@ -399,7 +399,7 @@ export const CourseDetailsPage: React.FC = () => {
       {course && (
         <>
           <LanguageMetaTags
-            title={`${course.title} | AiCrafters`}
+            title={`${course.title} | ADWIN`}
             description={seoDescription}
             canonicalPath={`/courses/${course.id}`}
           />
