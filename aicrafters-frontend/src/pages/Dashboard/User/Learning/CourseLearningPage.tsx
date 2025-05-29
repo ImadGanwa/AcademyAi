@@ -14,8 +14,9 @@ import { coursesService } from '../../../../services/coursesService';
 import { updateUser } from '../../../../store/slices/authSlice';
 import { DEFAULT_LANGUAGE } from '../../../../utils/constants';
 import { CongratulationsPopup } from '../../../../components/common/Popup/CongratulationsPopup';
-import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
+// import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
 import AICoach from '../../../../components/ai/AICoach';
+import config from '../../../../config';
 
 const PageContainer = styled.div`
   margin-bottom: 40px;
@@ -423,7 +424,7 @@ export const CourseLearningPage: React.FC = () => {
 
   const handleShare = () => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${courseTitle}!\n\nCheck out my achievement: https://aicrafters.aicademy.com/en/courses/${courseId}\n\n#aicrafters`;
+    const shareText = `I just completed ${courseTitle}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n#aicrafters`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;

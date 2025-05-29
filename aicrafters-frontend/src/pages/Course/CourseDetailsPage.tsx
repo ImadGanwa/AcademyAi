@@ -26,7 +26,6 @@ import { LoginPopup } from '../../components/common/Popup/LoginPopup';
 import { useTranslation } from 'react-i18next';
 import { LanguageMetaTags } from '../../components/common/SEO/LanguageMetaTags';
 import { StructuredData } from '../../components/common/SEO/StructuredData';
-const API_URL = config.API_URL;
 
 const PageWrapper = styled.div`
   display: flex;
@@ -153,7 +152,7 @@ export const CourseDetailsPage: React.FC = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/auth/me`);
+        const response = await axios.get(`${config.API_URL}/api/auth/me`);
         dispatch(updateUser(response.data));
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -209,7 +208,7 @@ export const CourseDetailsPage: React.FC = () => {
         // If we have stateData, we still need to fetch fresh instructor data
         if (stateData) {
           // Fetch fresh instructor data
-          const response = await axios.get(`${API_URL}/api/courses/${stateData.id}`);
+          const response = await axios.get(`${config.API_URL}/api/courses/${stateData.id}`);
           const freshData = response.data;
           
           // Transform state data to match Course interface
@@ -237,7 +236,7 @@ export const CourseDetailsPage: React.FC = () => {
 
         // If no state data, fetch from API
         
-        const response = await axios.get(`${API_URL}/api/courses/${params.courseId}`);
+        const response = await axios.get(`${config.API_URL}/api/courses/${params.courseId}`);
         const course = response.data;
         
         const transformedCourse: Course = {
@@ -314,7 +313,7 @@ export const CourseDetailsPage: React.FC = () => {
       setIsSaved(response.isSaved);
       
       // Refresh user data to get updated saved courses
-      const userResponse = await axios.get(`${API_URL}/api/auth/me`);
+      const userResponse = await axios.get(`${config.API_URL}/api/auth/me`);
       dispatch(updateUser(userResponse.data));
     } catch (error) {
       console.error('Error toggling course save:', error);
@@ -353,7 +352,7 @@ export const CourseDetailsPage: React.FC = () => {
       "provider": {
         "@type": "Organization",
         "name": "AiCrafters",
-        "sameAs": "https://aicrafters.aicademy.com"
+        "sameAs": config.FRONTEND_URL
       },
       "timeRequired": `PT${Math.ceil(totalDuration)}H`,
       "image": course.image,

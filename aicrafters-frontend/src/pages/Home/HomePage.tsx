@@ -110,7 +110,7 @@ const ImageItem = styled(Box)`
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { i18n } = useTranslation();
+  const { t,i18n } = useTranslation();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const tracePlusSectionRef = useRef<HTMLDivElement>(null);
 
@@ -150,18 +150,18 @@ export const HomePage: React.FC = () => {
       
       <TracePlusSection maxWidth="lg" ref={tracePlusSectionRef} id="traceSection">
         <SectionHeader>
-          <Title variant="h2">Free Access to Trace+</Title>
+          <Title variant="h2">{t('home.tracePlus.title', 'Free Access to Trace+')}</Title>
           {isAuthenticated && (
             <PromoCodeContainer>
               <PromoCode>
-                <Typography variant="body1">Promo code : </Typography>
+                <Typography variant="body1">{t('home.tracePlus.promoCode')}</Typography>
                 <PromoCodeText>ADWIN2025</PromoCodeText>
               </PromoCode>
               <JoinNowButton 
                 variant="contained"
                 onClick={() => window.open('https://trace.plus/en/', '_blank')}
               >
-                Join now
+                {t('home.tracePlus.joinNow')}
               </JoinNowButton>
             </PromoCodeContainer>
           )}

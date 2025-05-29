@@ -26,16 +26,13 @@ import mindMapRoutes from './routes/mindMapRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 
 const app = express();
+if(!process.env.ALLOWED_ORIGINS){
+  throw new Error('ALLOWED_ORIGINS environment variable is not defined');
+}
 
-// CORS configuration
-// TODO: Move hardcoded origin URLs to environment variables or configuration
-const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://aicrafters.aicademy.com',
-    'https://aicrafters-backend.onrender.com',
-    'https://adwin-frontend.onrender.com'
-  ],
+  // CORS configuration
+  const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS?.split(','),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']

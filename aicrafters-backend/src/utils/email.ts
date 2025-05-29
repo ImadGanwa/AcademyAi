@@ -24,6 +24,10 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not defined');
 }
 
+if (!FRONTEND_URL) {
+  throw new Error('FRONTEND_URL environment variable is not defined');
+}
+
 export const generateVerificationToken = (email: string): string => {
   return jwt.sign({ email }, JWT_SECRET, { expiresIn: '24h' });
 };
@@ -72,7 +76,7 @@ export const sendWelcomeEmail = async (email: string, fullName: string, password
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
             <p style="margin: 10px 0 0;"><strong>Password:</strong> ${password}</p>
-            <p style="margin: 10px 0 0;"><strong>URL:</strong> <a href="https://aicrafters.aicademy.com/">aicrafters.aicademy.com</a></p>
+            <p style="margin: 10px 0 0;"><strong>URL:</strong> <a href="${FRONTEND_URL}/en/">${FRONTEND_URL}/en/</a></p>
           </div>
           <p>For security reasons, we recommend changing your password after your first login.</p>
           <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
@@ -101,7 +105,7 @@ export const sendCourseApprovalEmail = async (email: string, fullName: string, c
           <p>Great news! Your course "${courseTitle}" has been approved and is now published on AiCrafters.</p>
           <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
             <p style="margin: 0;"><strong>Course Title:</strong> ${courseTitle}</p>
-            <p style="margin: 10px 0 0;"><strong>Course URL:</strong> <a href="https://aicrafters.aicademy.com/en/courses/${courseId}">View Course</a></p>
+            <p style="margin: 10px 0 0;"><strong>Course URL:</strong> <a href="${FRONTEND_URL}/en/courses/${courseId}">View Course</a></p>
           </div>
           <p>Your course is now live and accessible to users. You can:</p>
           <ul>

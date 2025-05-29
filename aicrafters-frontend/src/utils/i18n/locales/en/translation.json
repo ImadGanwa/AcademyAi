@@ -433,6 +433,11 @@
       "AIAugmtedSofDev": "AI-augmented software development",
       "MarkCommunAugmtedAI": "Marketing and Communication augmented by AI",
       "ProdAugmtedAI": "Productivity augmented by AI"
+    },
+    "tracePlus": {
+      "promoCode": "Promo code : ",
+      "joinNow": "Join now",
+      "title": "Free Access to Trace+"
     }
   },
   "course": {
@@ -896,6 +901,7 @@
       "availableTimeSlots": "Available Time Slots",
       "noAvailableSlots": "No available time slots for this date.",
       "selectedDateTime": "Selected Date & Time:",
+      "myBookings": "My Bookings",
       "bookingDetails": "Booking Details",
       "topicRequired": "Topic*",
       "topicPlaceholder": "Enter the topic you'd like to discuss",

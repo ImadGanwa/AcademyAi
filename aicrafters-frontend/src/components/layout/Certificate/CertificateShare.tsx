@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { MetaTags } from '../../common/MetaTags/MetaTags';
 import { RatingDialog } from '../../common/RatingDialog/RatingDialog';
+import config from '../../../config';
 
 export const ContentWrapper = styled(Container)`
   max-width: 800px !important;
@@ -358,7 +359,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
 
   const handleShare = () => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: https://aicrafters.aicademy.com/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #aicrafters`;
+    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #aicrafters`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
@@ -377,7 +378,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
         title={courseTitle}
         description={`${courseSubtitle}\n\n${categories.map(category => `#${category.toLowerCase()}`).join(' ')} #aicrafters`}
         image={certificateImage || defaultCertificateImage}
-        url={`https://aicrafters.aicademy.com/en/courses/${courseId}`}
+        url={`${config.FRONTEND_URL}/en/courses/${courseId}`}
       />
       <ShareCard>
         <ShareHeader>
@@ -409,7 +410,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
               {courseSubtitle}
             </Typography>
             <ShareLink>
-              Check out my achievement: <span>https://aicrafters.aicademy.com/en/courses/{courseId}</span>
+              Check out my achievement: <span>{config.FRONTEND_URL}/en/courses/{courseId}</span>
             </ShareLink>
             <ShareTags>
               #aicrafters {categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')}

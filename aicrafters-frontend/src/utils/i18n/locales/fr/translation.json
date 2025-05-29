@@ -433,6 +433,11 @@
       "AIAugmtedSofDev": "Développement logiciel augmenté par l'IA",
       "MarkCommunAugmtedAI": "Marketing et Communication augmentés par l'IA",
       "ProdAugmtedAI": "Productivité augmentée par l'IA"
+    },
+    "tracePlus": {
+      "promoCode": "Code promo : ",
+      "joinNow": "Rejoindre maintenant",
+      "title": "Accès gratuit à Trace+"
     }
   },
   "course": {
@@ -896,6 +901,7 @@
       "availableTimeSlots": "Créneaux horaires disponibles",
       "noAvailableSlots": "Aucun créneau horaire disponible pour cette date.",
       "selectedDateTime": "Date & Heure sélectionnées :",
+      "myBookings": "Mes Réservations",
       "bookingDetails": "Détails de la réservation",
       "topicRequired": "Sujet*",
       "topicPlaceholder": "Entrez le sujet que vous souhaitez aborder",

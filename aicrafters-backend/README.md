@@ -49,7 +49,7 @@ The `src` directory contains the core application code:
 1.  **Clone the repository:**
     ```bash
     git clone <repository-url>
-    cd aicrafters.aicademy/aicrafters-backend
+    cd ADWIN/aicrafters-backend
     ```
 
 2.  **Install dependencies:**

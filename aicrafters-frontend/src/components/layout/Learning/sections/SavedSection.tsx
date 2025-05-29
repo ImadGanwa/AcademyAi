@@ -4,6 +4,7 @@ import { CourseData } from '../types';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { useLocalizedNavigate } from '../../../../hooks/useLocalizedNavigate';
+import config from '../../../../config';
 
 interface SavedSectionProps {
   courses: CourseData[];
@@ -19,7 +20,7 @@ export const SavedSection: React.FC<SavedSectionProps> = ({ courses }) => {
 
   const handleShare = (course: CourseData) => {
     // Create the sharing text with proper formatting
-    const shareText = `Check out this amazing course on AiCrafters: ${course.title}\n\nJoin me: https://aicrafters.aicademy.com/en/courses/${course.id}\n\n#aicrafters #learning`;
+    const shareText = `Check out this amazing course on AiCrafters: ${course.title}\n\nJoin me: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#aicrafters #learning`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;

@@ -416,6 +416,11 @@ export interface Translations {
       MarkCommunAugmtedAI: string;
       ProdAugmtedAI: string;
     };
+    tracePlus: {
+      promoCode: string;
+      joinNow: string;
+      title: string;
+    };
   };
   course: {
     loadingCourse: string;

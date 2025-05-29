@@ -2,6 +2,7 @@ import React from 'react';
 import { LearningCard } from '../../../common/Card/LearningCard';
 import { CourseData } from '../types';
 import { useLocalizedNavigate } from '../../../../hooks/useLocalizedNavigate';
+import config from '../../../../config';
 
 interface CompletedSectionProps {
   courses: CourseData[];
@@ -16,7 +17,7 @@ export const CompletedSection: React.FC<CompletedSectionProps> = ({ courses }) =
 
   const handleShare = (course: CourseData) => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${course.title}!\n\nCheck out my achievement: https://aicrafters.aicademy.com/en/courses/${course.id}\n\n#aicrafters`;
+    const shareText = `I just completed ${course.title}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#aicrafters`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
