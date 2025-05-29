@@ -37,8 +37,36 @@ export const certificateController = {
         return res.status(403).json({ message: 'Course not completed' });
       }
 
+      // Generate a certificate ID if it doesn't exist
+      if (!userCourse.certificateId) {
+        const certificateId = `CERT-${courseId.slice(-6).toUpperCase()}-${userId.slice(-4).toUpperCase()}-${Date.now()}`;
+        
+        // Update the user's course with the certificate ID
+        await User.updateOne(
+          { 
+            _id: userId,
+            'courses.courseId': new mongoose.Types.ObjectId(courseId)
+          },
+          { 
+            $set: { 
+              'courses.$.certificateId': certificateId 
+            } 
+          }
+        );
+        
+        // Refresh user data
+        const updatedUser = await User.findById(userId).exec() as (IUser & { _id: mongoose.Types.ObjectId }) | null;
+        if (updatedUser) {
+          user.courses = updatedUser.courses;
+        }
+      }
+
       // Generate certificate data
-      const certificateData = await certificateService.generateCertificateData(user, course);
+      const certificateData = {
+        userName: user.fullName,
+        courseName: course.title,
+        certificateId: userCourse.certificateId || `CERT-${courseId.slice(-6).toUpperCase()}-${userId.slice(-4).toUpperCase()}-${Date.now()}`
+      };
 
       // Always generate both PDF and image if image doesn't exist
       // Pass courseId to use course-specific template if available
@@ -96,8 +124,33 @@ export const certificateController = {
           return res.status(404).json({ message: 'Course not found' });
         }
 
+        // Generate a certificate ID if it doesn't exist
+        if (!userCourse.certificateId) {
+          const certificateId = `CERT-${courseId.slice(-6).toUpperCase()}-${userId.slice(-4).toUpperCase()}-${Date.now()}`;
+          
+          // Update the user's course with the certificate ID
+          await User.updateOne(
+            { 
+              _id: userId,
+              'courses.courseId': new mongoose.Types.ObjectId(courseId)
+            },
+            { 
+              $set: { 
+                'courses.$.certificateId': certificateId 
+              } 
+            }
+          );
+          
+          // Refresh the userCourse with the certificate ID
+          userCourse.certificateId = certificateId;
+        }
+
         // Generate certificate data
-        const certificateData = await certificateService.generateCertificateData(user, course);
+        const certificateData = {
+          userName: user.fullName,
+          courseName: course.title,
+          certificateId: userCourse.certificateId
+        };
 
         // Generate and upload certificate - pass courseId for course-specific template
         const { imageUrl } = await certificateService.generateAndUploadCertificate(certificateData, courseId);

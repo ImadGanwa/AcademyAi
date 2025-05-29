@@ -58,14 +58,18 @@ class CertificateService {
       throw new Error('Course not found in user\'s completed courses');
     }
 
-    if (!userCourse.certificateId) {
-      throw new Error('Certificate ID not found. Course may not be completed yet.');
+    // Generate a certificate ID if it doesn't exist
+    let certificateId = userCourse.certificateId;
+    if (!certificateId) {
+      certificateId = `CERT-${course._id.toString().slice(-6).toUpperCase()}-${user._id.toString().slice(-4).toUpperCase()}-${Date.now()}`;
+      
+      // We don't update the database here as that should be handled by the controller
     }
 
     return {
       userName: user.fullName,
       courseName: course.title,
-      certificateId: userCourse.certificateId
+      certificateId: certificateId
     };
   }
 

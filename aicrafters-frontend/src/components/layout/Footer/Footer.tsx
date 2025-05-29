@@ -95,7 +95,7 @@ const LanguageLink = styled.button`
     font-size: 14px;
     
     &:hover {
-      color: ${({ theme }) => theme.palette.primary.main};
+      color: ${({ theme }) => theme.palette.secondary.main};
     }
   }
 `;
@@ -136,26 +136,38 @@ export const Footer: React.FC = () => {
               <FooterTitle variant="h6">
                 {t('common.footer.explore')}
               </FooterTitle>
-              <FooterLink to="/business">
+              {/* <FooterLink to="/business">
                 {t('common.navigation.businessLink')}
-              </FooterLink>
-              <FooterLink to="/teach">
+              </FooterLink> */}
+              {/* <FooterLink to="/teach">
                 {t('common.navigation.teachLink')}
-              </FooterLink>
-              <FooterLink to="/mentorship/become-mentor">
-                {t('common.navigation.becomeAMentor')}
-              </FooterLink>
-              <FooterLink to="/about">
+              </FooterLink> */}
+              {/* <FooterLink to="/about">
                 {t('common.footer.aboutUs')}
-              </FooterLink>
-              <FooterLink to="/contact">
+              </FooterLink> */}
+              {/* <FooterLink to="/contact">
                 {t('common.footer.contactUs')}
-              </FooterLink>
+              </FooterLink> */}
               {/* 
               <FooterLink to="/app">
                 {t('common.footer.getApp')}
               </FooterLink>
               */}
+              <FooterLink to="/mentorship/become-mentor">
+                {t('common.navigation.becomeAMentor')}
+              </FooterLink>
+               
+              {languages.map((lang) => (
+                <LanguageLink
+                  key={lang}
+                  onClick={() => handleLanguageChange(lang)}
+                  style={{
+                    fontWeight: i18n.language === lang ? 600 : 400,
+                  }}
+                >
+                  {t(`common.languages.${lang}`)}
+                </LanguageLink>
+              ))}
             </FooterSection> 
           </Grid>
 
@@ -204,7 +216,7 @@ export const Footer: React.FC = () => {
 
           <Grid item xs={6} md={2}>
             <FooterSection>
-              <FooterTitle variant="h6">
+              {/* <FooterTitle variant="h6">
                 {t('common.footer.language')}
               </FooterTitle>
               {languages.map((lang) => (
@@ -217,7 +229,7 @@ export const Footer: React.FC = () => {
                 >
                   {t(`common.languages.${lang}`)}
                 </LanguageLink>
-              ))}
+              ))} */}
             </FooterSection>
           </Grid>
         </Grid>

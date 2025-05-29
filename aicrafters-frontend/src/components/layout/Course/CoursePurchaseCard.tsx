@@ -449,9 +449,9 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   }, []);
 
   const handleAddToCart = () => {
-    if (hasPurchased) {
-      return;
-    }
+    // if (hasPurchased) {
+    //   return;
+    // }
     addItem({
       id: courseId,
       imageId: image,
@@ -526,9 +526,9 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
                     >
                       Start Learning
                     </PurpleButton>
-                    <AlreadyPurchasedMessage>
+                    {/* <AlreadyPurchasedMessage>
                       {t('course.purchase.already_purchased')}
-                    </AlreadyPurchasedMessage>
+                    </AlreadyPurchasedMessage> */}
                   </>
                 ) : isInCart ? (
                   <AlreadyInCartMessage>

@@ -178,6 +178,11 @@ export const CourseDetailsPage: React.FC = () => {
 
 
   const hasPurchased = useMemo(() => {
+    // Always return true to make all courses appear as purchased
+    return true;
+    
+    // Original code commented out:
+    /*
     if (!user?.courses || !course?.id) {
       return false;
     }
@@ -185,6 +190,7 @@ export const CourseDetailsPage: React.FC = () => {
     return user.courses.some(userCourse => {
       return userCourse.courseId === course.id && (userCourse.status === 'in progress' || userCourse.status === 'completed');
     });
+    */
   }, [user?.courses, course?.id]);
 
   const isTrainerOrAdmin = useMemo(() => {

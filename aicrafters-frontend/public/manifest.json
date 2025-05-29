@@ -1,6 +1,6 @@
 {
-  "short_name": "Aicrafters",
-  "name": "Aicrafters",
+  "short_name": "ADWIN",
+  "name": "ADWIN",
   "icons": [
     {
       "src": "favicon.ico",
@@ -19,7 +19,7 @@
     }
   ],
   "start_url": ".",
-  "display": "standalone",
+  "display": "browser",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }

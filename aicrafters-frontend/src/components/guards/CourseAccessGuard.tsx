@@ -15,6 +15,10 @@ export const CourseAccessGuard: React.FC<CourseAccessGuardProps> = ({ children }
     return <Navigate to="/login" />;
   }
 
+  // Always grant access to courses by returning the children directly
+  return <>{children}</>;
+
+  /* Original code commented out:
   const userCourse = user.courses?.find(course => 
     course.courseId === courseId && (course.status === 'in progress' || course.status === 'completed')
   );
@@ -24,4 +28,5 @@ export const CourseAccessGuard: React.FC<CourseAccessGuardProps> = ({ children }
   }
 
   return <>{children}</>;
+  */
 }; 
