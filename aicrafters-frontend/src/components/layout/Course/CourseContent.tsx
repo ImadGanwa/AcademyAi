@@ -8,11 +8,21 @@ import { Title } from '../../common/Typography/Title';
 const ContentSection = styled.section`
   width: 100%;
   background-color: #ffffff;
+
+  @media (max-width: 768px) {
+    background: transparent;
+  }
 `;
 
 const LearningSection = styled.div`
   background: #ffffff;
   border-radius: 12px;
+
+  @media (max-width: 768px) {
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
 `;
 
 const LearningTitle = styled(Title)`
@@ -23,6 +33,17 @@ const LearningTitle = styled(Title)`
     padding: 1rem;
     border-bottom: none;
     margin-bottom: 0 !important;
+
+    @media (max-width: 768px) {
+      background: ${props => props.theme.palette.primary.main};
+      color: white !important;
+      border: none;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      font-size: 1.25rem !important;
+      font-weight: 600 !important;
+      text-align: center;
+    }
   }
 `;
 
@@ -32,7 +53,7 @@ const LearningColumns = styled.div`
   
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
   }
 `;
 
@@ -50,22 +71,58 @@ const LearningItem = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
+
+  @media (max-width: 768px) {
+    padding: 16px 0;
+    border-bottom: 1px solid #F0F0F0;
+    margin-bottom: 0;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 `;
 
 const WhatToLearn = styled.div`
   border: 1px solid #D6D9DD;
   border-radius: 0px 0px 12px 12px;
   padding: 1.5rem;
+
+  @media (max-width: 768px) {
+    border: none;
+    border-radius: 0 0 16px 16px;
+    padding: 20px;
+    background: white;
+  }
 `;
 
 const IconWrapper = styled.div`
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    background: white;
+    border-radius: 6px;
+    padding: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E8ECEF;
+  }
 `;
 
 const ItemText = styled(Typography)`
   color: ${props => props.theme.palette.text.secondary};
   font-size: .9rem;
   line-height: 1.4;
+
+  @media (max-width: 768px) {
+    color: ${props => props.theme.palette.text.title};
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
 `;
 
 interface LearningPoint {

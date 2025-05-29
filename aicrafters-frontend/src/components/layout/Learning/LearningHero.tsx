@@ -14,7 +14,7 @@ const HeroSection = styled.section`
   overflow: hidden;
 
   @media (max-width: 768px) {
-    padding: 40px 16px;
+    padding: 30px 16px;
   }
 `;
 
@@ -40,7 +40,8 @@ const HeroContainer = styled(Container)`
 
   @media (max-width: 768px) {
     flex-direction: column !important;
-    gap: 32px !important;
+    gap: 24px !important;
+    text-align: center !important;
   }
 `;
 
@@ -52,7 +53,8 @@ const Title = styled(Typography)`
     color: white;
 
     @media (max-width: 768px) {
-      font-size: 2rem;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
     }
   }
 `;
@@ -62,6 +64,10 @@ const Description = styled(Typography)`
     font-size: 1rem;
     color: rgba(255, 255, 255, 0.8);
     max-width: 600px;
+
+    @media (max-width: 768px) {
+      margin: 0 auto;
+    }
   }
 `;
 
@@ -71,6 +77,9 @@ const ContentWrapper = styled(Box)`
 
   @media (max-width: 768px) {
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 `;
 

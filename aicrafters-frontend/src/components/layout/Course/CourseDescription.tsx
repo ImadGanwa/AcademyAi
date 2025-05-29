@@ -7,6 +7,18 @@ import { useTranslation } from 'react-i18next';
 const ContentSection = styled.section`
   background: #ffffff;
   padding: 32px 0;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: left;
+    
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
 `;
 
 const DescriptionWrapper = styled.div`
@@ -45,7 +57,7 @@ export const CourseDescription: React.FC<CourseDescriptionProps> = ({ descriptio
 
   return (
     <ContentSection>
-      <Title variant="h2" style={{ marginBottom: '24px' }}>
+      <Title variant="h2" className="section-title" style={{ marginBottom: '24px' }}>
         {t('course.description.title')}
       </Title>
       <DescriptionWrapper>

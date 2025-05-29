@@ -36,6 +36,11 @@ const EmptyStateContainer = styled.div`
   background: #FAFBFC;
   border-radius: 10px;
   margin: 20px 0;
+  
+  @media (max-width: 768px) {
+    padding: 32px 16px;
+    margin: 10px 0;
+  }
 `;
 
 const EmptyStateText = styled(Typography)`
@@ -43,6 +48,12 @@ const EmptyStateText = styled(Typography)`
     color: ${props => props.theme.palette.text.secondary};
     font-size: 1rem;
     margin-top: 16px;
+    max-width: 400px;
+    
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
   }
 `;
 

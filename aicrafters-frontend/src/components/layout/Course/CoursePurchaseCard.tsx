@@ -22,14 +22,15 @@ const Card = styled.div`
   max-width: 400px;
   border: 1px solid #D6D9DD;
   margin-top: -330px;
-  height: 100%;
+  height: fit-content;
 
   @media (max-width: 768px) {
     margin-top: 0;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
+    border: 1px solid #E0E0E0;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
     max-width: 100%;
+    background: white;
   }
 `;
 
@@ -43,7 +44,11 @@ const VideoPreview = styled.div`
 
   @media (max-width: 768px) {
     padding: 0;
-    height: 300px;
+    height: 220px;
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+    background: white;
+    margin: 0 16px 16px 16px;
   }
 
   img {
@@ -51,7 +56,9 @@ const VideoPreview = styled.div`
     border-radius: 12px;
 
     @media (max-width: 768px) {
-      border-radius: 0;
+      border-radius: 0 0 16px 16px;
+      object-fit: cover;
+      height: 100%;
     }
   }
 `;
@@ -95,9 +102,14 @@ const Content = styled.div`
   padding: 16px;
 
   @media (max-width: 768px) {
-    border-bottom: 1px solid #E0E0E0;
+    border-bottom: none;
     margin: 0 16px;
     padding: 16px 0;
+    background: white;
+    border-radius: 16px;
+    padding: 20px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -144,6 +156,10 @@ const ActionButtons = styled.div`
 
     @media (max-width: 768px) {
       font-size: 1.1rem;
+      padding: 14px 24px;
+      font-weight: 600;
+      border-radius: 12px;
+      min-height: 48px;
     }
   }
 `;
@@ -162,7 +178,14 @@ const WishlistButton = styled.button<{ $isSaved?: boolean }>`
   padding: 10px;
 
   @media (max-width: 768px) {
-    padding: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    min-height: 48px;
+    border: 2px solid #E0E0E0;
+    
+    &:active {
+      transform: scale(0.98);
+    }
   }
 
   &:hover {
@@ -172,6 +195,11 @@ const WishlistButton = styled.button<{ $isSaved?: boolean }>`
   svg {
     width: 20px;
     height: 20px;
+    
+    @media (max-width: 768px) {
+      width: 24px;
+      height: 24px;
+    }
     
     path {
       fill: ${props => props.$isSaved ? props.theme.palette.secondary.main : 'none'};
@@ -234,62 +262,71 @@ const MobileContent = styled.div`
   
   @media (max-width: 768px) {
     display: block;
-    padding: 16px;
+    padding: 20px 16px;
+    background: white;
+    margin: 0 16px 16px 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const MobileTitle = styled(Typography)`
-  font-size: 1.1rem !important;
+  font-size: 1.25rem !important;
   font-weight: bold !important;
-  line-height: 1.2 !important;
-  margin-bottom: 12px !important;
+  line-height: 1.3 !important;
+  margin-bottom: 8px !important;
   color: ${props => props.theme.palette.text.title} !important;
 `;
 
 const MobileDescription = styled(Typography)`
-  font-size: 0.9rem !important;
-  color: #5A5A5A !important;
+  font-size: 1rem !important;
+  color: #666 !important;
   margin-bottom: 0 !important;
-  line-height: 1.3 !important;
+  line-height: 1.4 !important;
 `;
 
 interface MobileFixedBottomProps {
   $show: boolean;
+  hasPurchased?: boolean;
 }
 
 const MobileFixedBottom = styled.div<MobileFixedBottomProps>`
   display: none;
   
   @media (max-width: 768px) {
-    display: flex;
+    display: ${props => props.hasPurchased ? 'flex' : 'none'};
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: white;
-    padding: 16px 16px;
-    box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.05);
+    padding: 16px 20px 20px;
+    box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.1);
     z-index: 999;
     flex-direction: column;
-    gap: 2px;
-    transform: translateY(${props => props.$show ? '0' : '100%'});
-    transition: transform 0.3s ease-in-out;
+    gap: 8px;
+    border-top: 1px solid #E0E0E0;
   }
 `;
 
 const MobileFixedBottomContent = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
+  gap: 12px;
   
   button {
-    width: 70% !important;
-    max-width: 250px !important;
-    margin-bottom: 6px !important;
-    padding: 10px 24px !important;
-    min-height: 44px !important;
+    width: auto !important;
+    max-width: none !important;
+    margin-bottom: 0 !important;
+    padding: 16px 24px !important;
+    min-height: 52px !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    flex-shrink: 0;
   }
 `;
 
@@ -337,8 +374,7 @@ const AlreadyPurchasedMessage = styled(Typography)`
   font-size: 0.9rem;
   
   @media (max-width: 768px) {
-    margin-top: 6px;
-    font-size: 0.85rem;
+    display: none;
   }
 `;
 
@@ -364,9 +400,13 @@ const PurpleButton = styled(Button)`
     }
     
     @media (max-width: 768px) {
-      width: 70%;
-      padding: 12px 24px;
-      font-size: 1.05rem;
+      width: 100%;
+      max-width: none;
+      padding: 16px 24px;
+      font-size: 1.1rem;
+      min-height: 52px;
+      border-radius: 12px;
+      margin-top: 0;
     }
   }
 `;
@@ -378,6 +418,45 @@ const ButtonContainer = styled.div`
   justify-content: center;
   width: 100%;
   gap: 12px;
+  
+  @media (max-width: 768px) {
+    gap: 16px;
+  }
+`;
+
+// Add new styled components for course info in mobile banner
+const MobileBannerCourseInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+`;
+
+const MobileBannerImage = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const MobileBannerTitle = styled.div`
+  font-size: 1rem;
+  font-weight: 600;
+  color: ${props => props.theme.palette.text.title};
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 `;
 
 interface CoursePurchaseCardProps {
@@ -417,7 +496,6 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const { items: cartItems, addItem } = useCart();
   const [showVideoPopup, setShowVideoPopup] = useState(false);
   const [showCartPopup, setShowCartPopup] = useState(false);
-  const [showFixedBar, setShowFixedBar] = useState(false);
   const { formatPrice } = useCurrency();
 
   const discountPercentage = useMemo(() => {
@@ -437,16 +515,6 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
     return courseInCart || courseInPack;
   }, [cartItems, courseId, packData]);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setShowFixedBar(scrollPosition > 300);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleAddToCart = () => {
     // if (hasPurchased) {
@@ -610,35 +678,22 @@ export const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
         </Content>
       </Card>
 
-      <MobileFixedBottom $show={showFixedBar && !isInCart && !hasPurchased}>
+      <MobileFixedBottom $show={true} hasPurchased={hasPurchased}>
         <MobileFixedBottomContent>
-          <Button 
-            variant="contained"
-            onClick={handleAddToCart}
-            sx={{
-              fontSize: '1rem',
-              padding: '10px'
-            }}
-          >
-            {t('course.purchase.add_to_cart')} - {formatPrice(price)}
-          </Button>
-        </MobileFixedBottomContent>
-        <MobileGuaranteeText>
-          {t('course.purchase.guarantee')}. {t('course.purchase.lifetime_access')}
-        </MobileGuaranteeText>
-      </MobileFixedBottom>
-
-      <MobileFixedBottom $show={Boolean(showFixedBar && hasPurchased)}>
-        <MobileFixedBottomContent>
+          <MobileBannerCourseInfo>
+            <MobileBannerImage>
+              <img src={image} alt={courseTitle} />
+            </MobileBannerImage>
+            <MobileBannerTitle>
+              {courseTitle}
+            </MobileBannerTitle>
+          </MobileBannerCourseInfo>
           <PurpleButton
             variant="contained"
             onClick={handleStartLearning}
           >
             Start Learning
           </PurpleButton>
-          <AlreadyPurchasedMessage>
-            {t('course.purchase.already_purchased')}
-          </AlreadyPurchasedMessage>
         </MobileFixedBottomContent>
       </MobileFixedBottom>
 

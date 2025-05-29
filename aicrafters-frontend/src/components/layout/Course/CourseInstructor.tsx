@@ -9,6 +9,18 @@ import { useTranslation } from 'react-i18next';
 const InstructorSection = styled.section`
   background: #ffffff;
   padding: 32px 0;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: left;
+    
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
 `;
 
 const InstructorCard = styled.div`
@@ -23,8 +35,9 @@ const InstructorHeader = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
+    text-align: center;
   }
 `;
 
@@ -50,6 +63,10 @@ const InstructorAvatar = styled.div`
 
 const InstructorInfo = styled.div`
   flex: 1;
+
+  @media (max-width: 768px) {
+    text-align: center;
+  }
 `;
 
 const InstructorName = styled.a`
@@ -61,6 +78,10 @@ const InstructorName = styled.a`
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 
   &:hover {
     text-decoration: underline;
@@ -81,6 +102,7 @@ const StatsRow = styled.div`
 
   @media (max-width: 768px) {
     gap: 16px;
+    justify-content: center;
   }
 `;
 
@@ -147,7 +169,7 @@ export const CourseInstructor: React.FC<CourseInstructorProps> = ({ instructor }
 
   return (
     <InstructorSection>
-      <Title variant="h2">{t('course.instructor.title')}</Title>
+      <Title variant="h2" className="section-title">{t('course.instructor.title')}</Title>
       <InstructorCard>
         <InstructorHeader>
           <InstructorAvatar>

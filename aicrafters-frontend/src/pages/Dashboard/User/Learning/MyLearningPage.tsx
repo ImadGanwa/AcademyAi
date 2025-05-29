@@ -19,8 +19,8 @@ const PageWrapper = styled.div`
 
 const ContentWrapper = styled(Container)`
   display: flex !important;
-  gap: 10px;
-  padding: 24px;
+  gap: 24px;
+  padding: 32px 24px;
   max-width: 1440px;
   margin: 0 auto;
   width: 100%;
@@ -28,7 +28,7 @@ const ContentWrapper = styled(Container)`
   @media (max-width: 768px) {
     flex-direction: column;
     padding: 16px;
-    gap: 0px;
+    gap: 16px;
   }
 `;
 

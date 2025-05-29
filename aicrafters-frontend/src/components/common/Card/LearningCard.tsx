@@ -54,7 +54,7 @@ const Card = styled.div`
 
 const ImageContainer = styled.div`
   width: 280px;
-  height: 220px;
+  height: 180px;
   flex-shrink: 0;
   border-radius: 10px;
   overflow: hidden;
@@ -62,7 +62,7 @@ const ImageContainer = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    height: 320px;
+    height: 200px;
   }
 `;
 
@@ -209,7 +209,6 @@ const Footer = styled.div`
   margin-top: auto;
 
   @media (max-width: 768px) {
-    display: block;
     margin-top: 20px;
   }
 `;
@@ -222,7 +221,19 @@ const ProgressSection = styled.div`
   gap: 10px;
 
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+`;
+
+const ProgressInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+  @media (max-width: 768px) {
+    flex: 1;
   }
 `;
 
@@ -232,8 +243,8 @@ const ActionsSection = styled.div`
   gap: 6px;
 
   @media (max-width: 768px) {
-    justify-content: space-between;
-    margin-top: 20px;
+    justify-content: flex-end;
+    margin-top: 0;
   }
 `;
 
@@ -514,22 +525,23 @@ export const LearningCard: React.FC<LearningCardProps> = ({
                 <ProgressBar>
                   <Progress $progress={progressPercentage} />
                 </ProgressBar>
-                <Typography variant="body2" color="textSecondary">
-                  {Math.round(progressPercentage)}%
-                </Typography>
+                <ProgressInfo>
+                  <Typography variant="body2" color="textSecondary">
+                    {Math.round(progressPercentage)}%
+                  </Typography>
+                </ProgressInfo>
+                <ActionsSection>
+                  <ShareButton 
+                    className="share-button" 
+                    onClick={onShare}
+                    >
+                    {t('user.learning.share')}
+                    <ShareIcon />
+                  </ShareButton>
+                </ActionsSection>
               </ProgressSection>
-              
-              <ActionsSection>
-                <ShareButton 
-                  className="share-button" 
-                  onClick={onShare}
-                  >
-                  {t('user.learning.share')}
-                  <ShareIcon />
-                </ShareButton>
-              </ActionsSection>
-              </>
-            )}
+            </>
+          )}
         </Footer>
       </Content>
     </CardContainer>

@@ -26,11 +26,11 @@ import { useCart } from '../../../contexts/CartContext';
 const NavbarWrapper = styled(AppBar)`
   && {
     background-color: ${({ theme }) => theme.palette.background.default};
-    padding: 16px 48px;
+    padding: 10px 30px;
     box-shadow: none;
 
     @media (max-width: 768px) {
-      padding: 16px 14px;
+      padding: 10px 14px;
     }
   }
 `;
@@ -50,14 +50,14 @@ const NavContainer = styled(Box)`
 
 const LogoContainer = styled(Box)`
   && {
-    height: 100px;
+    height: 80px;
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     margin-top: -10px;
     
     svg {
-      height: 75px;
+      height: 60px;
       width: auto;
       transition: transform 0.3s ease;
       
@@ -269,11 +269,15 @@ const MobileMenuButton = styled(Box)`
       border-radius: 8px;
       
       &.exit-button {
-        background: #FAFBFC;
+        background: rgba(255, 255, 255, 0.1);
         
         svg {
           width: 12px;
           height: 12px;
+          
+          path {
+            fill: white;
+          }
         }
       }
     }
@@ -296,7 +300,7 @@ const MobileMenu = styled(Box)<{ isOpen: boolean; $isRtl: boolean }>`
     ${({ $isRtl }) => $isRtl ? 'right' : 'left'}: 0;
     width: 100%;
     height: 100vh;
-    background: white;
+    background: ${({ theme }) => theme.palette.background.default};
     transform: translateX(${({ isOpen, $isRtl }) => 
       isOpen ? '0' : ($isRtl ? '-100%' : '100%')
     });
@@ -337,7 +341,7 @@ const MobileNavLinks = styled(Box)`
 
 const MobileNavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   text-decoration: none;
-  color: #000;
+  color: white;
   font-size: 1.2rem;
   padding: 8px 0;
   font-weight: 600;
@@ -352,7 +356,7 @@ const MobileNavLink = styled(RouterLink)<{ $isActive?: boolean }>`
       left: 0;
       width: 100%;
       height: 2px;
-      background-color: #D710C1;
+      background-color: white;
     }
   `}
 `;
@@ -362,7 +366,7 @@ const LanguageTitle = styled(Box)`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: ${({ theme }) => theme.palette.text.title};
+    color: white;
     font-size: 18px;
     font-weight: 600;
     padding: 16px 20px;
@@ -370,7 +374,7 @@ const LanguageTitle = styled(Box)`
     cursor: pointer;
     
     &.active {
-      background: #FAFBFC;
+      background: rgba(255, 255, 255, 0.1);
     }
 
     svg {
@@ -378,7 +382,7 @@ const LanguageTitle = styled(Box)`
       height: 8px;
       transition: transform 0.3s ease;
       path {
-        stroke: ${({ theme }) => theme.palette.text.title};
+        stroke: white;
       }
       
       &.open {
@@ -405,7 +409,7 @@ const LanguageOption = styled.button<{ $isActive?: boolean; $isRtl?: boolean }>`
     padding: 8px 0;
     text-align: ${({ $isRtl }) => $isRtl ? 'right' : 'left'};
     font-size: 16px;
-    color: ${({ theme }) => theme.palette.text.title};
+    color: white;
     font-weight: ${({ $isActive }) => $isActive ? 600 : 400};
     cursor: pointer;
     width: 100%;
@@ -427,12 +431,12 @@ const BottomButtonsContainer = styled(Box)`
 
 const MobileLoginButton = styled(LoginButton)`
   && {
-    color: ${({ theme }) => theme.palette.text.title};
-    border-color: ${({ theme }) => theme.palette.divider};
+    color: white;
+    border-color: rgba(255, 255, 255, 0.5);
     
     &:hover {
-      border-color: ${({ theme }) => theme.palette.text.title};
-      background: transparent;
+      border-color: white;
+      background: rgba(255, 255, 255, 0.1);
     }
   }
 `;
@@ -731,7 +735,7 @@ export const Navbar: React.FC = () => {
                   className="hide-mobile"
                 />
               )}
-              <div style={{ position: 'relative' }}>
+              <div className="hide-mobile" style={{ position: 'relative' }}>
                 <UserAvatar onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
                   <div className="avatar-content">
                     {user.profileImage ? (
@@ -803,7 +807,7 @@ export const Navbar: React.FC = () => {
               }}
               $isActive={isSkillsActive}
             >
-              <WinText>Win</WinText><SkillsText style={{color: '#000'}}>Skills</SkillsText>
+              <WinText>Win</WinText><SkillsText>Skills</SkillsText>
             </MobileNavLink>
             <MobileNavLink 
               to="/mentorship" 
@@ -814,7 +818,7 @@ export const Navbar: React.FC = () => {
               }}
               $isActive={isConfidenceActive}
             >
-              <WinText>Win</WinText><SkillsText style={{color: '#000'}}>Confidence</SkillsText>
+              <WinText>Win</WinText><SkillsText>Confidence</SkillsText>
             </MobileNavLink>
             
             <LanguageTitle 
@@ -842,30 +846,208 @@ export const Navbar: React.FC = () => {
           </MobileNavLinks>
           
           <BottomButtonsContainer>
-            <MobileLoginButton 
-              variant="outlined"
-              to="/login"
-              fullWidth
-              onClick={(e) => {
-                e.preventDefault();
-                handleLoginClick(e);
-                toggleMobileMenu();
-              }}
-            >
-              {t('common.buttons.login')}
-            </MobileLoginButton>
-            <MobileSignUpButton 
-              variant="contained"
-              to="/signup"
-              fullWidth
-              onClick={(e) => {
-                e.preventDefault();
-                handleSignupClick(e);
-                toggleMobileMenu();
-              }}
-            >
-              {t('common.buttons.signup')}
-            </MobileSignUpButton>
+            {isAuthenticated && user ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                  <UserAvatar style={{ width: '60px', height: '60px' }}>
+                    <div className="avatar-content" style={{ fontSize: '24px' }}>
+                      {user.profileImage ? (
+                        <img 
+                          src={user.profileImage}
+                          alt={user.fullName || 'User avatar'}
+                        />
+                      ) : (
+                        user.fullName?.[0]?.toUpperCase() || 'U'
+                      )}
+                    </div>
+                    <OnlineStatus />
+                  </UserAvatar>
+                </div>
+                
+                <div style={{ padding: '0 20px' }}>
+                  {user?.role === 'admin' && (
+                    <>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/admin`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {t('admin.navbar.adminDashboard')}
+                      </DropdownItem>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/admin/users`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px'
+                        }}
+                      >
+                        {t('admin.navbar.userManagement')}
+                      </DropdownItem>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/admin/courses`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px'
+                        }}
+                      >
+                        {t('admin.navbar.courseManagement')}
+                      </DropdownItem>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/admin/settings`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px'
+                        }}
+                      >
+                        {t('admin.navbar.platformSettings')}
+                      </DropdownItem>
+                    </>
+                  )}
+                  
+                  {user?.role === 'trainer' && (
+                    <DropdownItem 
+                      to={`/${currentLanguage}/dashboard/trainer`} 
+                      onClick={toggleMobileMenu}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)', 
+                        color: 'white', 
+                        borderRadius: '8px', 
+                        marginBottom: '8px', 
+                        padding: '16px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {t('trainer.navbar.dashboard')}
+                    </DropdownItem>
+                  )}
+                  
+                  {user?.role === 'mentor' && (
+                    <DropdownItem 
+                      to={`/${currentLanguage}/dashboard/mentor`} 
+                      onClick={toggleMobileMenu}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.1)', 
+                        color: 'white', 
+                        borderRadius: '8px', 
+                        marginBottom: '8px', 
+                        padding: '16px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {t('mentor.navbar.dashboard', 'Mentor Dashboard')}
+                    </DropdownItem>
+                  )}
+                  
+                  {(!user?.role || user?.role === 'user') && (
+                    <>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/user/learning`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {t('user.navbar.myLearning')}
+                      </DropdownItem>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/user/booking`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px'
+                        }}
+                      >
+                        {t('user.navbar.myBookings', 'My Bookings')}
+                      </DropdownItem>
+                      <DropdownItem 
+                        to={`/${currentLanguage}/dashboard/user/settings`} 
+                        onClick={toggleMobileMenu}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.1)', 
+                          color: 'white', 
+                          borderRadius: '8px', 
+                          marginBottom: '8px', 
+                          padding: '16px'
+                        }}
+                      >
+                        {t('user.navbar.accountSettings')}
+                      </DropdownItem>
+                    </>
+                  )}
+                  
+                  <DropdownItem 
+                    to="#" 
+                    onClick={() => {
+                      handleLogout();
+                      toggleMobileMenu();
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.1)', 
+                      color: 'white', 
+                      borderRadius: '8px', 
+                      marginBottom: '8px', 
+                      padding: '16px'
+                    }}
+                  >
+                    {t('user.navbar.logout')}
+                  </DropdownItem>
+                </div>
+              </>
+            ) : (
+              <>
+                <MobileLoginButton 
+                  variant="outlined"
+                  to="/login"
+                  fullWidth
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLoginClick(e);
+                    toggleMobileMenu();
+                  }}
+                >
+                  {t('common.buttons.login')}
+                </MobileLoginButton>
+                <MobileSignUpButton 
+                  variant="contained"
+                  to="/signup"
+                  fullWidth
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSignupClick(e);
+                    toggleMobileMenu();
+                  }}
+                >
+                  {t('common.buttons.signup')}
+                </MobileSignUpButton>
+              </>
+            )}
           </BottomButtonsContainer>
         </MobileMenuContent>
       </MobileMenu>

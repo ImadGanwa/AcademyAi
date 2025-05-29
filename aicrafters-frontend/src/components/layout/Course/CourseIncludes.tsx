@@ -12,6 +12,20 @@ import { Title } from '../../common/Typography/Title';
 const Section = styled.section`
   background: #ffffff;
   padding: 32px 0;
+
+  @media (max-width: 768px) {
+    padding: 0;
+    background: transparent;
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: left;
+    
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
 `;
 
 const FeaturesContainer = styled.div`
@@ -20,7 +34,7 @@ const FeaturesContainer = styled.div`
   
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 11px;
+    gap: 16px;
   }
 `;
 
@@ -29,12 +43,24 @@ const Column = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  @media (max-width: 768px) {
+    gap: 14px;
+  }
 `;
 
 const FeatureItem = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  @media (max-width: 768px) {
+    gap: 12px;
+    padding: 16px;
+    background: #F8F9FA;
+    border-radius: 12px;
+    border: 1px solid #E8ECEF;
+  }
 `;
 
 const IconWrapper = styled.div`
@@ -42,12 +68,29 @@ const IconWrapper = styled.div`
   align-items: center;
   justify-content: center;
   
+  @media (max-width: 768px) {
+    background: ${props => props.theme.palette.primary.main};
+    border-radius: 8px;
+    padding: 8px;
+    min-width: 40px;
+    height: 40px;
+  }
+  
   svg {
     width: 18px;
     height: 18px;
     
+    @media (max-width: 768px) {
+      width: 20px;
+      height: 20px;
+    }
+    
     path {
       stroke: ${props => props.theme.palette.text.title};
+
+      @media (max-width: 768px) {
+        stroke: white;
+      }
     }
   }
 `;
@@ -55,6 +98,13 @@ const IconWrapper = styled.div`
 const FeatureText = styled(Typography)`
   font-size: 1rem !important;
   color: ${props => props.theme.palette.text.secondary} !important;
+
+  @media (max-width: 768px) {
+    font-size: 1rem !important;
+    color: ${props => props.theme.palette.text.title} !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+  }
 `;
 
 interface CourseIncludesProps {
@@ -100,7 +150,7 @@ export const CourseIncludes: React.FC<CourseIncludesProps> = ({ courseData }) =>
 
   return (
     <Section>
-      <Title variant="h2">
+      <Title variant="h2" className="section-title">
         {t('course.includes.title')}
       </Title>
       <FeaturesContainer>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Container, Snackbar, Alert } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { Input } from '../../common/Input/Input';
+// import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
 import { ReactComponent as HeroLogo } from '../../../assets/images/hero-logo.svg';
 // import { ReactComponent as EmailIcon } from '../../../assets/icons/email.svg';
@@ -12,10 +12,10 @@ import config from '../../../config';
 const HeroSection = styled.section`
   width: 100%;
   background-color: ${props => props.theme.palette.background.default};
-  padding: 80px 0;
+  padding: 60px 0;
 
   @media (max-width: 768px) {
-    padding: 80px 0 50px;
+    padding: 30px 0 40px;
   }
 `;
 
@@ -28,6 +28,7 @@ const HeroContainer = styled(Container)`
   @media (max-width: 768px) {
     flex-direction: column !important;
     gap: 32px !important;
+    text-align: center !important;
   }
 `;
 
@@ -37,6 +38,9 @@ const ContentWrapper = styled(Box)`
 
   @media (max-width: 768px) {
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 `;
 
@@ -48,7 +52,8 @@ const Title = styled(Typography)`
   color: #ffffff !important;
 
   @media (max-width: 768px) {
-    font-size: 2.2rem !important;
+    font-size: 2rem !important;
+    margin-bottom: 16px !important;
   }
 `;
 
@@ -65,40 +70,43 @@ const Description = styled(Typography)`
 
   @media (max-width: 768px) {
     padding-right: 0;
+    font-size: 1rem !important;
+    margin-bottom: 30px !important;
+    max-width: 90%;
   }
 `;
 
-const StyledInput = styled(Input)`
-  && {
-    .MuiOutlinedInput-root {
-      background-color: ${props => props.theme.palette.background.secondary};
-      border: 1px solid #203962;
-      border-radius: 8px;
+// const StyledInput = styled(Input)`
+//   && {
+//     .MuiOutlinedInput-root {
+//       background-color: ${props => props.theme.palette.background.secondary};
+//       border: 1px solid #203962;
+//       border-radius: 8px;
 
-      &:hover {
-        border-color: ${props => props.theme.palette.primary.main};
-      }
+//       &:hover {
+//         border-color: ${props => props.theme.palette.primary.main};
+//       }
       
-      .MuiOutlinedInput-input {
-        color: white;
-        &::placeholder {
-          color: rgba(255, 255, 255, 0.7);
-          opacity: 1;
-        }
-      }
+//       .MuiOutlinedInput-input {
+//         color: white;
+//         &::placeholder {
+//           color: rgba(255, 255, 255, 0.7);
+//           opacity: 1;
+//         }
+//       }
 
-      .MuiInputAdornment-root {
-        svg {
-          color: white;
-        }
-      }
+//       .MuiInputAdornment-root {
+//         svg {
+//           color: white;
+//         }
+//       }
 
-      .MuiOutlinedInput-notchedOutline {
-        border: none;
-      }
-    }
-  }
-`;
+//       .MuiOutlinedInput-notchedOutline {
+//         border: none;
+//       }
+//     }
+//   }
+// `;
 
 const InputWrapper = styled(Box)`
   display: flex;
@@ -108,6 +116,7 @@ const InputWrapper = styled(Box)`
   @media (max-width: 768px) {
     flex-direction: column;
     max-width: 100%;
+    width: 100%;
   }
 `;
 
@@ -117,6 +126,21 @@ const StyledLogo = styled(HeroLogo)`
 
   @media (max-width: 768px) {
     display: none;
+  }
+`;
+
+const MobileLogoWrapper = styled(Box)`
+  display: none;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    
+    svg {
+      width: 220px;
+      height: auto;
+    }
   }
 `;
 
@@ -132,6 +156,8 @@ const StyledButton = styled(Button)`
     @media (max-width: 768px) {
       padding: 14px 0;
       font-size: 1.2rem;
+      width: 80%;
+      max-width: 300px;
     }
   }
 `;
@@ -189,6 +215,9 @@ export const Hero: React.FC = () => {
     <HeroSection>
       <HeroContainer maxWidth="lg">
         <ContentWrapper>
+          <MobileLogoWrapper>
+            <HeroLogo />
+          </MobileLogoWrapper>
           <Title variant="h1">
             <Highlight>{t('home.hero.titleHighlight')}</Highlight>{' '}
             {t('home.hero.titleEnd')}
@@ -201,7 +230,7 @@ export const Hero: React.FC = () => {
               href="https://adwin.global/join-adwin/" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: 'none', width: '100%', display: 'flex', justifyContent: 'center' }}
             >
               <StyledButton
                 variant="contained"

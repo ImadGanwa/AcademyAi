@@ -14,8 +14,9 @@ const HeroSection = styled.section`
   margin-bottom: 50px;
 
   @media (max-width: 768px) {
-    padding: 14px 0 0;
+    padding: 16px 0 0;
     margin-bottom: 0;
+    background: ${props => props.theme.palette.primary.main};
   }
 `;
 
@@ -40,7 +41,8 @@ const BreadcrumbNav = styled.nav`
   margin-bottom: 40px;
 
   @media (max-width: 768px) {
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    padding: 0 16px;
   }
 `;
 
@@ -106,39 +108,121 @@ const Description = styled(Typography)`
   }
 `;
 
+// Add mobile-specific hero section
+const MobileHeroSection = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+    background: white;
+    margin: 0 16px 16px 16px;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+`;
+
+const MobileHeroTitle = styled(Typography)`
+  font-size: 1.5rem !important;
+  font-weight: bold !important;
+  line-height: 1.3 !important;
+  margin-bottom: 12px !important;
+  color: ${props => props.theme.palette.text.title} !important;
+  text-align: center;
+`;
+
+const MobileHeroSubtitle = styled(Typography)`
+  font-size: 1rem !important;
+  color: ${props => props.theme.palette.text.secondary} !important;
+  line-height: 1.4 !important;
+  margin-bottom: 16px !important;
+  text-align: center;
+`;
+
+const MobileCategoryBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  background: ${props => props.theme.palette.primary.main};
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+`;
+
+// Add course thumbnail for mobile
+const MobileThumbnail = styled.div`
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
 interface CourseHeroProps {
   title: string;
   category?: string;
   subtitle?: string;
+  image?: string;
 }
 
 export const CourseHero: React.FC<CourseHeroProps> = ({
   title,
   category = '',
-  subtitle = ''
+  subtitle = '',
+  image
 }) => {
   const { i18n } = useTranslation();
   const isRtl = isRTL(i18n.language);
 
   return (
-    <HeroSection>
-      <HeroContainer maxWidth="lg">
-        <ContentWrapper>
-          <BreadcrumbNav aria-label="breadcrumb">
-            <StyledRouterLink to="/">
-              <HomeIcon />
-            </StyledRouterLink>
-            <BreadcrumbSeparator $isRtl={isRtl} />
-            <BreadcrumbText>{category}</BreadcrumbText>
-          </BreadcrumbNav>
-          <Title variant="h1">
-            {title}
-          </Title>
-          <Description>
-            {subtitle}
-          </Description>
-        </ContentWrapper>
-      </HeroContainer>
-    </HeroSection>
+    <>
+      <HeroSection>
+        <HeroContainer maxWidth="lg">
+          <ContentWrapper>
+            <BreadcrumbNav aria-label="breadcrumb">
+              <StyledRouterLink to="/">
+                <HomeIcon />
+              </StyledRouterLink>
+              <BreadcrumbSeparator $isRtl={isRtl} />
+              <BreadcrumbText>{category}</BreadcrumbText>
+            </BreadcrumbNav>
+            <Title variant="h1">
+              {title}
+            </Title>
+            <Description>
+              {subtitle}
+            </Description>
+          </ContentWrapper>
+        </HeroContainer>
+      </HeroSection>
+      
+      <MobileHeroSection>
+        {category && (
+          <MobileCategoryBadge>
+            {category}
+          </MobileCategoryBadge>
+        )}
+        <MobileHeroTitle variant="h1">
+          {title}
+        </MobileHeroTitle>
+        <MobileHeroSubtitle>
+          {subtitle}
+        </MobileHeroSubtitle>
+        {image && (
+          <MobileThumbnail>
+            <img src={image} alt={title} />
+          </MobileThumbnail>
+        )}
+      </MobileHeroSection>
+    </>
   );
 }; 

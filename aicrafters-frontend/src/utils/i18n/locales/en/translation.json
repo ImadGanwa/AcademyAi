@@ -550,7 +550,8 @@
     "navbar": {
       "myLearning": "My Learning",
       "accountSettings": "Account Settings",
-      "logout": "Logout"
+      "logout": "Logout",
+      "myBookings": "My Bookings"
     },
     "sidebar": {
       "profile": "Profile",
@@ -1253,12 +1254,12 @@
     "loadingMentors": "Loading mentors...",
     "bookSession": "Book Session",
     "viewProfile": "View Profile",
-    "becomeMentorTitle": "Become an AI Mentor on AiCrafters",
+    "becomeMentorTitle": "Become an AI Mentor on ADWIN",
     "becomeMentorSubtitle": "Guide the Next Generation of AI Innovators",
     "missionTitle": "Our Mission: Empowering Through Mentorship",
-    "missionText1": "At AiCrafters, we believe in the transformative power of mentorship. Our mission is to connect experienced AI professionals like you with enthusiastic learners and aspiring professionals worldwide.",
+    "missionText1": "At ADWIN, we believe in the transformative power of mentorship. Our mission is to connect experienced AI professionals like you with enthusiastic learners and aspiring professionals worldwide.",
     "missionText2": "By sharing your expertise, you can help shape the future of AI and make a lasting impact on someone's life.",
-    "whyMentorTitle": "Why Become a Mentor with AiCrafters?",
+    "whyMentorTitle": "Why Become a Mentor with ADWIN?",
     "benefitImpactTitle": "Meaningful Impact",
     "benefitImpactText": "Guide and inspire emerging talent, directly contributing to their growth and success in the AI field.",
     "benefitCrossCulturalTitle": "Cross-Cultural Engagement",

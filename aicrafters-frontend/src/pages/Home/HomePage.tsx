@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout/Layout';
 import { Hero } from '../../components/layout/Hero/Hero';
 import { CoursesSection } from '../../components/layout/Courses/CoursesSection';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Course } from '../../types/course';
 import { Container, Typography, Box, Button } from '@mui/material';
@@ -80,10 +80,12 @@ const ImagesGrid = styled(Box)`
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 16px;
   }
 `;
 
-const ImageItem = styled(Box)`
+const ImageItem = styled(Box)<{ $hiddenOnMobile?: boolean }>`
   position: relative;
   height: 215px;
   border-radius: 8px;
@@ -104,6 +106,12 @@ const ImageItem = styled(Box)`
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
+  }
+  
+  @media (max-width: 768px) {
+    display: ${props => props.$hiddenOnMobile ? 'none' : 'block'};
+    height: 180px;
+    margin-bottom: 5px;
   }
 `;
 
@@ -180,19 +188,19 @@ export const HomePage: React.FC = () => {
           <ImageItem onClick={handleTraceImageClick}>
             <img src="/images/trace/afd2.jpg" alt="AFD 2" />
           </ImageItem>
-          <ImageItem onClick={handleTraceImageClick}>
+          <ImageItem $hiddenOnMobile onClick={handleTraceImageClick}>
             <img src="/images/trace/afreximbank.jpg" alt="Afreximbank" />
           </ImageItem>
-          <ImageItem onClick={handleTraceImageClick}>
+          <ImageItem $hiddenOnMobile onClick={handleTraceImageClick}>
             <img src="/images/trace/visa.jpg" alt="VISA" />
           </ImageItem>
-          <ImageItem onClick={handleTraceImageClick}>
+          <ImageItem $hiddenOnMobile onClick={handleTraceImageClick}>
             <img src="/images/trace/smart-reporter.jpg" alt="Smart Reporter" />
           </ImageItem>
-          <ImageItem onClick={handleTraceImageClick}>
+          <ImageItem $hiddenOnMobile onClick={handleTraceImageClick}>
             <img src="/images/trace/sacem.jpg" alt="SACEM" />
           </ImageItem>
-          <ImageItem onClick={handleTraceImageClick}>
+          <ImageItem $hiddenOnMobile onClick={handleTraceImageClick}>
             <img src="/images/trace/canalplus.jpg" alt="Canal Plus" />
           </ImageItem>
         </ImagesGrid>

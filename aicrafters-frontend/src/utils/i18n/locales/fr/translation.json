@@ -550,7 +550,8 @@
     "navbar": {
       "myLearning": "Mon apprentissage",
       "accountSettings": "Paramètres du compte",
-      "logout": "Déconnexion"
+      "logout": "Déconnexion",
+      "myBookings": "Mes réservations"
     },
     "sidebar": {
       "profile": "Profil",

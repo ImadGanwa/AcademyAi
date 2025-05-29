@@ -11,6 +11,10 @@ const FooterWrapper = styled.footer`
   padding: 48px 0 24px;
   margin-top: auto;
   position: relative;
+  
+  @media (max-width: 900px) {
+    padding: 30px 0 20px;
+  }
 `;
 
 const FooterLogoContainer = styled.div`
@@ -18,7 +22,7 @@ const FooterLogoContainer = styled.div`
   
   @media (max-width: 900px) {
     text-align: center;
-    margin-bottom: 55px;
+    margin-bottom: 30px;
   }
 `;
 
@@ -29,6 +33,11 @@ const FooterLogo = styled(Logo)`
 
 const FooterSection = styled.div`
   margin-bottom: 24px;
+  
+  @media (max-width: 900px) {
+    text-align: center;
+    margin-bottom: 16px;
+  }
 `;
 
 const FooterTitle = styled(Typography)`
@@ -37,6 +46,10 @@ const FooterTitle = styled(Typography)`
     font-weight: 600;
     margin-bottom: 16px;
     font-size: 16px;
+    
+    @media (max-width: 900px) {
+      text-align: center;
+    }
   }
 `;
 
@@ -50,6 +63,10 @@ const FooterLink = styled(RouterLink)`
     
     &:hover {
       color: ${({ theme }) => theme.palette.secondary.main};
+    }
+    
+    @media (max-width: 900px) {
+      text-align: center;
     }
   }
 `;
@@ -97,6 +114,13 @@ const LanguageLink = styled.button`
     &:hover {
       color: ${({ theme }) => theme.palette.secondary.main};
     }
+    
+    @media (max-width: 900px) {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
   }
 `;
 
@@ -117,7 +141,7 @@ export const Footer: React.FC = () => {
   return (
     <FooterWrapper>
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
+        <Grid container spacing={{ xs: 2, md: 4 }} justifyContent="center">
           <Grid item xs={12} md={4}>
             <FooterLogoSection>
               <FooterLogoContainer>
@@ -131,28 +155,11 @@ export const Footer: React.FC = () => {
             </FooterLogoSection>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <FooterSection>
               <FooterTitle variant="h6">
                 {t('common.footer.explore')}
               </FooterTitle>
-              {/* <FooterLink to="/business">
-                {t('common.navigation.businessLink')}
-              </FooterLink> */}
-              {/* <FooterLink to="/teach">
-                {t('common.navigation.teachLink')}
-              </FooterLink> */}
-              {/* <FooterLink to="/about">
-                {t('common.footer.aboutUs')}
-              </FooterLink> */}
-              {/* <FooterLink to="/contact">
-                {t('common.footer.contactUs')}
-              </FooterLink> */}
-              {/* 
-              <FooterLink to="/app">
-                {t('common.footer.getApp')}
-              </FooterLink>
-              */}
               <FooterLink to="/mentorship/become-mentor">
                 {t('common.navigation.becomeAMentor')}
               </FooterLink>
@@ -171,7 +178,7 @@ export const Footer: React.FC = () => {
             </FooterSection> 
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             {/* <FooterSection>
               <FooterTitle variant="h6">
                 {t('common.footer.resources')}
@@ -191,7 +198,7 @@ export const Footer: React.FC = () => {
             </FooterSection> */}
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             {/* <FooterSection>
               <FooterTitle variant="h6">
                 {t('common.footer.company')}
@@ -214,7 +221,7 @@ export const Footer: React.FC = () => {
             </FooterSection> */}
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={12} sm={6} md={2}>
             <FooterSection>
               {/* <FooterTitle variant="h6">
                 {t('common.footer.language')}

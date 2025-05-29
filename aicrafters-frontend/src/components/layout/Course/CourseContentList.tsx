@@ -15,6 +15,18 @@ import { LessonPreviewPopup } from './LessonPreviewPopup';
 const ContentSection = styled.section`
   background: #ffffff;
   padding: 32px 0;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: left;
+    
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
 `;
 
 const ContentHeader = styled.div`
@@ -40,6 +52,7 @@ const StatsWrapper = styled.div`
   @media (max-width: 768px) {
     display: block;
     margin-top: -14px;
+    text-align: center;
   }
 `;
 
@@ -62,7 +75,8 @@ const ExpandAllButton = styled.button`
     font-size: 1rem;
     padding: 6px;
     display: block;
-    margin-top: 12px;
+    margin: 12px auto 0 auto;
+    max-width: 200px;
   }
 
   &:hover {
@@ -310,7 +324,7 @@ export const CourseContentList: React.FC<CourseContentListProps> = ({ content })
   return (
     <ContentSection>
       <ContentHeader>
-        <Title variant="h2">{t('course.content.title')}</Title>
+        <Title variant="h2" className="section-title">{t('course.content.title')}</Title>
         <StatsRow>
           <StatsWrapper>
             <Stats>

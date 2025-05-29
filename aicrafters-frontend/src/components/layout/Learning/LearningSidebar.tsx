@@ -38,6 +38,7 @@ const MobileSelect = styled.div`
 
   @media (max-width: 768px) {
     display: block;
+    margin-bottom: 16px;
   }
 `;
 
@@ -46,13 +47,18 @@ const SelectButton = styled.button<{ $isOpen: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  background: white;
+  padding: 14px 16px;
+  background: #FAFBFC;
   border: 1px solid ${props => props.theme.palette.divider};
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   color: ${props => props.theme.palette.text.title};
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f0f2f5;
+  }
 
   span {
     font-weight: bold;
@@ -91,14 +97,17 @@ const OptionsList = styled.ul<{ $isOpen: boolean }>`
   z-index: 10;
   display: ${props => props.$isOpen ? 'block' : 'none'};
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
 `;
 
 const Option = styled.li`
-  padding: 8px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 0.2s;
 
   &:hover {
     background: ${props => props.theme.palette.action.hover};

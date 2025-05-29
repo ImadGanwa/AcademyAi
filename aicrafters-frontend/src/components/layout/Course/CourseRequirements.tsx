@@ -5,12 +5,30 @@ import { useTranslation } from 'react-i18next';
 const RequirementsSection = styled.section`
   background: #ffffff;
   padding: 32px 0;
+  
+  @media (max-width: 768px) {
+    text-align: center;
+  }
+  
+  .section-title {
+    text-align: left;
+    
+    @media (max-width: 768px) {
+      text-align: center;
+    }
+  }
 `;
 
 const RequirementsList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 24px 0;
+
+  @media (max-width: 768px) {
+    text-align: center;
+    max-width: 400px;
+    margin: 24px auto;
+  }
 `;
 
 const RequirementItem = styled.li`
@@ -21,11 +39,20 @@ const RequirementItem = styled.li`
   font-size: 1rem;
   line-height: 1.6;
 
+  @media (max-width: 768px) {
+    justify-content: center;
+    text-align: left;
+  }
+
   &:before {
     content: "•";
     color: ${props => props.theme.palette.text.title};
     font-weight: bold;
     margin-right: 12px;
+    
+    @media (max-width: 768px) {
+      flex-shrink: 0;
+    }
   }
 `;
 
@@ -37,7 +64,7 @@ export const CourseRequirements: React.FC<CourseRequirementsProps> = ({ requirem
   const { t } = useTranslation();
   return (
     <RequirementsSection>
-      <Title variant="h2">{t('course.requirements.title')}</Title>
+      <Title variant="h2" className="section-title">{t('course.requirements.title')}</Title>
       <RequirementsList>
         {requirements.map((requirement, index) => (
           <RequirementItem key={index}>{requirement}</RequirementItem>

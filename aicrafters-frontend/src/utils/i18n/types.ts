@@ -533,6 +533,7 @@ export interface Translations {
       myLearning: string;
       accountSettings: string;
       logout: string;
+      myBookings: string;
     };
     sidebar: {
       profile: string;

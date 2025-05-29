@@ -4,6 +4,7 @@ import { Layout } from '../../components/layout/Layout/Layout';
 import { CourseHero } from '../../components/layout/Course/CourseHero';
 import { Divider } from '../../components/common/Divider/Divider';
 import { useLanguageRoute } from '../../hooks/useLanguageRoute';
+import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import { useCart } from '../../contexts/CartContext';
 import styled from 'styled-components';
 import { CourseContent } from '../../components/layout/Course/CourseContent';
@@ -62,7 +63,8 @@ const ContentWrapper = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     padding: 0;
-    gap: 24px;
+    gap: 0;
+    margin-bottom: 100px; // Space for fixed bottom bar
   }
 `;
 
@@ -72,11 +74,135 @@ const MainContent = styled.div`
   @media (max-width: 768px) {
     flex: 0 0 100%;
     max-width: 100%;
-    padding: 0 24px;
+    padding: 0;
     order: -1;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 0;
+  }
+`;
+
+// Add new mobile-specific components
+const MobileSection = styled.div`
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    background: white;
+    margin-bottom: 8px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    &.no-background {
+      background: transparent;
+      padding: 16px;
+    }
+  }
+`;
+
+const MobileDivider = styled.div`
+  @media (max-width: 768px) {
+    height: 8px;
+    background: #f5f5f5;
+    margin: 0 -16px;
+    width: calc(100% + 32px);
+  }
+`;
+
+// Add styled component for mobile purchase card container
+const PurchaseCardContainer = styled.div`
+  // No mobile-specific hiding styles needed anymore
+`;
+
+// Add a new mobile-specific purchase card container
+const MobilePurchaseCardContainer = styled.div`
+  display: none;
+`;
+
+// Add styled component for desktop purchase card container
+const DesktopPurchaseCardContainer = styled.div`
+  @media (max-width: 768px) {
+    display: none; // Hide on mobile
+  }
+`;
+
+// Add a styled component for the fixed mobile banner
+const MobileStartLearningBanner = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 16px 20px;
+    box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 2px solid ${props => props.theme.palette.primary.main};
+  }
+`;
+
+const MobileBannerImage = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const MobileBannerInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+`;
+
+const MobileBannerTitle = styled.div`
+  font-size: 1rem;
+  font-weight: 600;
+  color: ${props => props.theme.palette.text.title};
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+const StartLearningButton = styled.button`
+  background-color: ${props => props.theme.palette.primary.main};
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-height: 52px;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background-color 0.2s;
+  
+  &:hover, &:active {
+    background-color: ${props => props.theme.palette.primary.dark};
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
@@ -148,6 +274,7 @@ export const CourseDetailsPage: React.FC = () => {
   const dispatch = useDispatch();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { t, i18n } = useTranslation();
+  const navigate = useLocalizedNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -415,20 +542,50 @@ export const CourseDetailsPage: React.FC = () => {
                 title={course.title}
                 subtitle={course.subtitle}
                 category={course.categories?.[0]}
+                image={course.image}
             />
             <ContentWrapper>
               <MainContent>
+                <MobileSection>
                   <CourseContent learningPoints={course.learningPoints || []} />
+                </MobileSection>
+                
+                <MobileSection className="no-background">
                   <RelatedTopics categories={course.categories || []} />
+                </MobileSection>
+                
+                <MobileDivider />
                 <Divider />
+                
+                <MobileSection>
                   <CourseIncludes courseData={course} />
+                </MobileSection>
+                
+                <MobileDivider />
                 <Divider />
+                
+                <MobileSection>
                   <StyledCourseDescription description={course.description} subtitle={course.subtitle} />
+                </MobileSection>
+                
+                <MobileDivider />
                 <Divider />
+                
+                <MobileSection>
                   <StyledCourseContentList content={course} />
+                </MobileSection>
+                
+                <MobileDivider />
                 <Divider />
+                
+                <MobileSection>
                   <StyledCourseRequirements requirements={course.requirements} />
+                </MobileSection>
+                
+                <MobileDivider />
                 <Divider />
+                
+                <MobileSection>
                     <CourseInstructor 
                       instructor={{
                       id: course.instructor._id,
@@ -442,30 +599,55 @@ export const CourseDetailsPage: React.FC = () => {
                       coursesCount: course.instructor.coursesCount
                       }}
                     />
+                </MobileSection>
               </MainContent>
-                {course && (
-                <CoursePurchaseCard
-                    price={course.price}
-                    originalPrice={course.originalPrice}
-                  onAddToCart={() => handleAddToCart()}
-                  onToggleWishlist={() => handleToggleWishlist()}
-                    courseId={course.id}
-                    courseTitle={course.title}
-                    instructorName={course.instructor.fullName}
-                    image={course.image}
-                    video={course.video}
-                  packData={null}
-                  hasPurchased={hasPurchased}
-                  isSaved={isSaved}
-                  isTrainerOrAdmin={isTrainerOrAdmin}
-                />
+              
+              {/* Add desktop purchase card */}
+              {course && (
+                <DesktopPurchaseCardContainer>
+                  <CoursePurchaseCard
+                      price={course.price}
+                      originalPrice={course.originalPrice}
+                    onAddToCart={() => handleAddToCart()}
+                    onToggleWishlist={() => handleToggleWishlist()}
+                      courseId={course.id}
+                      courseTitle={course.title}
+                      instructorName={course.instructor.fullName}
+                      image={course.image}
+                      video={course.video}
+                    packData={null}
+                    hasPurchased={hasPurchased}
+                    isSaved={isSaved}
+                    isTrainerOrAdmin={isTrainerOrAdmin}
+                  />
+                </DesktopPurchaseCardContainer>
               )}
             </ContentWrapper>
+            
             {showLoginPopup && (
               <LoginPopup
                 onClose={() => setShowLoginPopup(false)}
                 message={t('course.loginToSaveCourse')}
               />
+            )}
+            
+            {/* Add the mobile banner */}
+            {hasPurchased && (
+              <MobileStartLearningBanner>
+                <MobileBannerInfo>
+                  <MobileBannerImage>
+                    <img src={course.image} alt={course.title} />
+                  </MobileBannerImage>
+                  <MobileBannerTitle>
+                    {course.title}
+                  </MobileBannerTitle>
+                </MobileBannerInfo>
+                <StartLearningButton 
+                  onClick={() => navigate(`/dashboard/user/learning/${course.id}`)}
+                >
+                  Start Learning
+                </StartLearningButton>
+              </MobileStartLearningBanner>
             )}
           </PageWrapper>
         </>
