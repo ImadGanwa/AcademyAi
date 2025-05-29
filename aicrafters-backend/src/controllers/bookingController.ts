@@ -9,7 +9,7 @@ import {
   sendMentorBookingCancelledEmail,
   sendBookingUpdateEmail,
   sendSessionCompletionEmail,
-  sendMentorBookingConfirmationEmail,
+  sendMentorBookingConfirmedEmail,
   sendMenteeBookingConfirmedEmail
 } from '../utils/email';
 
@@ -844,7 +844,7 @@ export const bookingController = {
           // If meeting link was added, send confirmation emails with calendar integration
           if (meetingLink) {
             // Send confirmation to mentor with calendar
-            await sendMentorBookingConfirmationEmail(
+            await sendMentorBookingConfirmedEmail(
               mentorData.email,
               mentorData.fullName,
               menteeData.fullName,

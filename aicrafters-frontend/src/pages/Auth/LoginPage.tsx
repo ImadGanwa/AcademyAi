@@ -6,6 +6,7 @@ import { Input } from '../../components/common/Input/Input';
 import { IconButton } from '../../components/common/Button/IconButton';
 import { ReactComponent as Logo } from '../../assets/images/dark-logo.svg';
 import { ReactComponent as EmailIcon } from '../../assets/icons/email.svg';
+import { ReactComponent as LockIcon } from '../../assets/icons/password.svg';
 import { ReactComponent as GoogleIcon } from '../../assets/icons/google.svg';
 import { ReactComponent as LinkedInIcon } from '../../assets/icons/linkedin.svg';
 import { ReactComponent as MessageIcon } from '../../assets/icons/Message.svg';
@@ -16,9 +17,9 @@ import { authService } from '../../services/authService';
 import { toast } from 'react-toastify';
 import { Layout } from '../../components/layout/Layout/Layout';
 import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate, useLocation } from 'react-router-dom';
+import {useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { LinkedIn } from 'react-linkedin-login-oauth2';
+// import { LinkedIn } from 'react-linkedin-login-oauth2';
 
 const Container = styled(Box)`
   display: flex;
@@ -38,23 +39,23 @@ const Container = styled(Box)`
   }
 `;
 
-const LogoWrapper = styled(Box)`
-  display: flex;
-  align-items: baseline;
-  justify-content: space-evenly;
-  margin-top: 4rem;
-  margin-bottom: 3rem;
+// const LogoWrapper = styled(Box)`
+//   display: flex;
+//   align-items: baseline;
+//   justify-content: space-evenly;
+//   margin-top: 4rem;
+//   margin-bottom: 3rem;
 
-  & svg {
-  height: 3rem;
-    width: 11rem;
-  }
+//   & svg {
+//   height: 3rem;
+//     width: 11rem;
+//   }
 
-  @media (max-width: 768px) {
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-  }
-`;
+//   @media (max-width: 768px) {
+//     margin-top: 3rem;
+//     margin-bottom: 2rem;
+//   }
+// `;
 
 const Form = styled.form`
   width: 100%;
@@ -386,6 +387,7 @@ export const LoginPage: React.FC = () => {
               placeholder={t('auth.signup.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              icon={<LockIcon />}
               fullWidth
               required
               error={!!error}

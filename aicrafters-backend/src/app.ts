@@ -71,7 +71,10 @@ app.use('/api/bookings', bookingRoutes);
 
 // Connect to MongoDB
 // TODO: Move hardcoded MongoDB connection string to environment variables
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/aicrafters')
+if(!process.env.MONGODB_URI){
+  throw new Error('MONGODB_URI environment variable is not defined');
+}
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 

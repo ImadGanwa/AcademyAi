@@ -7,6 +7,7 @@ import { Input } from '../../components/common/Input/Input';
 import { IconButton } from '../../components/common/Button/IconButton';
 import { ReactComponent as EmailIcon } from '../../assets/icons/email.svg';
 import { ReactComponent as MessageIcon } from '../../assets/icons/Message.svg';
+import { ReactComponent as LockIcon } from '../../assets/icons/password.svg';
 import { RouterLink } from '../../components/common/RouterLink/RouterLink';
 import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import { authService } from '../../services/authService';
@@ -30,23 +31,23 @@ const Container = styled(Box)`
   margin-bottom: 40px;
 `;
 
-const LogoWrapper = styled(Box)`
-  display: flex;
-  align-items: baseline;
-  justify-content: space-evenly;
-  margin-top: 4rem;
-  margin-bottom: 3rem;
+// const LogoWrapper = styled(Box)`
+//   display: flex;
+//   align-items: baseline;
+//   justify-content: space-evenly;
+//   margin-top: 4rem;
+//   margin-bottom: 3rem;
 
-  & svg {
-  height: 3rem;
-    width: 11rem;
-  }
+//   & svg {
+//   height: 3rem;
+//     width: 11rem;
+//   }
 
-  @media (max-width: 768px) {
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-  }
-`;
+//   @media (max-width: 768px) {
+//     margin-top: 3rem;
+//     margin-bottom: 2rem;
+//   }
+// `;
 
 const Form = styled.form`
   width: 100%;
@@ -85,14 +86,14 @@ const OrDivider = styled(Box)`
 
 const StyledIconButton = styled(IconButton)`
   && {
-    background: #D710C1;
+    background: ${({ theme }) => theme.palette.secondary.main};
     color: white;
     padding: 12px;
     font-size: 16px;
     border-radius: 8px;
     
     &:hover {
-      background: #b0009c;
+      background: ${({ theme }) => theme.palette.secondary.dark};
     }
   }
 `;
@@ -452,6 +453,7 @@ export const SignUpPage: React.FC = () => {
               onChange={handleInputChange}
               error={!!errors.password}
               helperText={errors.password}
+              icon={<LockIcon />}
               disabled={loading}
             />
             <PasswordStrengthIndicator password={formData.password} />
