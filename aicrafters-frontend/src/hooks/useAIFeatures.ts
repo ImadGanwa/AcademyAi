@@ -61,6 +61,11 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   const summariesRetryCount = useRef(0);
   const [summariesFetchAttempted, setSummariesFetchAttempted] = useState(false);
 
+  // Add retry tracking for mind map
+  const [hasFailedMindMapFetch, setHasFailedMindMapFetch] = useState(false);
+  const mindMapRetryCount = useRef(0);
+  const [mindMapFetchAttempted, setMindMapFetchAttempted] = useState(false);
+
   const MAX_RETRY_ATTEMPTS = 3; // Maximum number of retry attempts
 
   // Check if we have a cached mind map for this video when video URL changes
@@ -104,6 +109,9 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     setHasFailedSummariesFetch(false);
     summariesRetryCount.current = 0;
     setSummariesFetchAttempted(false);
+    setHasFailedMindMapFetch(false);
+    mindMapRetryCount.current = 0;
+    setMindMapFetchAttempted(false);
   }, [videoUrl]);
 
   // Send message to AI coach
@@ -237,9 +245,15 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     }
   }, [courseId, videoUrl, hasFailedSummariesFetch]);
 
-  // Fetch mind map - now with caching
+  // Fetch mind map - now with caching and retry mechanism
   const fetchMindMap = useCallback(async () => {
     if (!courseId || !videoUrl) return;
+    
+    // Skip if already failed and exceeded retry attempts
+    if (hasFailedMindMapFetch && mindMapRetryCount.current >= MAX_RETRY_ATTEMPTS) {
+      console.warn(`Skipping mind map fetch after ${MAX_RETRY_ATTEMPTS} failed attempts`);
+      return false;
+    }
     
     // Return immediately if we already have the mind map cached
     const cacheKey = `${courseId}:${videoUrl}`;
@@ -250,6 +264,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     try {
       setMindMapLoading(true);
       setMindMapError(null);
+      setMindMapFetchAttempted(true);
       
       const data = await aiService.getMindMap(courseId, videoUrl);
       
@@ -257,15 +272,34 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
       setMindMap(data);
       mindMapCache[cacheKey] = data;
       
+      // Reset failure tracking on success
+      setHasFailedMindMapFetch(false);
+      mindMapRetryCount.current = 0;
+      
       return true;
     } catch (err: any) {
+      // Track failure
+      setHasFailedMindMapFetch(true);
+      mindMapRetryCount.current += 1;
+      
       setMindMapError(err.message || 'Failed to fetch mind map');
-      console.error('Error in useAIFeatures.fetchMindMap:', err);
+      console.error(`Error in useAIFeatures.fetchMindMap (attempt ${mindMapRetryCount.current}/${MAX_RETRY_ATTEMPTS}):`, err);
       return false;
     } finally {
       setMindMapLoading(false);
     }
-  }, [courseId, videoUrl, mindMap]);
+  }, [courseId, videoUrl, mindMap, hasFailedMindMapFetch]);
+
+  // Auto-fetch mind map when courseId or videoUrl changes
+  useEffect(() => {
+    // Check if we need to fetch the mind map
+    if (!mindMap && !mindMapLoading && !mindMapError && 
+        mindMapRetryCount.current < MAX_RETRY_ATTEMPTS && 
+        !mindMapFetchAttempted) {
+      console.log("Auto-fetching mind map for new course/video");
+      fetchMindMap();
+    }
+  }, [courseId, videoUrl, mindMap, mindMapLoading, mindMapError, fetchMindMap, mindMapFetchAttempted]);
 
   // Generate summary from transcript if video summary is null - with better controls
   useEffect(() => {

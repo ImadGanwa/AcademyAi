@@ -26,7 +26,7 @@ interface SectionContainerProps {
 }
 
 const NavigationContainer = styled.aside<{ $isCollapsed: boolean; $isMobileOpen: boolean }>`
-  width: ${props => props.$isCollapsed ? '60px' : '320px'};
+  width: ${props => props.$isCollapsed ? '90px' : '320px'};
   transition: width 0.3s ease;
   background: #FAFBFC;
   border-radius: 10px 0 0 10px;
@@ -55,10 +55,23 @@ const Header = styled.div<{ $isCollapsed: boolean }>`
   padding: ${props => props.$isCollapsed ? '12px 8px' : '12px 16px'};
   display: flex;
   align-items: center;
+  justify-content: ${props => props.$isCollapsed ? 'center' : 'space-between'};
   gap: 8px;
+  border-bottom: 1px solid ${props => props.theme.palette.divider};
+  height: 47px;
+  box-sizing: border-box;
 
   .search-input-wrapper {
     display: ${props => props.$isCollapsed ? 'none' : 'block'};
+  }
+`;
+
+const NavigationTitle = styled(Typography)<{ $isCollapsed: boolean }>`
+  && {
+    display: ${props => props.$isCollapsed ? 'none' : 'block'};
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: ${props => props.theme.palette.text.primary};
   }
 `;
 
@@ -83,13 +96,15 @@ const SearchIconCollapsed = styled.div<{ $isCollapsed: boolean }>`
 
 const CollapseButton = styled(IconButton)<{ $isCollapsed: boolean }>`
   && {
-    width: 24px;
-    height: 24px;
+    width: ${props => props.$isCollapsed ? '30px' : '24px'};
+    height: ${props => props.$isCollapsed ? '30px' : '24px'};
     background: white;
     border: 1px solid ${props => props.theme.palette.divider};
     border-radius: 4px;
-    position: absolute;
-    right: -12px;
+    position: ${props => props.$isCollapsed ? 'static' : 'absolute'};
+    right: ${props => props.$isCollapsed ? 'auto' : '-12px'};
+    margin: ${props => props.$isCollapsed ? '0 auto' : '0'};
+    z-index: 10;
 
     @media (max-width: 768px) {
       display: none;
@@ -151,7 +166,7 @@ const NavigationContent = styled.div<{ $isCollapsed: boolean }>`
 `;
 
 const SectionContainer = styled.div<SectionContainerProps>`
-  padding: ${props => props.$isCollapsed ? '10px 8px' : '20px 16px'};
+  padding: ${props => props.$isCollapsed ? '16px 8px' : '20px 16px'};
   border-bottom: 1px solid ${props => props.theme.palette.divider};
 
   &:last-child {
@@ -161,7 +176,7 @@ const SectionContainer = styled.div<SectionContainerProps>`
 
 const SectionHeader = styled.div<{ $isExpanded: boolean; $isCollapsed: boolean }>`
   display: flex;
-  align-items: baseline;
+  align-items: ${props => props.$isCollapsed ? 'center' : 'baseline'};
   justify-content: ${props => props.$isCollapsed ? 'center' : 'start'};
   gap: 8px;
   cursor: pointer;
@@ -169,6 +184,7 @@ const SectionHeader = styled.div<{ $isExpanded: boolean; $isCollapsed: boolean }
   transition: background-color 0.2s;
   color: ${props => props.theme.palette.text.title};
   padding: ${props => props.$isCollapsed ? '8px 0' : '8px'};
+  margin-bottom: ${props => props.$isCollapsed ? '10px' : '0'};
 
   svg {
     transform: ${props => props.$isExpanded ? 'rotate(180deg)' : 'none'};
@@ -195,23 +211,34 @@ const ItemList = styled.div`
 const Item = styled.div<{ $isActive?: boolean; $isCollapsed: boolean }>`
   display: flex;
   align-items: center;
-  padding: ${props => props.$isCollapsed ? '0' : '2px 16px'};
-  gap: 0;
+  padding: ${props => props.$isCollapsed ? '5px 0' : '2px 16px'};
+  gap: ${props => props.$isCollapsed ? '0' : '8px'};
   cursor: pointer;
   border-radius: 6px;
   background: ${props => props.$isActive ? '#d6d9dd47' : 'transparent'};
+  justify-content: ${props => props.$isCollapsed ? 'center' : 'flex-start'};
+  margin-bottom: ${props => props.$isCollapsed ? '8px' : '2px'};
 
   &:hover {
     background: #d6d9dd47;
   }
 `;
 
-const ItemIcon = styled.div`
+const ItemIcon = styled.div<{ $isCollapsed: boolean; $isActive?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
+  ${props => props.$isCollapsed && `
+    width: 40px;
+    height: 40px;
+    background-color: ${props.theme.palette.background.paper};
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: ${props.$isActive ? '0 2px 5px rgba(0,0,0,0.15)' : 'none'};
+    margin: 5px 0;
+  `}
 `;
 
 const ItemContent = styled.div<{ $isCollapsed: boolean }>`
@@ -229,8 +256,8 @@ const ItemTitle = styled(Typography)`
   }
 `;
 
-const StatusIcon = styled.div`
-  display: flex;
+const StatusIcon = styled.div<{ $isCollapsed: boolean }>`
+  display: ${props => props.$isCollapsed ? 'none' : 'flex'};
   align-items: center;
   justify-content: center;
   width: 20px;
@@ -358,17 +385,11 @@ export const CourseLearningNavigation: React.FC<NavigationProps> = ({
         </CloseNavMobile>
       </MobileHeader>
       <Header $isCollapsed={isCollapsed}>
-        <div className="search-input-wrapper" style={{ width: '100%' }}>
-          <SearchInput
-            placeholder={t('user.courseLearning.search')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onSearch={setSearchQuery}
-          />
-        </div>
-        <SearchIconCollapsed $isCollapsed={isCollapsed} onClick={() => setIsCollapsed(false)}>
-          <SearchIcon />
-        </SearchIconCollapsed>
+        {!isCollapsed && (
+          <NavigationTitle $isCollapsed={isCollapsed}>
+            Navigation
+          </NavigationTitle>
+        )}
         <CollapseButton 
           $isCollapsed={isCollapsed}
           onClick={toggleCollapse}
@@ -405,13 +426,13 @@ export const CourseLearningNavigation: React.FC<NavigationProps> = ({
                       order: item.order,
                     })}
                   >
-                    <ItemIcon>
+                    <ItemIcon $isCollapsed={isCollapsed} $isActive={item.id === currentLesson.id && section.id === currentLesson.sectionId}>
                       {getItemIcon(item.type)}
                     </ItemIcon>
                     <ItemContent $isCollapsed={isCollapsed}>
                       <ItemTitle>{item.title}</ItemTitle>
                     </ItemContent>
-                    <StatusIcon>
+                    <StatusIcon $isCollapsed={isCollapsed}>
                       {getStatusIcon(item.status, item.progress)}
                     </StatusIcon>
                   </Item>

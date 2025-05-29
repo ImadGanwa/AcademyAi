@@ -968,10 +968,10 @@ export const sendMentorApprovalEmail = async (email: string, fullName: string) =
     const preheaderText = `Congratulations, ${fullName}! You're now an official mentor on ${ADWIN_SERVICE_NAME}.`;
     
     const nextSteps = [
-      "Complete your mentor profile to attract more students.",
+      "Complete your mentor profile to attract more Users.",
       "Set your availability schedule.",
       "Familiarize yourself with the mentor dashboard and tools.",
-      `Start connecting with students looking for mentorship on the ${ADWIN_SERVICE_NAME} platform.`
+      `Start connecting with Users looking for mentorship on the ${ADWIN_SERVICE_NAME} platform.`
     ];
     const nextStepsCard = `
       <h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">What's Next:</h3>
@@ -1106,7 +1106,7 @@ export const sendMentorWelcomeEmail = async (email: string, fullName: string, pa
     const mentorAbilities = [
       "Complete your profile to attract potential mentees.",
       "Set your availability schedule for mentorship sessions.",
-      "Connect with students seeking guidance on the ${ADWIN_SERVICE_NAME} platform.",
+      "Connect with Users seeking guidance on the ADWIN platform.",
       "Track your mentorship sessions and manage bookings.",
       "Receive payments for your mentoring services (if applicable)."
     ];

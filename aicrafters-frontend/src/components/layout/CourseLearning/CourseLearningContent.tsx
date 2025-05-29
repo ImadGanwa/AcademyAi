@@ -5,6 +5,7 @@ import { VideoContent } from './content/VideoContent';
 import { ArticleContent } from './content/ArticleContent';
 import { QuizContent } from './content/QuizContent';
 import { ReactComponent as ExpandIcon } from '../../../assets/icons/Expand.svg';
+import MenuIcon from '@mui/icons-material/Menu';
 import { LessonContent } from '../../../types/course';
 import { useTranslation } from 'react-i18next';
 
@@ -26,12 +27,14 @@ const ContentContainer = styled.main`
 const ContentHeader = styled.div`
   margin-bottom: 4px;
   background-color: #FAFBFC;
-  padding: 20px 24px;
+  padding: 12px 24px;
   border-bottom: 1px solid ${props => props.theme.palette.divider};
   border-radius: 0px 10px 0 0;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 16px;
+  height: 47px;
+  box-sizing: border-box;
 
   @media (max-width: 768px) {
     position: sticky;
@@ -48,6 +51,7 @@ const ContentHeader = styled.div`
 const ContentBody = styled.div`
   flex: 1;
   overflow-y: auto;
+  margin-top: 10px;
 `;
 
 const HeaderContent = styled.div`
@@ -59,12 +63,12 @@ const MobileMenuButton = styled(IconButton)`
     display: none;
     @media (max-width: 768px) {
       background: #f0f0f0;
-        height: 40px;
-        width: 40px;
-        padding: 2px;
-        display: flex;
-        border-radius: 8px;
-        align-self: center;
+      height: 40px;
+      width: 40px;
+      padding: 2px;
+      display: flex;
+      border-radius: 8px;
+      align-self: center;
     }
   }
 `;
@@ -194,8 +198,8 @@ export const CourseLearningContent = React.forwardRef<HTMLDivElement, CourseLear
         <HeaderContent>
           <LessonTitle variant="h1">{title}</LessonTitle>
         </HeaderContent>
-        <MobileMenuButton onClick={onMobileMenuClick}>
-          <ExpandIcon />
+        <MobileMenuButton onClick={onMobileMenuClick} aria-label="Open navigation menu">
+          <MenuIcon />
         </MobileMenuButton>
       </ContentHeader>
       <ContentBody>

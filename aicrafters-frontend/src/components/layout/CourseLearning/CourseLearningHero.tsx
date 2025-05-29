@@ -21,7 +21,7 @@ const HeroContainer = styled.div`
 const HeroContent = styled(Container)`
   display: flex !important;
   flex-direction: column !important;
-  gap: 5px !important;
+  gap: 16px !important;
 
   @media (max-width: 768px) {
     
@@ -30,7 +30,8 @@ const HeroContent = styled(Container)`
 
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   && {
-    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
     
     .MuiBreadcrumbs-separator {
       color: rgba(255, 255, 255, 0.6);
@@ -39,7 +40,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)`
     a {
       color: rgba(255, 255, 255, 0.8);
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 1rem;
       
       &:hover {
         color: white;
@@ -55,7 +56,7 @@ const CourseTitle = styled(Typography)`
     max-width: 730px;
     font-size: 2.5rem;
     font-weight: bold;
-    margin-bottom: 16px;
+    margin: 8px 0;
     color: white;
 
     @media (max-width: 768px) {
@@ -66,14 +67,15 @@ const CourseTitle = styled(Typography)`
 `;
 
 const ProgressSection = styled.div`
-  display: block;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ProgressBar = styled.div`
   height: 12px;
   width: 220px;
   background: ${props => props.theme.palette.background.secondary};
-  border: 1px solid #203962;
+  border: 1px solid #ffffff;
   border-radius: 7px;
   overflow: hidden;
   padding: 2px;
@@ -95,7 +97,7 @@ const Progress = styled.div<{ $progress: number }>`
 
 const ProgressCompleted = styled(Typography)`
   && {
-    font-size: 0.75rem;
+    font-size: 1rem;
     color: white;
   }
 `;
@@ -121,7 +123,7 @@ export const CourseLearningHero: React.FC<CourseLearningHeroProps> = ({
           <RouterLink to="/dashboard/user/learning">
             {t('user.learning.title')}
           </RouterLink>
-          <Typography sx={{ color: 'white', fontSize: '0.875rem' }}>
+          <Typography sx={{ color: 'white', fontSize: '1rem' }}>
             {title}
           </Typography>
         </StyledBreadcrumbs>

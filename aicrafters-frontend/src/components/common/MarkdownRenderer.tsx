@@ -9,7 +9,7 @@ const MarkdownContainer = styled(Box)`
   p {
     margin: 0.5em 0;
     line-height: 1.6;
-    font-size: 0.875rem;
+    font-size: 0.9rem !important;
   }
   
   ul, ol {
@@ -19,7 +19,7 @@ const MarkdownContainer = styled(Box)`
   
   li {
     margin: 0.25em 0;
-    font-size: 0.875rem;
+    font-size: 0.9rem !important;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -29,19 +29,19 @@ const MarkdownContainer = styled(Box)`
   }
   
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.5rem !important;
   }
   
   h2 {
-    font-size: 1.3rem;
+    font-size: 1.3rem !important;
   }
   
   h3 {
-    font-size: 1.15rem;
+    font-size: 1.15rem !important;
   }
   
   h4, h5, h6 {
-    font-size: 1rem;
+    font-size: 1rem !important;
   }
   
   code {
@@ -49,7 +49,7 @@ const MarkdownContainer = styled(Box)`
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-family: monospace;
-    font-size: 0.9em;
+    font-size: 0.85em !important;
   }
   
   pre {
@@ -71,11 +71,13 @@ const MarkdownContainer = styled(Box)`
     margin: 1em 0;
     padding-left: 1em;
     color: #666;
+    font-size: 0.9rem !important;
   }
   
   a {
     color: ${props => props.theme.palette.primary.main};
     text-decoration: none;
+    font-size: 0.9rem !important;
     
     &:hover {
       text-decoration: underline;
@@ -86,6 +88,7 @@ const MarkdownContainer = styled(Box)`
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
+    font-size: 0.9rem !important;
     
     th, td {
       border: 1px solid #ddd;

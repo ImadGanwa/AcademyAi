@@ -12,6 +12,8 @@ import {
   Button,
   useTheme
 } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import SendIcon from '@mui/icons-material/Send';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -19,6 +21,8 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MarkdownRenderer from '../common/MarkdownRenderer';
+import { ReactComponent as ChatIcon } from '../../assets/icons/Chat.svg';
+import { ReactComponent as UserIcon } from '../../assets/icons/user.svg';
 
 const ChatContainer = styled(Paper)`
   display: flex;
@@ -28,18 +32,26 @@ const ChatContainer = styled(Paper)`
   overflow: hidden;
   background-color: #fff;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 2px solidrgb(155, 153, 153);
+  
+  @media (max-width: 1200px) {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+  }
 `;
 
 const ChatHeader = styled(Box)`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 20px;
+  padding: 12px 20px;
   background-color: #FAFBFC;
   color: ${props => props.theme.palette.text.primary};
   border-bottom: 1px solid ${props => props.theme.palette.divider};
   border-radius: 0px 10px 0 0;
-
+  height: 47px;
+  box-sizing: border-box;
   flex-shrink: 0;
 `;
 
@@ -86,6 +98,14 @@ const MessageBubble = styled(Box)<{ isUser: boolean }>`
   color: ${props => props.isUser ? '#fff' : props.theme.palette.text.primary};
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   position: relative;
+  text-align: ${props => props.isUser ? 'left' : 'left'};
+  font-size: 0.9rem;
+`;
+
+const MessageTimestamp = styled(Typography)`
+  font-size: 0.75rem !important;
+  color: rgba(0, 0, 0, 0.5);
+  margin-top: 2px;
 `;
 
 const MessageContent = styled(Typography)<{ isUser: boolean }>`
@@ -130,6 +150,37 @@ const StyledAvatar = styled(Avatar)`
   background-color: ${props => props.theme.palette.primary.main};
 `;
 
+const AICoachAvatar = styled(Avatar)`
+  width: 40px;
+  height: 40px;
+  background-color: ${props => props.theme.palette.primary.light};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #e0e0e0;
+  
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+  }
+`;
+
+const UserAvatar = styled(Avatar)`
+  width: 40px;
+  height: 40px;
+  background-color: ${props => props.theme.palette.secondary.light};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+  }
+`;
+
 interface AIMessage {
   content: string;
   sender: 'user' | 'ai';
@@ -152,15 +203,10 @@ export const AIChat: React.FC<AIChatProps> = ({
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  // Scroll to bottom of messages when messages change, but only if it's not the initial render
-  const isInitialRender = useRef(true);
+  // Scroll to bottom of messages when messages change
   useEffect(() => {
-    if (isInitialRender.current) {
-      isInitialRender.current = false;
-      return;
-    }
-    
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -184,14 +230,30 @@ export const AIChat: React.FC<AIChatProps> = ({
     onSendMessage(suggestion);
   };
 
-  const renderMessages = () => {
-    if (messages.length === 0) {
-      return (
+  const formatTimestamp = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  return (
+    <ChatContainer elevation={0}>
+      <ChatHeader className="ai-chat-header">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <AICoachAvatar>
+            <ChatIcon />
+          </AICoachAvatar>
+          <Typography variant="subtitle1" fontWeight={600}>
+            AI Coach
+          </Typography>
+        </Box>
+      </ChatHeader>
+      
+      <ChatBody>
+        {/* Static welcome message always shown */}
         <WelcomeContainer>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <StyledAvatar>
-              <SmartToyOutlinedIcon />
-            </StyledAvatar>
+            <AICoachAvatar>
+              <ChatIcon />
+            </AICoachAvatar>
             <Box>
               <Typography variant="h6" fontWeight={600}>
                 Hey there! 👋
@@ -201,84 +263,75 @@ export const AIChat: React.FC<AIChatProps> = ({
               </Typography>
             </Box>
           </Box>
-          
-          <Divider />
-          
-          <Typography variant="subtitle2" color="text.secondary" fontWeight={600}>
-            Try asking me:
-          </Typography>
-          
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            <SuggestionButton
-              variant="outlined"
-              startIcon={<QuizOutlinedIcon />}
-              onClick={() => handleSuggestionClick('Give me practice questions about this topic')}
-            >
-              Give me practice questions
-            </SuggestionButton>
-            
-            <SuggestionButton
-              variant="outlined"
-              startIcon={<LightbulbOutlinedIcon />}
-              onClick={() => handleSuggestionClick('Explain this concept in simple terms')}
-            >
-              Explain this concept
-            </SuggestionButton>
-            
-            <SuggestionButton
-              variant="outlined"
-              startIcon={<SummarizeOutlinedIcon />}
-              onClick={() => handleSuggestionClick('Summarize the key points')}
-            >
-              Summarize key points
-            </SuggestionButton>
-          </Box>
         </WelcomeContainer>
-      );
-    }
-
-    return messages.map((msg, index) => (
-      <MessageContainer key={index} isUser={msg.sender === 'user'}>
-        {msg.sender === 'user' ? (
-          <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-            <AccountCircleIcon />
-          </Avatar>
-        ) : (
-          <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-            <SmartToyOutlinedIcon />
-          </Avatar>
+        
+        {/* Suggestion buttons only shown when no messages */}
+        {messages.length === 0 && (
+          <Box sx={{ mx: 3, my: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary" fontWeight={600} sx={{ mb: 1 }}>
+              Try asking me:
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <SuggestionButton
+                variant="outlined"
+                startIcon={<QuizOutlinedIcon />}
+                onClick={() => handleSuggestionClick('Give me practice questions about this topic')}
+              >
+                Give me practice questions
+              </SuggestionButton>
+              
+              <SuggestionButton
+                variant="outlined"
+                startIcon={<LightbulbOutlinedIcon />}
+                onClick={() => handleSuggestionClick('Explain this concept in simple terms')}
+              >
+                Explain this concept
+              </SuggestionButton>
+              
+              <SuggestionButton
+                variant="outlined"
+                startIcon={<SummarizeOutlinedIcon />}
+                onClick={() => handleSuggestionClick('Summarize the key points')}
+              >
+                Summarize key points
+              </SuggestionButton>
+            </Box>
+          </Box>
         )}
         
-        <Box sx={{ maxWidth: '85%' }}>
-          <Typography variant="caption" color="text.secondary" sx={{ mx: 1, mb: 0.5, display: 'block' }}>
-            {msg.sender === 'user' ? 'You' : 'AI Coach'}
-          </Typography>
-          
-          <MessageBubble isUser={msg.sender === 'user'}>
+        {/* User and AI messages */}
+        {messages.map((msg, index) => (
+          <MessageContainer key={index} isUser={msg.sender === 'user'}>
             {msg.sender === 'user' ? (
-              <Typography>{msg.content}</Typography>
+              user?.profileImage ? (
+                <UserAvatar src={user.profileImage} alt="User" />
+              ) : (
+                <UserAvatar>
+                  <UserIcon />
+                </UserAvatar>
+              )
             ) : (
-              <MarkdownRenderer content={msg.content} />
+              <AICoachAvatar>
+                <ChatIcon />
+              </AICoachAvatar>
             )}
-          </MessageBubble>
-        </Box>
-      </MessageContainer>
-    ));
-  };
-
-  return (
-    <ChatContainer elevation={0}>
-      <ChatHeader className="ai-chat-header">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <SmartToyOutlinedIcon fontSize="small" />
-          <Typography variant="subtitle1" fontWeight={600}>
-            AI Coach
-          </Typography>
-        </Box>
-      </ChatHeader>
-      
-      <ChatBody>
-        {renderMessages()}
+            
+            <Box sx={{ maxWidth: '85%', display: 'flex', flexDirection: 'column' }}>
+              <MessageBubble isUser={msg.sender === 'user'}>
+                {msg.sender === 'user' ? (
+                  <Typography variant="body2" sx={{ fontSize: '0.9rem !important', fontWeight: 'normal' }}>
+                    {msg.content}
+                  </Typography>
+                ) : (
+                  <MarkdownRenderer content={msg.content} />
+                )}
+              </MessageBubble>
+              <MessageTimestamp align={msg.sender === 'user' ? 'right' : 'left'}>
+                {formatTimestamp(msg.timestamp)}
+              </MessageTimestamp>
+            </Box>
+          </MessageContainer>
+        ))}
         
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>

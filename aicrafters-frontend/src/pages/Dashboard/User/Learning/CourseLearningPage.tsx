@@ -7,7 +7,7 @@ import { Layout } from '../../../../components/layout/Layout/Layout';
 import { CourseLearningHero } from '../../../../components/layout/CourseLearning/CourseLearningHero';
 import { CourseLearningContent } from '../../../../components/layout/CourseLearning/CourseLearningContent';
 import { CourseLearningNavigation } from '../../../../components/layout/CourseLearning/CourseLearningNavigation';
-import { Container, CircularProgress, Button, useMediaQuery, useTheme } from '@mui/material';
+import { Container, CircularProgress} from '@mui/material';
 import { Section, Lesson, LessonContent } from '../../../../types/course';
 import { api } from '../../../../services/api';
 import { coursesService } from '../../../../services/coursesService';
@@ -16,19 +16,21 @@ import { DEFAULT_LANGUAGE } from '../../../../utils/constants';
 import { CongratulationsPopup } from '../../../../components/common/Popup/CongratulationsPopup';
 // import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
 import AICoach from '../../../../components/ai/AICoach';
+import FloatingChatButton from '../../../../components/ai/FloatingChatButton';
 import config from '../../../../config';
 
 const PageContainer = styled.div`
   margin-bottom: 40px;
 `;
 
-const ContentWrapper = styled(Container)`
+const ContentWrapper = styled(Container)<{ expanded?: boolean }>`
   display: flex !important;
-  max-width: 1440px;
+  max-width: ${props => props.expanded ? '1440px' : '1340px'} !important;
   margin: 0 auto;
   padding: 0 24px;
   position: relative;
   gap: 0px;
+  transition: max-width 0.3s ease;
   
   @media (max-width: 768px) {
     padding: 0 16px;
@@ -57,6 +59,7 @@ const PageLayout = styled.div`
   margin: -80px auto 0;
   gap: 12px;
   align-items: flex-start;
+  justify-content: space-between;
   
   @media (max-width: 1200px) {
     flex-direction: column;
@@ -69,25 +72,51 @@ const MainContent = styled.div`
   flex: 1;
   min-width: 0;
   position: relative;
+  width: calc(100% - 450px);
+  
+  @media (max-width: 1200px) {
+    width: 100%;
+  }
 `;
 
-const AICoachPanel = styled.div`
-  width: 520px;
+const AICoachPanel = styled.div<{ isVisible: boolean }>`
+  width: ${props => props.isVisible ? '450px' : '0'};
+  max-width: 450px;
   flex-shrink: 0;
   height: calc(100vh - 180px);
   position: sticky;
   top: 100px;
-  margin-right: 74px;
-  margin-left: 0px;
-  overflow-y: auto;
+  overflow: ${props => props.isVisible ? 'visible' : 'hidden'};
+  transition: width 0.3s ease;
+  margin-left: ${props => props.isVisible ? '10px' : '0'};
+  margin-right: ${props => props.isVisible ? '10px' : '0'};
+  
+  @media (max-width: 1200px) {
+    width: ${props => props.isVisible ? '100%' : '0'};
+    max-width: 100%;
+    height: ${props => props.isVisible ? '500px' : '0'};
+    position: relative;
+    top: 0;
+    margin: ${props => props.isVisible ? '24px auto 0' : '0'};
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+`;
+
+const AICoachContent = styled.div<{ isVisible: boolean }>`
+  width: 100%;
+  height: 100%;
+  opacity: ${props => props.isVisible ? 1 : 0};
+  visibility: ${props => props.isVisible ? 'visible' : 'hidden'};
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
   
   @media (max-width: 1200px) {
     width: 100%;
-    height: 500px;
-    position: relative;
-    top: 0;
-    margin-top: 24px;
-    margin-right: 0;
+    max-width: 520px;
   }
 `;
 
@@ -122,11 +151,32 @@ export const CourseLearningPage: React.FC = () => {
   const currentLang = location.pathname.split('/')[1] || DEFAULT_LANGUAGE;
   const [showCongratulations, setShowCongratulations] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
+  // Chat visibility state
+  const [isChatOpen, setIsChatOpen] = useState(true);
 
   // Reset scroll position on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Load chat state from localStorage on initial load
+  useEffect(() => {
+    const savedChatState = localStorage.getItem('aiCoachChatOpen');
+    if (savedChatState !== null) {
+      setIsChatOpen(savedChatState === 'true');
+    }
+  }, []);
+
+  // Save chat state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('aiCoachChatOpen', isChatOpen.toString());
+  }, [isChatOpen]);
+
+  // Toggle chat visibility
+  const handleToggleChat = () => {
+    setIsChatOpen(prevState => !prevState);
+  };
 
   // Check authentication and course access
   useEffect(() => {
@@ -410,7 +460,7 @@ export const CourseLearningPage: React.FC = () => {
   };
 
   // Calculate total lessons
-  const totalLessons = sections.reduce((total, section) => total + section.items.length, 0);
+  // const totalLessons = sections.reduce((total, section) => total + section.items.length, 0);
 
   const handleBackToCourses = () => {
     setShowCongratulations(false);
@@ -453,6 +503,11 @@ export const CourseLearningPage: React.FC = () => {
     return <ErrorMessage>No course content available.</ErrorMessage>;
   }
 
+  // Check if current lesson has video content
+  const hasVideoContent = 
+    currentLesson?.type === 'video' && 
+    currentLesson.content?.contentItems?.some(item => item.type === 'video');
+
   return (
     <Layout title={`Learning - ${courseTitle || 'Course'}`}>
       <PageContainer>
@@ -462,7 +517,7 @@ export const CourseLearningPage: React.FC = () => {
         />
         <PageLayout>
           <MainContent>
-            <ContentWrapper>
+            <ContentWrapper expanded={hasVideoContent && !isChatOpen}>
               <CourseLearningNavigation 
                 sections={sections}
                 currentLesson={{
@@ -496,18 +551,28 @@ export const CourseLearningPage: React.FC = () => {
             </ContentWrapper>
           </MainContent>
           
-          {/* AI Coach Panel */}
-          {currentLesson?.type === 'video' && currentLesson.content?.contentItems?.some(item => item.type === 'video') && (
-            <AICoachPanel>
-              <AICoach 
-                courseId={courseId || ''}
-                videoUrl={
-                  (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
-                }
-              />
+          {/* AI Coach Panel - only render if the current lesson has video content */}
+          {hasVideoContent && (
+            <AICoachPanel isVisible={isChatOpen}>
+              <AICoachContent isVisible={isChatOpen}>
+                <AICoach 
+                  courseId={courseId || ''}
+                  videoUrl={
+                    (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
+                  }
+                  onClose={handleToggleChat}
+                />
+              </AICoachContent>
             </AICoachPanel>
           )}
         </PageLayout>
+        
+        {/* Floating chat button - only show when chat is closed and lesson has video */}
+        {hasVideoContent && !isChatOpen && (
+          <FloatingButtonContainer>
+            <FloatingChatButton onClick={handleToggleChat} />
+          </FloatingButtonContainer>
+        )}
         
         <CongratulationsPopup
           open={showCongratulations}
@@ -521,3 +586,27 @@ export const CourseLearningPage: React.FC = () => {
     </Layout>
   );
 };
+
+const FloatingButtonContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  animation: fadeInUp 0.3s ease forwards;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    bottom: 16px;
+    right: 16px;
+  }
+`;
