@@ -126,7 +126,7 @@ const DesktopPurchaseCardContainer = styled.div`
   }
 `;
 
-// Add a styled component for the fixed mobile banner
+// Add styled component for the fixed mobile banner
 const MobileStartLearningBanner = styled.div`
   display: none;
   
@@ -139,12 +139,17 @@ const MobileStartLearningBanner = styled.div`
     background: white;
     padding: 16px 20px;
     box-shadow: 0px -4px 20px rgba(0, 0, 0, 0.1);
-    z-index: 9999;
+    z-index: 99;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     border-top: 2px solid ${props => props.theme.palette.primary.main};
+    transition: transform 0.3s ease-in-out;
+    
+    &.menu-open {
+      transform: translateY(100%);
+    }
   }
 `;
 
@@ -275,6 +280,7 @@ export const CourseDetailsPage: React.FC = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const { t, i18n } = useTranslation();
   const navigate = useLocalizedNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -500,6 +506,31 @@ export const CourseDetailsPage: React.FC = () => {
     };
   }, [course, totalDuration, i18n.language]);
 
+  // Add an effect to listen for clicks on dropdown menus with a timeout
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    const handleMenuClick = (e: MouseEvent) => {
+      // Check if the clicked element is a menu or has a parent that is a menu
+      const isMenu = !!(e.target as HTMLElement).closest('.MuiMenu-root, [role="menu"], .dropdown-menu, .MuiPopover-root');
+      
+      if (isMenu) {
+        setIsMenuOpen(true);
+      } else {
+        // Add a small delay before hiding the banner to prevent flickering
+        timeoutId = setTimeout(() => {
+          setIsMenuOpen(false);
+        }, 300);
+      }
+    };
+
+    document.addEventListener('mousedown', handleMenuClick);
+    return () => {
+      document.removeEventListener('mousedown', handleMenuClick);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
+
   if (loading) {
     return (
       <Layout title="Loading Course">
@@ -631,9 +662,9 @@ export const CourseDetailsPage: React.FC = () => {
               />
             )}
             
-            {/* Add the mobile banner */}
+            {/* Add the mobile banner with CSS class */}
             {hasPurchased && (
-              <MobileStartLearningBanner>
+              <MobileStartLearningBanner className={isMenuOpen ? 'menu-open' : ''}>
                 <MobileBannerInfo>
                   <MobileBannerImage>
                     <img src={course.image} alt={course.title} />
