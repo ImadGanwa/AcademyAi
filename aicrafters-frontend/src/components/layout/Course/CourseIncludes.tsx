@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as ClockIcon } from '../../../assets/icons/Clock.svg';
 import { ReactComponent as ArticleIcon } from '../../../assets/icons/Article.svg';
-import { ReactComponent as DownloadIcon } from '../../../assets/icons/Download.svg';
+// import { ReactComponent as DownloadIcon } from '../../../assets/icons/Download.svg';
 import { ReactComponent as AccessIcon } from '../../../assets/icons/Access.svg';
 import { ReactComponent as CertificateIcon } from '../../../assets/icons/Certificate.svg';
 import { Title } from '../../common/Typography/Title';

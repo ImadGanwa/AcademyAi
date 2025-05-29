@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-import { NavButton } from '../../common/Button/NavButton';
+// import { NavButton } from '../../common/Button/NavButton';
 import { useLocalizedHref } from '../../../hooks/useLocalizedHref';
 import { Title } from '../../common/Typography/Title';
 
@@ -41,7 +41,7 @@ interface RelatedTopicsProps {
 
 export const RelatedTopics: React.FC<RelatedTopicsProps> = ({ categories = [] }) => {
   const { t } = useTranslation();
-  const getLocalizedHref = useLocalizedHref();
+  // const getLocalizedHref = useLocalizedHref();
 
   if (!categories.length) {
     return null;

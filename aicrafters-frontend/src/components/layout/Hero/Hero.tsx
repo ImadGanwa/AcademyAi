@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
 import { ReactComponent as HeroLogo } from '../../../assets/images/hero-logo.svg';
-import { ReactComponent as EmailIcon } from '../../../assets/icons/email.svg';
+// import { ReactComponent as EmailIcon } from '../../../assets/icons/email.svg';
 import axios from 'axios';
 import config from '../../../config';
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, Tabs, Tab, IconButton, Tooltip, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Tabs, Tab, IconButton,  useTheme, useMediaQuery } from '@mui/material';
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import CloseIcon from '@mui/icons-material/Close';
+// import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 

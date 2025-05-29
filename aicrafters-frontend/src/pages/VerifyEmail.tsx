@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ export const VerifyEmail: React.FC = () => {
   const localizedNavigate = useLocalizedNavigate();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error' | 'already-verified'>('verifying');
   const [error, setError] = useState<string | null>(null);
-  const verificationAttempted = useRef(false);
+  // const verificationAttempted = useRef(false);
   
   // Get user from Redux store
   const user = useSelector((state: RootState) => state.auth.user);

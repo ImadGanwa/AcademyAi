@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Box, Typography, Paper, CircularProgress, Alert, Link, IconButton } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, Alert, IconButton } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import MarkdownRenderer from '../common/MarkdownRenderer';

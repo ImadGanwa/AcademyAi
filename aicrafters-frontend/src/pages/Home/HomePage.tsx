@@ -109,7 +109,7 @@ const ImageItem = styled(Box)`
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const { t,i18n } = useTranslation();
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const tracePlusSectionRef = useRef<HTMLDivElement>(null);

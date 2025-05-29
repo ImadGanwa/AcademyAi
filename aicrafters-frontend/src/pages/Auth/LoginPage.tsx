@@ -4,13 +4,13 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Input } from '../../components/common/Input/Input';
 import { IconButton } from '../../components/common/Button/IconButton';
-import { ReactComponent as Logo } from '../../assets/images/dark-logo.svg';
+// import { ReactComponent as Logo } from '../../assets/images/dark-logo.svg';
 import { ReactComponent as EmailIcon } from '../../assets/icons/email.svg';
 import { ReactComponent as LockIcon } from '../../assets/icons/password.svg';
-import { ReactComponent as GoogleIcon } from '../../assets/icons/google.svg';
-import { ReactComponent as LinkedInIcon } from '../../assets/icons/linkedin.svg';
+// import { ReactComponent as GoogleIcon } from '../../assets/icons/google.svg';
+// import { ReactComponent as LinkedInIcon } from '../../assets/icons/linkedin.svg';
 import { ReactComponent as MessageIcon } from '../../assets/icons/Message.svg';
-import { SocialSignInButton } from '../../components/common/Button/SocialSignInButton';
+// import { SocialSignInButton } from '../../components/common/Button/SocialSignInButton';
 import { RouterLink } from '../../components/common/RouterLink/RouterLink';
 import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import { authService } from '../../services/authService';
@@ -135,7 +135,7 @@ export const LoginPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useLocalizedNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

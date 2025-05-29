@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, TextField, Typography, Avatar, InputAdornment, IconButton } from '@mui/material';
+import { Box, TextField, Typography, Avatar, InputAdornment, IconButton } from '@mui/material';
 import styled from '@emotion/styled';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../../../services/api';

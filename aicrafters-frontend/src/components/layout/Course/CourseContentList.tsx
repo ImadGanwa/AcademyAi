@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Typography, Button } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Title } from '../../common/Typography/Title';
 import { ReactComponent as ExpandIcon } from '../../../assets/icons/Expand.svg';
@@ -8,7 +8,7 @@ import { ReactComponent as ArrowDownIcon } from '../../../assets/icons/ArrowDown
 import { ReactComponent as PlayIcon } from '../../../assets/icons/Play.svg';
 import { ReactComponent as ArticleIcon } from '../../../assets/icons/Article.svg';
 import { ReactComponent as QuizIcon } from '../../../assets/icons/Quiz.svg';
-import { ReactComponent as CloseIcon } from '../../../assets/icons/ExitIcon.svg';
+// import { ReactComponent as CloseIcon } from '../../../assets/icons/ExitIcon.svg';
 import { isRTL } from '../../../utils/i18n/i18n';
 import { LessonPreviewPopup } from './LessonPreviewPopup';
 

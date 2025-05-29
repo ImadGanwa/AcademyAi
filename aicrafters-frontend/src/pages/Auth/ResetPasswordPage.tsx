@@ -50,7 +50,7 @@ const Description = styled(Typography)`
 
 export const ResetPasswordPage: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
+  // const theme = useTheme();
   const { token } = useParams<{ token: string }>();
   const navigate = useLocalizedNavigate();
   
