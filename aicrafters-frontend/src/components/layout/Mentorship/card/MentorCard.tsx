@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { LoginPopup } from '../../../common/Popup/LoginPopup';
 import { useTranslation } from 'react-i18next';
-import { getCountryName } from '../../../../utils/countryUtils';
+import { getCountryName, getCountryFlag, getCountryCode } from '../../../../utils/countryUtils';
 
 // Types
 export interface MentorSkill {
@@ -311,6 +311,14 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
     }
   };
 
+  // Get country flag from country field (country code or full name)
+  const countryFlag = mentor.country ? 
+    getCountryFlag(mentor.country) || getCountryFlag(getCountryCode(mentor.country)) : 
+    null;
+  
+  // Get full country name for display - handle both codes and names
+  const countryName = mentor.country ? getCountryName(mentor.country) : null;
+
   return (
     <CardContainer>
       <MentorImage imageUrl={mentor.profileImage} />
@@ -320,7 +328,13 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
             <Name variant="body1">
               {mentor.fullName}
               {mentor.isVerified && <VerifiedBadge />}
-              {mentor.countryFlag && <CountryFlag src={mentor.countryFlag} alt={t('mentorship.countryFlagAlt', { defaultValue: 'Country flag' }) as string} />}
+              {(countryFlag || mentor.countryFlag) && (
+                <CountryFlag 
+                  src={countryFlag || mentor.countryFlag!} 
+                  alt={`${countryName || 'Country'} flag`}
+                  title={countryName || 'Country'}
+                />
+              )}
             </Name>
           </NameContainer>
           <Title>{t(`titles.${mentor.title}`, { defaultValue: mentor.title }) as string}</Title>

@@ -8,7 +8,7 @@ import { Mentor, MentorSkill, MentorLanguage } from './card/MentorCard';
 import { CustomPagination } from './Pagination';
 import { getPublicMentorList } from '../../../api/mentor';
 import { DynamicFilters } from './filters/DynamicFilters';
-import { getCountryName } from '../../../utils/countryUtils';
+import { getCountryName, getCountryCode } from '../../../utils/countryUtils';
 
 const SearchAndFiltersWrapper = styled.div`
   background: ${props => props.theme.palette.background.default};
@@ -260,7 +260,23 @@ export const MentorsList: React.FC = () => {
         if (searchTerm) filters.search = searchTerm;
         if (category) filters.category = category;
         if (skill) filters.skill = skill;
-        if (country) filters.country = country;
+        if (country) {
+          // Convert country name back to code for API
+          let countryCode = country;
+          if (country === 'United States') countryCode = 'USA';
+          else if (country === 'France') countryCode = 'FR';
+          else if (country === 'Germany') countryCode = 'DE';
+          else if (country === 'United Kingdom') countryCode = 'GB';
+          else if (country === 'Canada') countryCode = 'CA';
+          else if (country === 'Australia') countryCode = 'AU';
+          else if (country === 'India') countryCode = 'IN';
+          else if (country === 'Brazil') countryCode = 'BR';
+          else if (country === 'Japan') countryCode = 'JP';
+          else if (country === 'China') countryCode = 'CN';
+          else countryCode = getCountryCode(country);
+          
+          filters.country = countryCode;
+        }
         if (language) filters.language = language;
         
         console.log('Calling getPublicMentorList API with filters:', filters);
@@ -304,13 +320,20 @@ export const MentorsList: React.FC = () => {
           if (country) {
             filteredResults = filteredResults.filter(mentor => {
               if (mentor.country) {
-                // Use the country field from the database
-                return mentor.country === country;
+                // Get the full country name from mentor's country (could be code or name)
+                const mentorCountryName = getCountryName(mentor.country);
+                
+                // The filter value is a full country name, so compare with mentorCountryName
+                // Also check direct match in case they're both codes
+                const matches = mentorCountryName === country || mentor.country === country;
+                return matches;
               } else if (mentor.countryFlag) {
                 // Fallback to extracting from countryFlag URL for backward compatibility
                 const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
-                const countryName = getCountryName(countryCode);
-                return countryName === country;
+                if (countryCode) {
+                  const countryName = getCountryName(countryCode);
+                  return countryName === country;
+                }
               }
               return false;
             });

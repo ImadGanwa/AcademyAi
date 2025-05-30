@@ -1,9 +1,10 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import styled from 'styled-components';
-import VerifiedIcon from '@mui/icons-material/Verified';
+import { VerifiedUser as VerifiedIcon } from '@mui/icons-material';
 import { Mentor } from '../card/MentorCard';
 import { useTranslation } from 'react-i18next';
+import { getCountryFlag, getLanguageFlag, getCountryName } from '../../../../utils/countryUtils';
 
 // Main container for the entire header card
 const HeaderContainer = styled(Box)`
@@ -172,22 +173,13 @@ interface MentorHeaderInfoProps {
   mentor: Mentor;
 }
 
-// --- LANGUAGE FLAG MAPPING ---
-// Define language flags mapping for existing languages
-const languageFlagMap: Record<string, string> = {
-  'French': 'https://flagcdn.com/w20/fr.png',
-  'English': 'https://flagcdn.com/w20/gb.png', // Great Britain flag for English
-  'Spanish': 'https://flagcdn.com/w20/es.png',
-  'German': 'https://flagcdn.com/w20/de.png',
-  'Mandarin': 'https://flagcdn.com/w20/cn.png',
-  'Hindi': 'https://flagcdn.com/w20/in.png',
-  'Japanese': 'https://flagcdn.com/w20/jp.png',
-  // Add more as needed
-};
-
 // --- MAIN COMPONENT ---
 export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) => {
   const { t } = useTranslation();
+
+  // Get country flag and name from mentor's country field
+  const countryFlag = mentor.country ? getCountryFlag(mentor.country) : null;
+  const countryName = mentor.country ? getCountryName(mentor.country) : null;
 
   return (
     <HeaderContainer>
@@ -201,10 +193,11 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
           <MentorName variant="h4">
             {mentor.fullName}
             {mentor.isVerified !== false && <VerifiedBadge />}
-            {mentor.countryFlag && (
+            {(countryFlag || mentor.countryFlag) && (
               <CountryFlag 
-                src={mentor.countryFlag} 
-                alt={t('mentorship.countryFlagAlt', { defaultValue: 'Country flag' }) as string}
+                src={countryFlag || mentor.countryFlag!} 
+                alt={`${countryName || 'Country'} flag`}
+                title={countryName || 'Country'}
                 onError={(e) => (e.currentTarget.style.display = 'none')}
               />
             )}
@@ -237,18 +230,22 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
           <>
             <SectionTitle>{t('mentorship.spokenLanguages', { defaultValue: 'Spoken Languages' }) as string}</SectionTitle>
             <LanguageSection>
-              {mentor.languages.map(language => (
-                <Language key={language.id}>
-                  {languageFlagMap[language.name] && (
-                    <LanguageFlag 
-                        src={languageFlagMap[language.name]} 
-                        alt={t('mentorship.languageFlagAlt', { language: language.name, defaultValue: `${language.name} flag` }) as string}
+              {mentor.languages.map(language => {
+                const languageFlag = getLanguageFlag(language.name);
+                return (
+                  <Language key={language.id}>
+                    {languageFlag && (
+                      <LanguageFlag 
+                        src={languageFlag} 
+                        alt={`${language.name} flag`}
+                        title={language.name}
                         onError={(e) => (e.currentTarget.style.display = 'none')}
-                    />
-                  )}
-                  {t(`languages.${language.name}`, { defaultValue: language.name }) as string}
-                </Language>
-              ))}
+                      />
+                    )}
+                    {t(`languages.${language.name}`, { defaultValue: language.name }) as string}
+                  </Language>
+                );
+              })}
             </LanguageSection>
           </>
         )}

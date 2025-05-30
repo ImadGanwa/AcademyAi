@@ -4,7 +4,7 @@ import { logout } from '../store/slices/authSlice';
 
 const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 // TODO: Move hardcoded fallback URL to a central config file
-console.log('API baseURL configured as:', baseURL);
+// console.log('API baseURL configured as:', baseURL);
 
 const axiosInstance = axios.create({
   baseURL,
