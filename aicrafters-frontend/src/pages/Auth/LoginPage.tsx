@@ -19,6 +19,7 @@ import { Layout } from '../../components/layout/Layout/Layout';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import {useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { initiateLinkedInLogin } from '../../utils/auth';
 // import { LinkedIn } from 'react-linkedin-login-oauth2';
 
 const Container = styled(Box)`
@@ -156,6 +157,28 @@ export const LoginPage: React.FC = () => {
     if (expired === 'true') {
       toast.warning(t('auth.sessionExpired', 'Your session has expired. Please log in again.') as string);
     }
+
+    // Add event listener for messages from popup
+    const handleAuthMessage = (event: MessageEvent) => {
+      // Verify origin for security
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data?.type === 'linkedin-auth-success') {
+        toast.success(t('auth.linkedinLoginSuccess'));
+        redirectAfterLogin(event.data.user);
+      }
+      
+      if (event.data?.type === 'linkedin-auth-error') {
+        toast.error(event.data.error || t('auth.linkedinLoginFailed'));
+      }
+    };
+
+    window.addEventListener('message', handleAuthMessage);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('message', handleAuthMessage);
+    };
   }, [location]);
 
   const redirectAfterLogin = (user: any) => {
@@ -278,77 +301,7 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleLinkedInLogin = () => {
-    const clientId = process.env.REACT_APP_LINKEDIN_CLIENT_ID;
-    const redirectUri = process.env.REACT_APP_LINKEDIN_REDIRECT_URI;
-
-    if (!clientId || !redirectUri) {
-      toast.error(t('auth.linkedinConfigError', 'LinkedIn configuration is missing'));
-      return;
-    }
-    
-    const scope = 'openid profile email';
-    const state = Math.random().toString(36).substring(7);
-    
-    const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
-
-    // Calculate center position for the popup
-    const width = 600;
-    const height = 600;
-    const left = window.innerWidth / 2 - width / 2 + window.screenX;
-    const top = window.innerHeight / 2 - height / 2 + window.screenY;
-
-    // Open popup
-    const popup = window.open(
-      linkedinUrl,
-      'LinkedIn Login',
-      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,location=yes`
-    );
-
-    if (popup) {
-      // Poll for changes
-      const pollTimer = setInterval(() => {
-        try {
-          // Check if popup is closed
-          if (popup.closed) {
-            clearInterval(pollTimer);
-            return;
-          }
-
-          // Check if URL contains the callback
-          const currentUrl = popup.location.href;
-          
-          if (currentUrl.includes('/auth/linkedin/callback')) {
-            clearInterval(pollTimer);
-            
-            const urlParams = new URLSearchParams(new URL(currentUrl).search);
-            const code = urlParams.get('code');
-            const returnedState = urlParams.get('state');
-
-            // Verify state to prevent CSRF
-            if (code && returnedState === state) {
-              handleLinkedInCallback(code);
-            } else {
-              toast.error(t('auth.linkedinLoginFailed'));
-            }
-            
-            popup.close();
-          }
-        } catch (error) {
-          // Ignore cross-origin errors
-          if (error instanceof DOMException && error.name === 'SecurityError') {
-            return;
-          }
-        }
-      }, 500);
-
-      // Cleanup on window close
-      window.addEventListener('beforeunload', () => {
-        clearInterval(pollTimer);
-        if (!popup.closed) popup.close();
-      });
-    } else {
-      toast.error(t('auth.popupBlocked'));
-    }
+    initiateLinkedInLogin();
   };
 
   const handleOpenOrgInfo = (e: React.MouseEvent<HTMLSpanElement>) => {
@@ -374,7 +327,7 @@ export const LoginPage: React.FC = () => {
               placeholder={t('auth.login.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              startIcon={<EmailIcon />}
+              icon={<EmailIcon />}
               fullWidth
               required
               error={!!error}

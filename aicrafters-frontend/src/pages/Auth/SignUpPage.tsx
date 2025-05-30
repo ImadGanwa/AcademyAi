@@ -18,6 +18,7 @@ import { PasswordStrengthIndicator } from '../../components/common/Input/Passwor
 import { Layout } from '../../components/layout/Layout/Layout';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { initiateLinkedInLogin } from '../../utils/auth';
 
 const Container = styled(Box)`
   display: flex;
@@ -253,6 +254,49 @@ export const SignUpPage: React.FC = () => {
     });
   }, [location, navigate]);
 
+  useEffect(() => {
+    // Add event listener for messages from popup
+    const handleAuthMessage = (event: MessageEvent) => {
+      // Verify origin for security
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data?.type === 'linkedin-auth-success') {
+        toast.success(t('auth.linkedinSignupSuccess', 'Successfully signed up with LinkedIn'));
+        
+        // Determine dashboard path based on user role
+        let dashboardPath;
+        switch (event.data.user.role) {
+          case 'admin':
+            dashboardPath = '/dashboard/admin';
+            break;
+          case 'trainer':
+            dashboardPath = '/dashboard/trainer';
+            break;
+          case 'mentor':
+            dashboardPath = '/dashboard/mentor';
+            break;
+          default:
+            dashboardPath = '/dashboard/user/learning';
+        }
+
+        // Get the current language from the URL
+        const lang = location.pathname.split('/')[1] || 'en';
+        navigate(`/${lang}${dashboardPath}`);
+      }
+      
+      if (event.data?.type === 'linkedin-auth-error') {
+        toast.error(event.data.error || t('auth.linkedinSignupFailed', 'LinkedIn signup failed'));
+      }
+    };
+
+    window.addEventListener('message', handleAuthMessage);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('message', handleAuthMessage);
+    };
+  }, [navigate, location.pathname, t]);
+
   const handleRecaptchaChange = (token: string | null) => {
     setFormData(prev => ({ ...prev, recaptchaToken: token || '' }));
     if (errors.recaptcha) {
@@ -383,28 +427,7 @@ export const SignUpPage: React.FC = () => {
   };
 
   const handleLinkedInLogin = () => {
-
-    const clientId = process.env.REACT_APP_LINKEDIN_CLIENT_ID;
-    const redirectUri = process.env.REACT_APP_LINKEDIN_REDIRECT_URI;
-
-   
-
-    if (!clientId || !redirectUri) {
-      console.error('Missing LinkedIn configuration');
-      toast.error('LinkedIn configuration is incomplete');
-      return;
-    }
-
-    const scope = 'profile email openid';
-    const state = Math.random().toString(36).substring(7);
-    
-    const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
-
-    // Store state in localStorage to verify callback
-    localStorage.setItem('linkedinState', state);
-
-    // Redirect to LinkedIn authorization
-    window.location.href = linkedinUrl;
+    initiateLinkedInLogin();
   };
 
   return (

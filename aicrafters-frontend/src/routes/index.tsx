@@ -37,6 +37,7 @@ import MentorApplicationConfirmation from '../pages/Mentorship/MentorApplication
 import { MentorDashboard } from '../pages/Dashboard/Mentor/MentorDashboard';
 import { MentorRouteGuard } from '../components/guards/MentorRouteGuard';
 import MyBookingPage from '../pages/Dashboard/User/Booking/MyBookingPage';
+import { LinkedInCallback } from '../pages/Auth/LinkedInCallback';
 
 // Protected route component for dashboard
 const ProtectedDashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -133,7 +134,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/" element={<Navigate to={`/${DEFAULT_LANGUAGE}`} replace />} />
 
       {/* LinkedIn callback route - outside language wrapper */}
-      <Route path="/auth/linkedin/callback" element={<SignUpPage />} />
+      <Route path="/auth/linkedin/callback" element={<LinkedInCallback />} />
 
       {/* Language-specific routes */}
       <Route path="/:lang" element={<LanguageWrapper />}>
