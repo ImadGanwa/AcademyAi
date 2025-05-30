@@ -152,7 +152,9 @@
     "googleLoginFailed": "Google login failed. Please try again.",
     "googleSignupFailed": "Google signup failed. Please try again.",
     "signupWithLinkedin": "Sign up with LinkedIn",
+    "signupWithGoogle": "Sign up with Google",
     "loginWithLinkedin": "Sign in with LinkedIn",
+    "loginWithGoogle": "Sign in with Google",
     "linkedinLoginSuccess": "Successfully signed in with LinkedIn",
     "linkedinLoginFailed": "Failed to sign in with LinkedIn. Please try again.",
     "linkedinSignupSuccess": "Successfully signed up with LinkedIn",
@@ -620,7 +622,8 @@
       "completionMessage": "You can now download your certificate and share your achievement",
       "getCertificate": "Get Certificate",
       "backToCourses": "Back to Courses",
-      "share": "Share on LinkedIn"
+      "share": "Share on LinkedIn",
+      "mobileNavHelp": "Tap to open the menu"
     },
     "certificate": {
       "title": "Course Certificate",

@@ -152,7 +152,9 @@
     "googleLoginFailed": "La connexion avec Google a échoué. Veuillez réessayer.",
     "googleSignupFailed": "L'inscription avec Google a échoué. Veuillez réessayer.",
     "signupWithLinkedin": "S'inscrire avec LinkedIn",
+    "signupWithGoogle": "S'inscrire avec Google",
     "loginWithLinkedin": "Se connecter avec LinkedIn",
+    "loginWithGoogle": "Se connecter avec Google",
     "linkedinLoginSuccess": "Connecté avec succès avec LinkedIn",
     "linkedinLoginFailed": "Échec de la connexion avec LinkedIn. Veuillez réessayer.",
     "linkedinSignupSuccess": "Inscrit avec succès avec LinkedIn",
@@ -620,7 +622,8 @@
       "completionMessage": "Vous pouvez maintenant télécharger votre certificat et partager votre réussite",
       "getCertificate": "Obtenir le certificat",
       "backToCourses": "Retour aux cours",
-      "share": "Partager sur LinkedIn"
+      "share": "Partager sur LinkedIn",
+      "mobileNavHelp": "Appuyez pour ouvrir le menu"
     },
     "certificate": {
       "title": "Certificat de cours",

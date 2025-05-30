@@ -153,7 +153,7 @@ export const CourseLearningPage: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   // Chat visibility state
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Reset scroll position on component mount
   useEffect(() => {
@@ -321,6 +321,71 @@ export const CourseLearningPage: React.FC = () => {
           contentRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
       }
+    }
+  };
+
+  // Function to find next and previous lessons
+  const findAdjacentLessons = () => {
+    if (!currentSection || !currentLesson) return { prev: null, next: null };
+    
+    // Find the index of the current lesson in the current section
+    const sectionIndex = sections.findIndex(s => s.id === currentSection.id);
+    const lessonIndex = currentSection.items.findIndex(l => l.id === currentLesson.id);
+    
+    // Initialize prev and next as null
+    let prev = null;
+    let next = null;
+    
+    // Check if there's a previous lesson in the same section
+    if (lessonIndex > 0) {
+      prev = {
+        sectionId: currentSection.id,
+        lesson: currentSection.items[lessonIndex - 1]
+      };
+    } 
+    // Check if there's a previous section with lessons
+    else if (sectionIndex > 0) {
+      const prevSection = sections[sectionIndex - 1];
+      if (prevSection.items.length > 0) {
+        prev = {
+          sectionId: prevSection.id,
+          lesson: prevSection.items[prevSection.items.length - 1]
+        };
+      }
+    }
+    
+    // Check if there's a next lesson in the same section
+    if (lessonIndex < currentSection.items.length - 1) {
+      next = {
+        sectionId: currentSection.id,
+        lesson: currentSection.items[lessonIndex + 1]
+      };
+    } 
+    // Check if there's a next section with lessons
+    else if (sectionIndex < sections.length - 1) {
+      const nextSection = sections[sectionIndex + 1];
+      if (nextSection.items.length > 0) {
+        next = {
+          sectionId: nextSection.id,
+          lesson: nextSection.items[0]
+        };
+      }
+    }
+    
+    return { prev, next };
+  };
+
+  const handlePrevLesson = () => {
+    const { prev } = findAdjacentLessons();
+    if (prev) {
+      handleLessonSelect(prev.sectionId, prev.lesson);
+    }
+  };
+
+  const handleNextLesson = () => {
+    const { next } = findAdjacentLessons();
+    if (next) {
+      handleLessonSelect(next.sectionId, next.lesson);
     }
   };
 
@@ -547,6 +612,10 @@ export const CourseLearningPage: React.FC = () => {
                 sectionId={currentLesson?.sectionId || ''}
                 lessonId={currentLesson?.id || ''}
                 courseId={courseId || ''}
+                onPrevLesson={handlePrevLesson}
+                onNextLesson={handleNextLesson}
+                hasPrevLesson={!!findAdjacentLessons().prev}
+                hasNextLesson={!!findAdjacentLessons().next}
               />
             </ContentWrapper>
           </MainContent>

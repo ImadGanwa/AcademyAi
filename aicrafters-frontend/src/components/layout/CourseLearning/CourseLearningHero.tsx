@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 const HeroContainer = styled.div`
   width: 100%;
-  background-color: ${props => props.theme.palette.background.default};
+  background-color: ${props => props.theme.palette.primary.dark};
   padding: 60px 24px 120px;
   color: white;
   position: relative;
@@ -74,8 +74,8 @@ const ProgressSection = styled.div`
 const ProgressBar = styled.div`
   height: 12px;
   width: 220px;
-  background: ${props => props.theme.palette.background.secondary};
-  border: 1px solid #ffffff;
+  background: #ffffff;
+  border: 1px solid ${props => props.theme.palette.background.secondary};
   border-radius: 7px;
   overflow: hidden;
   padding: 2px;
@@ -89,7 +89,7 @@ const ProgressBar = styled.div`
 const Progress = styled.div<{ $progress: number }>`
   height: 100%;
   width: ${props => props.$progress}%;
-  background: #00d12d;
+  background:rgb(3, 122, 29);
   border-radius: 6px;
   transition: width 0.3s ease;
   box-shadow: 0px 2px 10px 1px #00d12d;
@@ -135,7 +135,7 @@ export const CourseLearningHero: React.FC<CourseLearningHeroProps> = ({
             <Progress $progress={progress} />
           </ProgressBar>
           <ProgressCompleted>
-            {Math.round(progress)}%
+            {Math.round(progress)}% {t('user.learning.completed')}
           </ProgressCompleted>
         </ProgressSection>
       </HeroContent>

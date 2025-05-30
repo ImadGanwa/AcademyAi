@@ -268,9 +268,11 @@ export interface Translations {
     linkedinLoginSuccess: string;
     linkedinLoginFailed: string;
     loginWithLinkedin: string;
+    loginWithGoogle: string;
     linkedinSignupSuccess: string;
     linkedinSignupFailed: string;
     signupWithLinkedin: string;
+    signupWithGoogle: string;
     linkedinConfigError: string;
     popupBlocked: string;
     errors: {
@@ -604,6 +606,7 @@ export interface Translations {
       getCertificate: string;
       backToCourses: string;
       watchProgress: string;
+      mobileNavHelp: string;
     };
     certificate: {
       title: string;

@@ -88,7 +88,7 @@ const NavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   font-size: 1.1rem;
   padding-bottom: 8px;
   position: relative;
-  font-family: 'Gayathri', sans-serif;
+  font-family: 'Lato', sans-serif;
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
@@ -150,12 +150,17 @@ const LoginButton = styled(NavButton)`
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.5);
     white-space: nowrap;
-    padding: 10px 34px 4px;
+    padding: 10px 34px;
     border-radius: 30px;
     font-weight: 600;
     font-size: 1.1rem;
-    font-family: 'Gayathri', sans-serif;
+    font-family: 'Lato', sans-serif;
     transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+    height: 40px;
     
     &:hover {
       border-color: white;
@@ -171,13 +176,18 @@ const SignUpButton = styled(NavButton)`
     background: ${({ theme }) => theme.palette.secondary.main};
     color: white;
     white-space: nowrap;
-    padding: 10px 34px 4px;
+    padding: 10px 34px;
     border-radius: 30px;
     font-weight: 600;
     font-size: 1.1rem;
-    font-family: 'Gayathri', sans-serif;
+    font-family: 'Lato', sans-serif;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
+    height: 40px;
 
     &:hover {
       background: ${({ theme }) => theme.palette.secondary.dark};
@@ -272,8 +282,8 @@ const MobileMenuButton = styled(Box)`
         background: rgba(255, 255, 255, 0.1);
         
         svg {
-          width: 12px;
-          height: 12px;
+          width: 21px;
+          height: 21px;
           
           path {
             fill: white;
@@ -287,7 +297,7 @@ const MobileMenuButton = styled(Box)`
       height: 24px;
       
       path {
-        fill: ${({ theme }) => theme.palette.text.title};
+        fill: white;
       }
     }
   }
@@ -321,6 +331,11 @@ const MobileMenuHeader = styled(Box)`
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
+    
+    .mobile-logo {
+      width: 180px;
+      height: auto;
+    }
   }
 `;
 
@@ -346,7 +361,7 @@ const MobileNavLink = styled(RouterLink)<{ $isActive?: boolean }>`
   padding: 8px 0;
   font-weight: 600;
   position: relative;
-  font-family: 'Gayathri', sans-serif;
+  font-family: 'Lato', sans-serif;
   
   ${props => props.$isActive && `
     &:after {
@@ -369,12 +384,16 @@ const LanguageTitle = styled(Box)`
     color: white;
     font-size: 18px;
     font-weight: 600;
-    padding: 16px 20px;
+    padding: 16px 0;
+    margin-top: 16px;
     border-radius: 8px;
     cursor: pointer;
     
     &.active {
       background: rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      margin-left: -16px;
+      margin-right: -16px;
     }
 
     svg {
@@ -789,8 +808,16 @@ export const Navbar: React.FC = () => {
 
       <MobileMenu isOpen={isMobileMenuOpen} $isRtl={isRtl}>
         <MobileMenuHeader>
-          <RouterLink to="/" onClick={handleLogoClick} style={{display: 'block', lineHeight: .8}}>
-            <DarkLogo />
+          <RouterLink 
+            to="/" 
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogoClick(e);
+              toggleMobileMenu();
+            }} 
+            style={{display: 'block', lineHeight: .8}}
+          >
+            <DarkLogo className="mobile-logo" />
           </RouterLink>
           <MobileMenuButton onClick={toggleMobileMenu} className="exit-button">
             <ExitIcon />

@@ -112,11 +112,14 @@ const InputWrapper = styled(Box)`
   display: flex;
   gap: 16px;
   max-width: 500px;
+  justify-content: flex-start;
+  width: 100%;
 
   @media (max-width: 768px) {
     flex-direction: column;
     max-width: 100%;
     width: 100%;
+    justify-content: center;
   }
 `;
 
@@ -230,7 +233,7 @@ export const Hero: React.FC = () => {
               href="https://adwin.global/join-adwin/" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{ textDecoration: 'none', width: '100%', display: 'flex', justifyContent: 'center' }}
+              style={{ textDecoration: 'none', display: 'flex', justifyContent: 'flex-start' }}
             >
               <StyledButton
                 variant="contained"

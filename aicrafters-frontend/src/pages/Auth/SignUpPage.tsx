@@ -8,6 +8,8 @@ import { IconButton } from '../../components/common/Button/IconButton';
 import { ReactComponent as EmailIcon } from '../../assets/icons/email.svg';
 import { ReactComponent as MessageIcon } from '../../assets/icons/Message.svg';
 import { ReactComponent as LockIcon } from '../../assets/icons/password.svg';
+import { ReactComponent as GoogleIcon } from '../../assets/icons/google.svg';
+import { ReactComponent as LinkedInIcon } from '../../assets/icons/linkedin.svg';
 import { RouterLink } from '../../components/common/RouterLink/RouterLink';
 import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import { authService } from '../../services/authService';
@@ -499,16 +501,48 @@ export const SignUpPage: React.FC = () => {
 
           <Box width="100%" display="flex" flexDirection="column" gap={2}>
             <div className="google-login-container" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                useOneTap={false}
-                theme="outline"
-                size="large"
-                text="signup_with"
-                shape="rectangular"
-                context="signup"
-              />
+              <button
+                onClick={() => {
+                  const container = document.querySelector('.google-login-container .google-button-wrapper') as HTMLElement;
+                  if (container) {
+                    const googleButton = container.querySelector('button') as HTMLElement;
+                    if (googleButton) {
+                      googleButton.click();
+                    }
+                  }
+                }}
+                className="google-button"
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: '#757575',
+                  border: '1px solid #dddddd',
+                  padding: '10px 20px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  fontSize: '14px',
+                  width: '250px',
+                  height: '42px'
+                }}
+              >
+                <GoogleIcon />
+                {t('auth.signupWithGoogle')}
+              </button>
+              <div className="google-button-wrapper" style={{ display: 'none' }}>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  useOneTap={false}
+                  theme="outline"
+                  size="large"
+                  text="signup_with"
+                  shape="rectangular"
+                  context="signup"
+                />
+              </div>
             </div>
 
             <div className="linkedin-login-container" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
@@ -524,13 +558,14 @@ export const SignUpPage: React.FC = () => {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '8px',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  width: '250px',
+                  height: '42px'
                 }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
+                <LinkedInIcon />
                 {t('auth.signupWithLinkedin')}
               </button>
             </div>

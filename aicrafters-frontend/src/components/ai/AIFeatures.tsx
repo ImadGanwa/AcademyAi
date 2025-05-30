@@ -17,12 +17,21 @@ const AIFeaturesContainer = styled(Box)<{ expanded: boolean }>`
   position: relative;
   display: flex;
   flex-direction: column;
-  height: ${props => props.expanded ? '100%' : '56px'};
-  transition: height 0.3s ease-in-out;
+  height: ${props => props.expanded ? '100%' : '80px'};
+  transition: all 0.3s ease-in-out;
   border-radius: 10px;
   overflow: hidden;
   background: ${props => props.theme.palette.background.paper};
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  cursor: ${props => props.expanded ? 'default' : 'pointer'};
+  
+  &:hover {
+    box-shadow: ${props => props.expanded ? '0 4px 20px rgba(0, 0, 0, 0.07)' : '0 4px 20px rgba(0, 0, 0, 0.15)'};
+  }
+  
+  @media (max-width: 768px) {
+    margin-bottom: 16px;
+  }
 `;
 
 const TabContainer = styled(Box)`
@@ -31,6 +40,33 @@ const TabContainer = styled(Box)`
   background-color: ${props => props.theme.palette.primary.main};
   color: white;
   width: 100%;
+  min-height: 56px;
+  position: relative;
+  
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+`;
+
+const CollapseIndicator = styled.div<{ expanded: boolean }>`
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  
+  svg {
+    transition: transform 0.3s ease;
+    transform: ${props => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+    width: 20px;
+    height: 20px;
+  }
 `;
 
 const StyledTabs = styled(Tabs)`
@@ -51,6 +87,17 @@ const StyledTabs = styled(Tabs)`
   
   .MuiTabs-indicator {
     background-color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .MuiTab-root {
+      min-height: 56px;
+      padding: 6px 12px;
+      
+      .MuiSvgIcon-root {
+        margin: 0;
+      }
+    }
   }
 `;
 
@@ -85,7 +132,7 @@ interface AIFeaturesProps {
 
 export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -120,6 +167,13 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
   
   // Handle tab change and fetch data if needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    // If on mobile and not expanded, expand first
+    if (isMobile && !expanded) {
+      setExpanded(true);
+      setActiveTab(newValue);
+      return;
+    }
+    
     setActiveTab(newValue);
     
     // Fetch data based on selected tab if not already loaded or errored
@@ -170,7 +224,10 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
   };
   
   return (
-    <AIFeaturesContainer expanded={expanded}>
+    <AIFeaturesContainer 
+      expanded={expanded} 
+      onClick={() => !expanded && setExpanded(true)}
+    >
       <TabContainer>
         <StyledTabs
           value={activeTab}
@@ -178,19 +235,21 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
           variant={isMobile ? "scrollable" : "fullWidth"}
           scrollButtons="auto"
           allowScrollButtonsMobile
+          onClick={(e) => expanded && e.stopPropagation()}
+          centered={isMobile}
         >
           <Tab 
-            icon={<TextSnippetOutlinedIcon fontSize="small" />} 
+            icon={<TextSnippetOutlinedIcon fontSize={isMobile ? "medium" : "small"} />} 
             label={!isMobile ? "Transcript" : undefined}
             aria-label="Transcript"
           />
           <Tab 
-            icon={<SummarizeOutlinedIcon fontSize="small" />} 
+            icon={<SummarizeOutlinedIcon fontSize={isMobile ? "medium" : "small"} />} 
             label={!isMobile ? "Summary" : undefined}
             aria-label="Summary"
           />
           <Tab 
-            icon={<AccountTreeOutlinedIcon fontSize="small" />} 
+            icon={<AccountTreeOutlinedIcon fontSize={isMobile ? "medium" : "small"} />} 
             label={!isMobile ? "Mind Map" : undefined}
             aria-label="Mind Map"
           />
@@ -199,7 +258,10 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
         {!isMobile && (
           <IconButton 
             size="small" 
-            onClick={toggleExpanded}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded();
+            }}
             sx={{ 
               color: 'white', 
               mr: 1,
@@ -211,17 +273,29 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
             {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         )}
+        
+        {isMobile && (
+          <CollapseIndicator 
+            expanded={expanded}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded();
+            }}
+          >
+            {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </CollapseIndicator>
+        )}
       </TabContainer>
       
       <ContentContainer>
         {renderContent()}
       </ContentContainer>
       
-      {isMobile && (
+      {/* {isMobile && (
         <ToggleButton onClick={toggleExpanded} size="small">
           {expanded ? <KeyboardArrowDownIcon fontSize="small" /> : <KeyboardArrowUpIcon fontSize="small" />}
         </ToggleButton>
-      )}
+      )} */}
     </AIFeaturesContainer>
   );
 };

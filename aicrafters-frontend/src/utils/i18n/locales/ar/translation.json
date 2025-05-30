@@ -137,7 +137,9 @@
     "linkedinSignupFailed": "فشل إنشاء حساب LinkedIn. يرجى المحاولة مرة أخرى.",
     "linkedinConfigError": "إعدادات LinkedIn غير متوفرة. يرجى المحاولة لاحقاً.",
     "loginWithLinkedin": "تسجيل الدخول باستخدام LinkedIn",
+    "loginWithGoogle": "تسجيل الدخول باستخدام Google",
     "signupWithLinkedin": "إنشاء حساب باستخدام LinkedIn",
+    "signupWithGoogle": "إنشاء حساب باستخدام Google",
     "popupBlocked": "تم إيقاف النافذة. يرجى المحاولة مرة أخرى.",
     "signin": {
       "title": "تسجيل الدخول",

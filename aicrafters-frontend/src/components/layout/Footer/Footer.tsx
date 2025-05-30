@@ -5,24 +5,31 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { languages } from '../../../utils/i18n/i18n';
 import { Logo } from '../../common/Logo/Logo';
+import { useNavigate } from 'react-router-dom';
 
 const FooterWrapper = styled.footer`
   background-color: ${({ theme }) => theme.palette.primary.main};
-  padding: 48px 0 24px;
+  padding: 40px 0 20px;
   margin-top: auto;
   position: relative;
   
   @media (max-width: 900px) {
-    padding: 30px 0 20px;
+    padding: 15px 0 10px;
   }
 `;
 
 const FooterLogoContainer = styled.div`
   text-align: left;
+  cursor: pointer;
   
   @media (max-width: 900px) {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: -10px;
+    
+    svg {
+      width: 180px !important;
+      height: auto !important;
+    }
   }
 `;
 
@@ -85,8 +92,8 @@ const MobileCopyrightContainer = styled.div`
   @media (max-width: 900px) {
     display: block;
     text-align: center;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 `;
 
@@ -133,18 +140,24 @@ const FooterLogoSection = styled.div`
 export const Footer: React.FC = () => {
   const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
 
-  const handleLanguageChange = (lang: string) => {
-    i18n.changeLanguage(lang);
+  // const handleLanguageChange = (lang: string) => {
+  //   i18n.changeLanguage(lang);
+  // };
+
+  const handleLogoClick = () => {
+    const currentLang = i18n.language;
+    navigate(`/${currentLang}/`, { replace: true });
   };
 
   return (
     <FooterWrapper>
       <Container maxWidth="lg">
-        <Grid container spacing={{ xs: 2, md: 4 }} justifyContent="center">
+        <Grid container spacing={{ xs: 1, md: 4 }} justifyContent="center">
           <Grid item xs={12} md={4}>
             <FooterLogoSection>
-              <FooterLogoContainer>
+              <FooterLogoContainer onClick={handleLogoClick}>
                 <FooterLogo />
               </FooterLogoContainer>
               <CopyrightContainer>
@@ -164,7 +177,7 @@ export const Footer: React.FC = () => {
                 {t('common.navigation.becomeAMentor')}
               </FooterLink>
                
-              {languages.map((lang) => (
+              {/* {languages.map((lang) => (
                 <LanguageLink
                   key={lang}
                   onClick={() => handleLanguageChange(lang)}
@@ -174,12 +187,12 @@ export const Footer: React.FC = () => {
                 >
                   {t(`common.languages.${lang}`)}
                 </LanguageLink>
-              ))}
+              ))} */}
             </FooterSection> 
           </Grid>
 
-          <Grid item xs={12} sm={6} md={2}>
-            {/* <FooterSection>
+          {/*<Grid item xs={12} sm={6} md={2}>
+             <FooterSection>
               <FooterTitle variant="h6">
                 {t('common.footer.resources')}
               </FooterTitle>
@@ -195,11 +208,11 @@ export const Footer: React.FC = () => {
               <FooterLink to="/investors">
                 {t('common.footer.investors')}
               </FooterLink>
-            </FooterSection> */}
-          </Grid>
+            </FooterSection> 
+          </Grid>*/}
 
-          <Grid item xs={12} sm={6} md={2}>
-            {/* <FooterSection>
+          {/*<Grid item xs={12} sm={6} md={2}>
+             <FooterSection>
               <FooterTitle variant="h6">
                 {t('common.footer.company')}
               </FooterTitle>
@@ -218,10 +231,10 @@ export const Footer: React.FC = () => {
               <FooterLink to="/accessibility">
                 {t('common.footer.accessibility')}
               </FooterLink>
-            </FooterSection> */}
-          </Grid>
+            </FooterSection> 
+          </Grid>*/}
 
-          <Grid item xs={12} sm={6} md={2}>
+          {/* <Grid item xs={12} sm={6} md={2}>
             <FooterSection>
               {/* <FooterTitle variant="h6">
                 {t('common.footer.language')}
@@ -236,9 +249,9 @@ export const Footer: React.FC = () => {
                 >
                   {t(`common.languages.${lang}`)}
                 </LanguageLink>
-              ))} */}
+              ))} 
             </FooterSection>
-          </Grid>
+          </Grid> */}
         </Grid>
         
         <MobileCopyrightContainer>
