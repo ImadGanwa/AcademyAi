@@ -286,7 +286,7 @@ export const LoginPage: React.FC = () => {
       return;
     }
     
-    const scope = 'test';
+    const scope = 'r_liteprofile r_emailaddress';
     const state = Math.random().toString(36).substring(7);
     
     const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
