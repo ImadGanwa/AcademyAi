@@ -386,9 +386,7 @@ export const SignUpPage: React.FC = () => {
   const handleLinkedInLogin = () => {
 
     const clientId = process.env.REACT_APP_LINKEDIN_CLIENT_ID;
-    const redirectUri = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:3000/auth/linkedin/callback'
-      : process.env.REACT_APP_LINKEDIN_REDIRECT_URI;
+    const redirectUri = process.env.REACT_APP_LINKEDIN_REDIRECT_URI;
 
    
 

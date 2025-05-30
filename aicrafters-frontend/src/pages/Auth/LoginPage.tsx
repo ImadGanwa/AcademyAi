@@ -104,14 +104,14 @@ const StyledSpan = styled.span`
 
 const StyledIconButton = styled(IconButton)`
   && {
-    background: #D710C1;
+    background: ${props => props.theme.palette.secondary.main};
     color: white;
     padding: 12px;
     font-size: 16px;
     border-radius: 8px;
     
     &:hover {
-      background: #b0009c;
+      background: ${props => props.theme.palette.secondary.dark};
     }
   }
 `;
@@ -286,7 +286,7 @@ export const LoginPage: React.FC = () => {
       return;
     }
     
-    const scope = 'r_liteprofile r_emailaddress';
+    const scope = 'test';
     const state = Math.random().toString(36).substring(7);
     
     const linkedinUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=${encodeURIComponent(scope)}`;
