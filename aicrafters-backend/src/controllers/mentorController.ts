@@ -805,7 +805,7 @@ export const mentorController = {
         'mentorProfile.isVerified': true
       }).select(
         'fullName email profileImage mentorProfile.title mentorProfile.bio mentorProfile.hourlyRate ' +
-        'mentorProfile.skills mentorProfile.languages mentorProfile.education mentorProfile.experience ' +
+        'mentorProfile.country mentorProfile.skills mentorProfile.languages mentorProfile.education mentorProfile.experience ' +
         'mentorProfile.availability mentorProfile.socialLinks mentorProfile.mentorRating ' +
         'mentorProfile.mentorReviewsCount mentorProfile.menteesCount mentorProfile.sessionsCount'
       );
@@ -837,6 +837,7 @@ export const mentorController = {
         title: mentor.mentorProfile?.title,
         bio: mentor.mentorProfile?.bio,
         hourlyRate: mentor.mentorProfile?.hourlyRate,
+        country: mentor.mentorProfile?.country,
         skills: mentor.mentorProfile?.skills,
         languages: mentor.mentorProfile?.languages,
         education: mentor.mentorProfile?.education,

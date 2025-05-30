@@ -966,6 +966,7 @@ export const adminController = {
               title: application.professionalInfo?.role || 'Professional Mentor',
               bio: application.bio,
               hourlyRate: application.hourlyRate,
+              country: application.countries?.[0] || 'United States',
               skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
               languages: application.languages.map(name => ({ id: String(Math.random()), name })),
               education: [],
@@ -1007,6 +1008,7 @@ export const adminController = {
                 title: application.professionalInfo?.role || 'Professional Mentor',
                 bio: application.bio,
                 hourlyRate: application.hourlyRate,
+                country: application.countries?.[0] || 'United States',
                 skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
                 languages: application.languages.map(name => ({ id: String(Math.random()), name })),
                 education: [],
@@ -1057,6 +1059,23 @@ export const adminController = {
           // Continue with the response even if there's an email error
         }
       } else if (status === 'rejected') {
+        // If application is rejected, remove mentor role and set isVerified to false
+        try {
+          const user = await User.findOne({ email: application.email });
+          if (user && user.role === 'mentor') {
+            // Remove mentor role and set isVerified to false
+            user.role = 'user'; // Revert to default role
+            if (user.mentorProfile) {
+              user.mentorProfile.isVerified = false;
+            }
+            await user.save();
+            console.log('Removed mentor role from user:', user.email);
+          }
+        } catch (userUpdateError) {
+          console.error('Error updating user role on rejection:', userUpdateError);
+          // Continue with the response even if there's an error
+        }
+        
         // Send rejection email
         try {
           await sendMentorRejectionEmail(application.email, application.fullName, adminNotes);
@@ -1079,6 +1098,96 @@ export const adminController = {
       res.status(500).json({
         success: false,
         error: error.message || 'An error occurred while updating mentor application status'
+      });
+    }
+  },
+
+  /**
+   * Fix existing mentors' country field - temporary migration endpoint
+   * @route POST /api/admin/fix-mentor-countries
+   */
+  fixMentorCountries: async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user || req.user.role !== 'admin') {
+        res.status(403).json({ message: 'Not authorized' });
+        return;
+      }
+
+      console.log('🔧 Starting mentor country field fix...');
+
+      // Find all mentors who don't have a country field or have empty country
+      const mentorsToUpdate = await User.find({
+        role: 'mentor',
+        'mentorProfile.isVerified': true,
+        $or: [
+          { 'mentorProfile.country': { $exists: false } },
+          { 'mentorProfile.country': '' },
+          { 'mentorProfile.country': null },
+          { 'mentorProfile.country': undefined }
+        ]
+      });
+
+      console.log(`📊 Found ${mentorsToUpdate.length} mentors to update`);
+
+      let updatedCount = 0;
+      const results = [];
+
+      for (const mentor of mentorsToUpdate) {
+        try {
+          // Try to find their original application to get the country
+          const application = await MentorApplication.findOne({ email: mentor.email });
+          
+          let countryToAssign = 'US'; // Default country code if no application found
+          
+          if (application && application.countries && application.countries.length > 0) {
+            countryToAssign = application.countries[0];
+            console.log(`🌍 Found country for ${mentor.email}: ${countryToAssign}`);
+          } else {
+            console.log(`⚠️ No application/country found for ${mentor.email}, using default: ${countryToAssign}`);
+          }
+
+          // Update the mentor's country field
+          await User.findByIdAndUpdate(
+            mentor._id,
+            { $set: { 'mentorProfile.country': countryToAssign } },
+            { new: true }
+          );
+
+          updatedCount++;
+          results.push({
+            email: mentor.email,
+            fullName: mentor.fullName,
+            assignedCountry: countryToAssign,
+            hadApplication: !!application
+          });
+
+          console.log(`✅ Updated ${mentor.email} with country: ${countryToAssign}`);
+        } catch (updateError) {
+          console.error(`❌ Error updating mentor ${mentor.email}:`, updateError);
+          results.push({
+            email: mentor.email,
+            fullName: mentor.fullName,
+            error: (updateError as Error).message
+          });
+        }
+      }
+
+      console.log(`🎉 Mentor country fix completed. Updated ${updatedCount} out of ${mentorsToUpdate.length} mentors.`);
+
+      res.status(200).json({
+        success: true,
+        message: `Successfully updated ${updatedCount} mentors`,
+        data: {
+          totalFound: mentorsToUpdate.length,
+          updated: updatedCount,
+          results
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fixing mentor countries:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'An error occurred while fixing mentor countries'
       });
     }
   }

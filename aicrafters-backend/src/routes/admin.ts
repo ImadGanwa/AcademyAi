@@ -73,4 +73,11 @@ router.get('/mentor-applications', authMiddleware, adminMiddleware, adminControl
  */
 router.put('/mentor-applications/:id', authMiddleware, adminMiddleware, adminController.updateMentorApplicationStatus);
 
+/**
+ * @route POST /api/admin/fix-mentor-countries
+ * @desc Fix existing mentors' country field - temporary migration endpoint
+ * @access Private (Admin only)
+ */
+router.post('/fix-mentor-countries', authMiddleware, adminMiddleware, adminController.fixMentorCountries);
+
 export default router; 

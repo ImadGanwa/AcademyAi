@@ -270,115 +270,84 @@ export const MentorsList: React.FC = () => {
         if (response && response.success && response.data) {
           // Extract mentors from API response
           const { mentors, pagination } = response.data;
-          console.log('Mentors received from API:', mentors);
-          console.log('Pagination data:', pagination);
-          console.log('Active filters:', { searchTerm, category, skill, country, language });
           
-          // In development, let's manually filter the mentors for now
-          // This is a temporary solution until the API filtering is fixed
-          if (process.env.NODE_ENV === 'development') {
-            let filteredResults = [...mentors];
-            
-            if (searchTerm) {
-              const search = searchTerm.toLowerCase();
-              filteredResults = filteredResults.filter(mentor => 
-                mentor.fullName.toLowerCase().includes(search) || 
-                mentor.title.toLowerCase().includes(search) ||
-                mentor.bio.toLowerCase().includes(search) ||
-                mentor.skills.some((skill: MentorSkill) => skill.name.toLowerCase().includes(search))
-              );
-            }
-            
-            if (category) {
-              filteredResults = filteredResults.filter(mentor => {
-                const mentorTitleNormalized = mentor.title.toLowerCase().replace(/\s+/g, '');
-                return mentorTitleNormalized === category || mentorTitleNormalized.includes(category);
-              });
-            }
-            
-            if (skill) {
-              filteredResults = filteredResults.filter(mentor => 
-                mentor.skills.some((s: MentorSkill) => {
-                  const skillNormalized = s.name.toLowerCase().replace(/\s+/g, '');
-                  return skillNormalized === skill || skillNormalized.includes(skill);
-                })
-              );
-            }
-            
-            if (country) {
-              filteredResults = filteredResults.filter(mentor => {
-                if (mentor.country) {
-                  // Use the country field from the database
-                  return mentor.country === country;
-                } else if (mentor.countryFlag) {
-                  // Fallback to extracting from countryFlag URL for backward compatibility
-                  const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
-                  const countryName = getCountryName(countryCode);
-                  return countryName === country;
-                }
-                return false;
-              });
-            }
-            
-            if (language) {
-              filteredResults = filteredResults.filter(mentor => 
-                mentor.languages.some((l: MentorLanguage) => {
-                  const langNormalized = l.name.toLowerCase().replace(/\s+/g, '');
-                  return langNormalized === language || langNormalized.includes(language);
-                })
-              );
-            }
-            
-            console.log('Client-side filtered mentors:', filteredResults);
-            console.log('Applied filters:', { searchTerm, category, skill, country, language });
-            
-            // Calculate pagination for filtered results
-            const totalFilteredItems = filteredResults.length;
-            const totalFilteredPages = Math.ceil(totalFilteredItems / mentorsPerPage);
-            
-            // Apply pagination to filtered results
-            const startIndex = (page - 1) * mentorsPerPage;
-            const endIndex = startIndex + mentorsPerPage;
-            const paginatedResults = filteredResults.slice(startIndex, endIndex);
-            
-            console.log(`Pagination: Page ${page} of ${totalFilteredPages}, showing ${paginatedResults.length} of ${totalFilteredItems} mentors`);
-            
-            // Always use the client-side filtered and paginated results in development
-            setMentors(mentors); // Keep original mentors for filter options
-            setDisplayedMentors(paginatedResults);
-            setTotalItems(totalFilteredItems);
-            setTotalPages(totalFilteredPages);
-            
-            // If no results, set appropriate message but don't show error
-            if (filteredResults.length === 0) {
-              setError(null);
-            }
-            return;
+          // Apply client-side filtering for both development and production
+          // This ensures consistent filtering behavior across environments
+          let filteredResults = [...mentors];
+          
+          if (searchTerm) {
+            const search = searchTerm.toLowerCase();
+            filteredResults = filteredResults.filter(mentor => 
+              mentor.fullName.toLowerCase().includes(search) || 
+              mentor.title.toLowerCase().includes(search) ||
+              mentor.bio.toLowerCase().includes(search) ||
+              mentor.skills.some((skill: MentorSkill) => skill.name.toLowerCase().includes(search))
+            );
           }
           
-          if (mentors && mentors.length > 0) {
-            setMentors(mentors);
-            setDisplayedMentors(mentors);
-            
-            // Check if pagination data exists
-            if (pagination) {
-              setTotalItems(pagination.total || mentors.length);
-              setTotalPages(pagination.pages || Math.ceil(mentors.length / mentorsPerPage));
-              console.log(`Setting pagination: ${pagination.total} total items, ${pagination.pages} pages`);
-            } else {
-              setTotalItems(mentors.length);
-              setTotalPages(Math.ceil(mentors.length / mentorsPerPage));
-              console.log(`No pagination data, calculated: ${mentors.length} total items, ${Math.ceil(mentors.length / mentorsPerPage)} pages`);
-              setError(null); // Don't show an error alert
-            }
-          } else {
-            // No mentors found in the API response
-            console.log('API returned success but no mentors in the data');
-            setMentors([]);
-            setDisplayedMentors([]);
-            setTotalItems(0);
-            setTotalPages(0);
-            setError(null); // Don't show an error alert
+          if (category) {
+            filteredResults = filteredResults.filter(mentor => {
+              const mentorTitleNormalized = mentor.title.toLowerCase().replace(/\s+/g, '');
+              return mentorTitleNormalized === category || mentorTitleNormalized.includes(category);
+            });
+          }
+          
+          if (skill) {
+            filteredResults = filteredResults.filter(mentor => 
+              mentor.skills.some((s: MentorSkill) => {
+                const skillNormalized = s.name.toLowerCase().replace(/\s+/g, '');
+                return skillNormalized === skill || skillNormalized.includes(skill);
+              })
+            );
+          }
+          
+          if (country) {
+            filteredResults = filteredResults.filter(mentor => {
+              if (mentor.country) {
+                // Use the country field from the database
+                return mentor.country === country;
+              } else if (mentor.countryFlag) {
+                // Fallback to extracting from countryFlag URL for backward compatibility
+                const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
+                const countryName = getCountryName(countryCode);
+                return countryName === country;
+              }
+              return false;
+            });
+          }
+          
+          if (language) {
+            filteredResults = filteredResults.filter(mentor => 
+              mentor.languages.some((l: MentorLanguage) => {
+                const langNormalized = l.name.toLowerCase().replace(/\s+/g, '');
+                return langNormalized === language || langNormalized.includes(language);
+              })
+            );
+          }
+          
+          console.log('Client-side filtered mentors:', filteredResults);
+          console.log('Applied filters:', { searchTerm, category, skill, country, language });
+          
+          // Calculate pagination for filtered results
+          const totalFilteredItems = filteredResults.length;
+          const totalFilteredPages = Math.ceil(totalFilteredItems / mentorsPerPage);
+          
+          // Apply pagination to filtered results
+          const startIndex = (page - 1) * mentorsPerPage;
+          const endIndex = startIndex + mentorsPerPage;
+          const paginatedResults = filteredResults.slice(startIndex, endIndex);
+          
+          console.log(`Pagination: Page ${page} of ${totalFilteredPages}, showing ${paginatedResults.length} of ${totalFilteredItems} mentors`);
+          
+          // Always use the client-side filtered and paginated results
+          setMentors(mentors); // Keep original mentors for filter options
+          setDisplayedMentors(paginatedResults);
+          setTotalItems(totalFilteredItems);
+          setTotalPages(totalFilteredPages);
+          
+          // If no results, set appropriate message but don't show error
+          if (filteredResults.length === 0) {
+            setError(null);
           }
         } else {
           console.error('API response invalid structure:', response);

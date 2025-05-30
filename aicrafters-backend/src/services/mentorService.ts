@@ -396,6 +396,7 @@ export const mentorService = {
         title: mentor.mentorProfile?.title,
         bio: mentor.mentorProfile?.bio,
         hourlyRate: mentor.mentorProfile?.hourlyRate,
+        country: mentor.mentorProfile?.country,
         skills: mentor.mentorProfile?.skills,
         languages: mentor.mentorProfile?.languages,
         stats: {

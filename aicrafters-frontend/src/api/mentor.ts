@@ -46,13 +46,10 @@ interface MentorAvailabilityData {
 // Get public list of mentors with optional filters
 export const getPublicMentorList = async (filters: MentorFilters = {}) => {
   try {
-    console.log('getPublicMentorList API call with filters:', filters);
     const response = await axiosInstance.get('/api/mentor/public/mentors', { params: filters });
-    console.log('getPublicMentorList API response:', response.data);
     return response.data;
   } catch (error: any) {
     console.error('Error fetching public mentors:', error);
-    console.error('Error details:', error.response?.data || error.message);
     throw error;
   }
 };

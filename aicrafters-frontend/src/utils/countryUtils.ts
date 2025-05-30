@@ -62,7 +62,73 @@ export const getCountryName = (code: string): string => {
     'np': 'Nepal'
   };
   
-  return countryMap[code] || code.toUpperCase();
+  return countryMap[code.toLowerCase()] || code.toUpperCase();
+};
+
+// Helper function to get country code from country name for form submissions
+export const getCountryCode = (countryName: string): string => {
+  const reverseMap: Record<string, string> = {
+    'United States': 'US',
+    'United Kingdom': 'UK', 
+    'Canada': 'CA',
+    'Australia': 'AU',
+    'India': 'IN',
+    'France': 'FR',
+    'Germany': 'DE',
+    'Japan': 'JP',
+    'Spain': 'ES',
+    'Senegal': 'SN',
+    'Brazil': 'BR',
+    'Mexico': 'MX',
+    'Italy': 'IT',
+    'Netherlands': 'NL',
+    'Switzerland': 'CH',
+    'Austria': 'AT',
+    'Belgium': 'BE',
+    'Sweden': 'SE',
+    'Norway': 'NO',
+    'Denmark': 'DK',
+    'Finland': 'FI',
+    'Portugal': 'PT',
+    'Poland': 'PL',
+    'Czech Republic': 'CZ',
+    'Hungary': 'HU',
+    'Greece': 'GR',
+    'Turkey': 'TR',
+    'Morocco': 'MA',
+    'Egypt': 'EG',
+    'South Africa': 'ZA',
+    'Nigeria': 'NG',
+    'Kenya': 'KE',
+    'Ghana': 'GH',
+    'China': 'CN',
+    'South Korea': 'KR',
+    'Thailand': 'TH',
+    'Singapore': 'SG',
+    'Malaysia': 'MY',
+    'Indonesia': 'ID',
+    'Philippines': 'PH',
+    'Vietnam': 'VN',
+    'Argentina': 'AR',
+    'Chile': 'CL',
+    'Colombia': 'CO',
+    'Peru': 'PE',
+    'Uruguay': 'UY',
+    'Russia': 'RU',
+    'Ukraine': 'UA',
+    'Israel': 'IL',
+    'United Arab Emirates': 'AE',
+    'Saudi Arabia': 'SA',
+    'Jordan': 'JO',
+    'Lebanon': 'LB',
+    'Iran': 'IR',
+    'Pakistan': 'PK',
+    'Bangladesh': 'BD',
+    'Sri Lanka': 'LK',
+    'Nepal': 'NP'
+  };
+  
+  return reverseMap[countryName] || countryName;
 };
 
 // List of countries for dropdowns

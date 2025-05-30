@@ -6,6 +6,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { applyToBecomeMentor } from '../../../api/mentor';
 import { useTranslation } from 'react-i18next';
+import { COUNTRIES, getCountryCode } from '../../../utils/countryUtils';
 
 // Styled components
 const FormSection = styled.div`
@@ -270,7 +271,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
         sessionDuration: formData.desiredDuration,
         ...formData.mentorPreferences
       },
-      countries: [formData.country]
+      countries: [getCountryCode(formData.country)]
     };
     
     setSubmitting(true);
@@ -353,31 +354,22 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.country', 'Country of Residence') as string}</FieldLabel>
-            <FormControl fullWidth variant="outlined">
+            <FieldLabel>{t('mentor.applicationForm.country', 'Country') as string}</FieldLabel>
+            <FormControl fullWidth>
               <TextField
                 select
-                fullWidth
-                placeholder={t('mentorship.applicationForm.selectCountry', 'Select a country') as string}
-                variant="outlined"
-                name="country"
+                label={t('mentor.applicationForm.country', 'Country') as string}
                 value={formData.country}
-                onChange={handleInputChange}
-                SelectProps={{
-                  native: true,
-                }}
+                onChange={(e) => setFormData({...formData, country: e.target.value})}
+                variant="outlined"
+                required
               >
-                {/* TODO: Move hardcoded country list to a configuration file or fetch from a countries API */}
                 <option value="" disabled>{t('mentor.applicationForm.selectCountry', 'Select a country') as string}</option>
-                <option value="USA">{t('mentor.applicationForm.countries.usa', 'United States') as string}</option>
-                <option value="CAN">{t('mentor.applicationForm.countries.canada', 'Canada') as string}</option>
-                <option value="UK">{t('mentor.applicationForm.countries.uk', 'United Kingdom') as string}</option>
-                <option value="FR">{t('mentor.applicationForm.countries.france', 'France') as string}</option>
-                <option value="DE">{t('mentor.applicationForm.countries.germany', 'Germany') as string}</option>
-                <option value="NG">{t('mentor.applicationForm.countries.nigeria', 'Nigeria') as string}</option>
-                <option value="GH">{t('mentor.applicationForm.countries.ghana', 'Ghana') as string}</option>
-                <option value="KE">{t('mentor.applicationForm.countries.kenya', 'Kenya') as string}</option>
-                <option value="ZA">{t('mentor.applicationForm.countries.southAfrica', 'South Africa') as string}</option>
+                {COUNTRIES.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
               </TextField>
             </FormControl>
           </FormField>

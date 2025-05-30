@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store';
 import { LoginPopup } from '../../../common/Popup/LoginPopup';
 import { useTranslation } from 'react-i18next';
+import { getCountryName } from '../../../../utils/countryUtils';
 
 // Types
 export interface MentorSkill {
@@ -42,6 +43,7 @@ export interface Mentor {
   stats?: MentorStats; // Added from API response
   isVerified?: boolean; // Made optional as it might not be in API
   countryFlag?: string; // Keep for backward compatibility but will be deprecated
+  status?: 'pending' | 'accepted' | 'denied'; // Add mentor status
 }
 
 const CardContainer = styled(Box)`
@@ -54,6 +56,11 @@ const CardContainer = styled(Box)`
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   border: 1px solid #eef0f3;
   box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
 
   @media (max-width: 768px) {
     padding: 16px;
@@ -79,9 +86,10 @@ const MentorImage = styled(Box)<{ imageUrl: string | null }>`
 
   @media (max-width: 768px) {
     width: 100%;
-    height: 280px;
+    height: 240px;
     margin-right: 0;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    border-radius: 8px;
   }
 `;
 
@@ -111,6 +119,10 @@ const Name = styled(Typography)`
     display: flex;
     align-items: center;
     gap: 8px;
+    
+    @media (max-width: 768px) {
+      font-size: 22px;
+    }
   }
 `;
 
@@ -119,13 +131,27 @@ const Title = styled(Typography)`
   color: #555e68;
   margin-bottom: 12px;
   font-weight: 400;
+  padding-bottom: 2px;
+  
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
 `;
 
 const SkillsContainer = styled(Box)`
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+
   gap: 10px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 13px;
+    margin-top: 7px;
+    gap: 8px;
+  }
 `;
 
 const SkillTag = styled.span`
@@ -147,6 +173,11 @@ const SkillTag = styled.span`
     border-radius: 50%;
     margin-right: 7px;
   }
+  
+  @media (max-width: 768px) {
+    padding: 5px 12px;
+    font-size: 12px;
+  }
 `;
 
 const Description = styled(Typography)`
@@ -157,6 +188,13 @@ const Description = styled(Typography)`
   padding: 15px 0;
   border-top: 1px solid #eef0f3;
   border-bottom: 1px solid #eef0f3;
+  
+  @media (max-width: 768px) {
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 12px 0;
+    margin-bottom: 16px;
+  }
 `;
 
 const ButtonContainer = styled(Box)`
@@ -164,6 +202,12 @@ const ButtonContainer = styled(Box)`
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
 `;
 
 const BookButton = styled(Button)`
@@ -177,15 +221,20 @@ const BookButton = styled(Button)`
     text-transform: none;
     height: 40px;
     box-shadow: none;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 
     &:hover {
       background-color: ${props => props.theme.palette.background.default};
       box-shadow: none;
+      transform: translateY(-2px);
     }
 
     @media (max-width: 768px) {
       width: 100%;
+      padding: 12px 24px;
+      height: 48px;
+      font-size: 16px;
+      border-radius: 10px;
     }
   }
 `;
@@ -194,6 +243,12 @@ const LanguagesContainer = styled(Box)`
   display: flex;
   align-items: center;
   gap: 12px;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 `;
 
 const Language = styled(Typography)`
@@ -216,6 +271,10 @@ const Language = styled(Typography)`
       top: 50%;
       transform: translateY(-50%);
     }
+    
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
   }
 `;
 
@@ -230,9 +289,9 @@ const VerifiedBadge = styled(VerifiedIcon)`
   font-size: 20px;
 `;
 
-const StyledLink = styled(Link)`
-  text-decoration: none;
-`;
+// const StyledLink = styled(Link)`
+//   text-decoration: none;
+// `;
 
 export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
   const { lang } = useParams<{ lang: string }>();
@@ -278,7 +337,6 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
             {t(`bios.${mentor.id}`, { defaultValue: mentor.bio }) as string}
           </Description>
         </HeaderSection>
-        <Box sx={{ padding: '10px 0' }} />
         
         <ButtonContainer>
           <LanguagesContainer>
@@ -286,12 +344,7 @@ export const MentorCard: React.FC<{ mentor: Mentor }> = ({ mentor }) => {
               <Language key={language.id || language._id}>{t(`languages.${language.name}`, { defaultValue: language.name }) as string}</Language>
             ))}
           </LanguagesContainer>
-          <Box display="flex" alignItems="center" gap={2}>
-            {/* {mentor.hourlyRate && (
-              <Typography variant="h6" fontWeight="bold" color="primary">
-                {t('mentor.hourlyRate', { rate: mentor.hourlyRate, defaultValue: `$${mentor.hourlyRate}/hr` }) as string}
-              </Typography>
-            )} */}
+          <Box display="flex" alignItems="center" gap={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
             <BookButton variant="contained" onClick={handleBookSession}>
               {t('mentor.bookSession', { defaultValue: 'Book a session' }) as string}
             </BookButton>

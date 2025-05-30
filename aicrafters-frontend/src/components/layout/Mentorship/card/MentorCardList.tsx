@@ -11,14 +11,35 @@ const ListContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    padding: 15px 0 40px;
+  }
 `;
 
 const CardWrapper = styled(Box)`
   width: 90%;
   max-width: 1200px;
+  transition: transform 0.2s ease;
 
   & + & {
-    margin-top: 20px;
+    margin-top: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    width: 95%;
+    
+    & + & {
+      margin-top: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+    
+    & + & {
+      margin-top: 16px;
+    }
   }
 `;
 
@@ -35,6 +56,14 @@ const LoadingContainer = styled(Box)`
   justify-content: center;
   width: 100%;
   padding: 40px 0;
+  
+  @media (max-width: 768px) {
+    padding: 30px 0;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px 0;
+  }
 `;
 
 const SkeletonCard = styled(Box)`
@@ -45,6 +74,18 @@ const SkeletonCard = styled(Box)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   padding: 20px;
+  
+  @media (max-width: 768px) {
+    width: 95%;
+    border-radius: 10px;
+    padding: 16px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
 `;
 
 interface MentorCardListProps {
@@ -63,8 +104,17 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
         <LoadingContainer>
           {[1, 2, 3].map((item) => (
             <SkeletonCard key={item}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Skeleton variant="circular" width={80} height={80} sx={{ mr: 2 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: { xs: 'column', sm: 'row' } }}>
+                <Skeleton 
+                  variant="rectangular" 
+                  sx={{ 
+                    width: { xs: '100%', sm: 80 },
+                    height: { xs: 200, sm: 80 },
+                    mr: { xs: 0, sm: 2 },
+                    mb: { xs: 2, sm: 0 },
+                    borderRadius: { xs: '8px', sm: '4px' }
+                  }} 
+                />
                 <Box sx={{ width: '100%' }}>
                   <Skeleton variant="text" width="40%" height={32} />
                   <Skeleton variant="text" width="60%" height={24} />
@@ -73,9 +123,21 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
               <Skeleton variant="text" width="100%" height={20} sx={{ mt: 2 }} />
               <Skeleton variant="text" width="100%" height={20} />
               <Skeleton variant="text" width="80%" height={20} />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                <Skeleton variant="rectangular" width={120} height={40} sx={{ borderRadius: 2 }} />
-                <Skeleton variant="rectangular" width={120} height={40} sx={{ borderRadius: 2 }} />
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                mt: 2,
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 2, sm: 0 }
+              }}>
+                <Skeleton 
+                  variant="rectangular" 
+                  sx={{ width: { xs: '100%', sm: 120 }, height: 40, borderRadius: 2 }} 
+                />
+                <Skeleton 
+                  variant="rectangular" 
+                  sx={{ width: { xs: '100%', sm: 120 }, height: 40, borderRadius: 2 }} 
+                />
               </Box>
             </SkeletonCard>
           ))}
@@ -104,7 +166,7 @@ export const MentorCardList: React.FC<MentorCardListProps> = ({
 
   return (
     <ListContainer>
-      {mentors.map(mentor => (
+      {mentors.map((mentor) => (
         <CardWrapper key={mentor.id}>
           <MentorCard mentor={mentor} />
         </CardWrapper>

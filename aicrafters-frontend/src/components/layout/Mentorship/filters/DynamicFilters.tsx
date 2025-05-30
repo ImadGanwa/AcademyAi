@@ -325,8 +325,9 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
       const uniqueCountries = new Set<string>();
       mentors.forEach(mentor => {
         if (mentor.country) {
-          // Use the country field from the database
-          uniqueCountries.add(mentor.country);
+          // Convert country code to full name for display
+          const countryName = getCountryName(mentor.country);
+          uniqueCountries.add(countryName);
         } else if (mentor.countryFlag) {
           // Fallback to extracting from countryFlag URL for backward compatibility
           const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
