@@ -839,6 +839,8 @@
     }
   },
   "mentor": {
+    "professionalRoleLabel": "Professional Role",
+    "allProfessionalRoles": "All Professional Roles",
     "navbar": {
       "dashboard": "Mentor Dashboard",
       "logout": "Logout"

@@ -51,6 +51,7 @@ export interface IUser extends Document {
     title: string;
     bio: string;
     hourlyRate: number;
+    country?: string;
     skills: Array<{
       id: string;
       name: string;
@@ -128,6 +129,7 @@ export interface SafeUser {
     title: string;
     bio: string;
     hourlyRate: number;
+    country?: string;
     skills: Array<{
       id: string;
       name: string;
@@ -343,6 +345,10 @@ const userSchema = new Schema({
     hourlyRate: {
       type: Number,
       min: 0
+    },
+    country: {
+      type: String,
+      trim: true
     },
     skills: [{
       id: {

@@ -16,7 +16,7 @@ import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import { authService } from '../../services/authService';
 import { toast } from 'react-toastify';
 import { Layout } from '../../components/layout/Layout/Layout';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import {useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 // import { LinkedIn } from 'react-linkedin-login-oauth2';
@@ -228,7 +228,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setIsLoading(true);
     try {
       if (!credentialResponse?.credential) {
@@ -415,50 +415,61 @@ export const LoginPage: React.FC = () => {
           </OrDivider>
         
           <Box width="100%" display="flex" flexDirection="column" gap={2}>
-            <div className="google-login-container" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <button
-                onClick={() => {
-                  const container = document.querySelector('.google-login-container .google-button-wrapper') as HTMLElement;
-                  if (container) {
-                    const googleButton = container.querySelector('button') as HTMLElement;
-                    if (googleButton) {
-                      googleButton.click();
-                    }
-                  }
-                }}
-                className="google-button"
-                style={{
-                  backgroundColor: '#ffffff',
-                  color: '#757575',
-                  border: '1px solid #dddddd',
-                  padding: '10px 20px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  fontSize: '14px',
-                  width: '250px',
-                  height: '42px'
-                }}
-              >
-                <GoogleIcon />
-                {t('auth.loginWithGoogle')}
-              </button>
-              <div className="google-button-wrapper" style={{ display: 'none' }}>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  useOneTap={false}
-                  theme="outline"
-                  size="large"
-                  text="signin_with"
-                  shape="rectangular"
-                  context="signin"
-                />
+            <Box className="google-login-container" display="flex" justifyContent="center" width="100%">
+              <div style={{ position: 'relative', width: '250px', height: '42px' }}>
+                {/* Custom styled button (visual only) */}
+                <button
+                  className="google-button-visual"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#ffffff',
+                    color: '#757575',
+                    border: '1px solid #dddddd',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    fontSize: '14px',
+                    pointerEvents: 'none', // Make this non-interactive
+                    zIndex: 1
+                  }}
+                >
+                  <GoogleIcon />
+                  {t('auth.loginWithGoogle')}
+                </button>
+                
+                {/* Actual Google Login button (transparent overlay) */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: 2,
+                    opacity: 0.01, // Nearly invisible but still interactive
+                  }}
+                >
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    useOneTap={false}
+                    type="standard"
+                    theme="filled_blue"
+                    size="large"
+                    text="signin_with"
+                    shape="rectangular"
+                    width="250px"
+                    locale={location.pathname.split('/')[1] || 'en'}
+                  />
+                </div>
               </div>
-            </div>
+            </Box>
 
             <div className="linkedin-login-container" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
               <button

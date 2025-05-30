@@ -176,6 +176,7 @@ export const mentorController = {
         education,
         experience,
         socialLinks,
+        country,
         removeProfileImage
       } = req.body;
 
@@ -252,6 +253,7 @@ export const mentorController = {
       if (title !== undefined) updateFields['mentorProfile.title'] = title;
       if (bio !== undefined) updateFields['mentorProfile.bio'] = bio;
       if (hourlyRate !== undefined) updateFields['mentorProfile.hourlyRate'] = hourlyRate;
+      if (country !== undefined) updateFields['mentorProfile.country'] = country;
       if (processedSkills !== undefined) updateFields['mentorProfile.skills'] = processedSkills;
       if (processedLanguages !== undefined) updateFields['mentorProfile.languages'] = processedLanguages;
       if (education !== undefined) updateFields['mentorProfile.education'] = education;
@@ -724,6 +726,7 @@ export const mentorController = {
       const { 
         skills, 
         languages, 
+        country,
         minHourlyRate, 
         maxHourlyRate,
         search, 
@@ -740,6 +743,10 @@ export const mentorController = {
       
       if (languages) {
         filters.languages = Array.isArray(languages) ? languages : [languages];
+      }
+      
+      if (country) {
+        filters.country = country as string;
       }
       
       if (minHourlyRate && !isNaN(Number(minHourlyRate))) {

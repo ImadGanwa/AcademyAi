@@ -36,11 +36,12 @@ export interface Mentor {
   title: string;
   bio: string; // Changed from description to bio to match API
   hourlyRate: number; // Added from API response
+  country?: string; // Add country field from database
   skills: MentorSkill[];
   languages: MentorLanguage[];
   stats?: MentorStats; // Added from API response
   isVerified?: boolean; // Made optional as it might not be in API
-  countryFlag?: string; // Made optional as it might not be in API
+  countryFlag?: string; // Keep for backward compatibility but will be deprecated
 }
 
 const CardContainer = styled(Box)`

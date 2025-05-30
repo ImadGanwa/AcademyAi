@@ -839,6 +839,8 @@
     }
   },
   "mentor": {
+    "professionalRoleLabel": "Rôle professionnel",
+    "allProfessionalRoles": "Tous les rôles professionnels",
     "navbar": {
       "dashboard": "Tableau de bord Mentor",
       "logout": "Déconnexion"

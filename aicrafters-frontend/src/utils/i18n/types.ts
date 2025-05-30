@@ -834,6 +834,8 @@ export interface Translations {
       profile: string;
       settings: string;
     };
+    professionalRoleLabel: string;
+    allProfessionalRoles: string;
   };
   admin: {
     navbar: {

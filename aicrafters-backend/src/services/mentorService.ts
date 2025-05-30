@@ -343,6 +343,10 @@ export const mentorService = {
         query['mentorProfile.languages.name'] = { $in: filters.languages };
       }
       
+      if (filters.country) {
+        query['mentorProfile.country'] = filters.country;
+      }
+      
       if (filters.minHourlyRate !== undefined) {
         query['mentorProfile.hourlyRate'] = { $gte: filters.minHourlyRate };
       }

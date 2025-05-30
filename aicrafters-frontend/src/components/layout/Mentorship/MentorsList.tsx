@@ -4,42 +4,83 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { MentorCardList } from './card/MentorCardList';
-import { Mentor } from './card/MentorCard';
+import { Mentor, MentorSkill, MentorLanguage } from './card/MentorCard';
 import { CustomPagination } from './Pagination';
 import { getPublicMentorList } from '../../../api/mentor';
 import { DynamicFilters } from './filters/DynamicFilters';
+import { getCountryName } from '../../../utils/countryUtils';
 
 const SearchAndFiltersWrapper = styled.div`
-  background-color: ${props => props.theme.palette.background.default};
+  background: ${props => props.theme.palette.background.default};
   width: 100%;
-  padding-bottom: 60px;
-  min-height: 200px;
+  padding-bottom: 80px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.1));
+    pointer-events: none;
+  }
+  
+  @media (max-width: 768px) {
+    padding-bottom: 60px;
+    min-height: 200px;
+  }
+  
+  @media (max-width: 480px) {
+    padding-bottom: 40px;
+    min-height: 180px;
+  }
 `;
 
 const ListWrapper = styled.div`
   background-color: #fff;
   width: 90%;
   max-width: 1200px;
-  margin: -30px auto 0;
-  padding: 40px;
-  border-radius: 30px 30px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  margin: -40px auto 0;
+  padding: 50px 40px;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: ${props => props.theme.palette.primary.main};
+    border-radius: 2px;
+  }
 
   @media (max-width: 1024px) {
     width: 95%;
-    padding: 30px 20px;
+    padding: 40px 30px;
+    margin: -30px auto 0;
   }
 
   @media (max-width: 768px) {
     width: 100%;
-    padding: 20px 15px;
+    padding: 30px 20px;
     margin-top: -20px;
     border-radius: 20px 20px 0 0;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px 15px;
+    border-radius: 16px 16px 0 0;
   }
 `;
 
@@ -55,16 +96,29 @@ const FilterContainer = styled(Box)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   width: 100%;
   max-width: 1200px;
-  margin: -40px auto 40px;
+  margin: -50px auto 50px;
   position: relative;
   z-index: 2;
   padding: 0 20px;
 
+  @media (max-width: 1024px) {
+    margin: -40px auto 40px;
+    gap: 20px;
+  }
+
   @media (max-width: 768px) {
+    margin: -30px auto 30px;
+    gap: 18px;
+    padding: 0 15px;
+  }
+  
+  @media (max-width: 480px) {
     margin: -20px auto 20px;
+    gap: 16px;
+    padding: 0 10px;
   }
 `;
 
@@ -80,27 +134,62 @@ const StyledTextField = styled(TextField)`
   width: 100%;
   
   .MuiOutlinedInput-root {
-    background-color: #fff;
-    border-radius: 50px;
+    background: #ffffff;
+    border-radius: 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     height: 56px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
     
     .MuiOutlinedInput-input {
       padding: 16px 20px 16px 56px;
       font-size: 1.1rem;
+      color: #2c3e50;
+      font-weight: 500;
+      
       &::placeholder {
-        color: #757575;
+        color: #6c757d;
         opacity: 1;
+        font-weight: 400;
       }
     }
 
     .MuiOutlinedInput-notchedOutline {
-      border: 1px solid #E0E0E0;
+      border: 2px solid #e8ecef;
+      transition: border-color 0.3s ease;
     }
 
-    &:hover, &.Mui-focused {
+    &:hover {
       .MuiOutlinedInput-notchedOutline {
         border-color: ${props => props.theme.palette.primary.main};
+      }
+    }
+
+    &.Mui-focused {
+      border-color: ${props => props.theme.palette.primary.main};
+      
+      .MuiOutlinedInput-notchedOutline {
+        border-color: ${props => props.theme.palette.primary.main};
+        border-width: 2px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      height: 52px;
+      border-radius: 12px;
+      
+      .MuiOutlinedInput-input {
+        padding: 14px 18px 14px 52px;
+        font-size: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      height: 48px;
+      
+      .MuiOutlinedInput-input {
+        padding: 12px 16px 12px 48px;
+        font-size: 0.95rem;
       }
     }
   }
@@ -112,13 +201,20 @@ const SearchIconWrapper = styled(Box)`
   top: 50%;
   transform: translateY(-50%);
   z-index: 1;
-  color: #757575;
+  color: #6c757d;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.3s ease;
+  
+  @media (max-width: 768px) {
+    left: 18px;
+  }
+  
+  @media (max-width: 480px) {
+    left: 16px;
+  }
 `;
-
-
 
 export const MentorsList: React.FC = () => {
   const { t } = useTranslation();
@@ -188,43 +284,70 @@ export const MentorsList: React.FC = () => {
               filteredResults = filteredResults.filter(mentor => 
                 mentor.fullName.toLowerCase().includes(search) || 
                 mentor.title.toLowerCase().includes(search) ||
-                mentor.bio.toLowerCase().includes(search)
+                mentor.bio.toLowerCase().includes(search) ||
+                mentor.skills.some((skill: MentorSkill) => skill.name.toLowerCase().includes(search))
               );
             }
             
             if (category) {
-              filteredResults = filteredResults.filter(mentor => 
-                mentor.title.toLowerCase().replace(/\s+/g, '').includes(category)
-              );
+              filteredResults = filteredResults.filter(mentor => {
+                const mentorTitleNormalized = mentor.title.toLowerCase().replace(/\s+/g, '');
+                return mentorTitleNormalized === category || mentorTitleNormalized.includes(category);
+              });
             }
             
             if (skill) {
               filteredResults = filteredResults.filter(mentor => 
-                mentor.skills.some((s: { name: string }) => s.name.toLowerCase().replace(/\s+/g, '').includes(skill))
+                mentor.skills.some((s: MentorSkill) => {
+                  const skillNormalized = s.name.toLowerCase().replace(/\s+/g, '');
+                  return skillNormalized === skill || skillNormalized.includes(skill);
+                })
               );
             }
             
             if (country) {
               filteredResults = filteredResults.filter(mentor => {
-                if (!mentor.countryFlag) return false;
-                const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
-                return countryCode === country;
+                if (mentor.country) {
+                  // Use the country field from the database
+                  return mentor.country === country;
+                } else if (mentor.countryFlag) {
+                  // Fallback to extracting from countryFlag URL for backward compatibility
+                  const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
+                  const countryName = getCountryName(countryCode);
+                  return countryName === country;
+                }
+                return false;
               });
             }
             
             if (language) {
               filteredResults = filteredResults.filter(mentor => 
-                mentor.languages.some((l: { name: string }) => l.name.toLowerCase().replace(/\s+/g, '').includes(language))
+                mentor.languages.some((l: MentorLanguage) => {
+                  const langNormalized = l.name.toLowerCase().replace(/\s+/g, '');
+                  return langNormalized === language || langNormalized.includes(language);
+                })
               );
             }
             
             console.log('Client-side filtered mentors:', filteredResults);
+            console.log('Applied filters:', { searchTerm, category, skill, country, language });
             
-            // Always use the client-side filtered results in development
+            // Calculate pagination for filtered results
+            const totalFilteredItems = filteredResults.length;
+            const totalFilteredPages = Math.ceil(totalFilteredItems / mentorsPerPage);
+            
+            // Apply pagination to filtered results
+            const startIndex = (page - 1) * mentorsPerPage;
+            const endIndex = startIndex + mentorsPerPage;
+            const paginatedResults = filteredResults.slice(startIndex, endIndex);
+            
+            console.log(`Pagination: Page ${page} of ${totalFilteredPages}, showing ${paginatedResults.length} of ${totalFilteredItems} mentors`);
+            
+            // Always use the client-side filtered and paginated results in development
             setMentors(mentors); // Keep original mentors for filter options
-            setDisplayedMentors(filteredResults);
-            setTotalItems(filteredResults.length);
-            setTotalPages(Math.ceil(filteredResults.length / mentorsPerPage));
+            setDisplayedMentors(paginatedResults);
+            setTotalItems(totalFilteredItems);
+            setTotalPages(totalFilteredPages);
             
             // If no results, set appropriate message but don't show error
             if (filteredResults.length === 0) {
