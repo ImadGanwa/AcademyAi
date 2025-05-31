@@ -22,6 +22,7 @@ This project serves as the core API for the AICrafters Academy platform. It hand
 *   **PDF Generation:** pdfkit
 *   **Excel Handling:** xlsx
 *   **Development Tooling:** Nodemon, ts-node
+*   **AI Integration:** OpenAI Assistants API
 
 ## Project Structure
 
@@ -35,6 +36,9 @@ The `src` directory contains the core application code:
 *   `models/`: Mongoose schemas and models defining the structure of database documents.
 *   `routes/`: Express router definitions, mapping API endpoints to controller functions.
 *   `services/`: Business logic modules, interacting with external APIs or performing complex operations.
+    *   `mentorAiService.ts`: Service for AI-powered mentor chat functionality using OpenAI Assistants API
+    *   `mentorSearchService.ts`: Service for searching mentors based on various criteria 
+*   `scripts/`: Utility scripts for testing and development purposes.
 *   `types/`: TypeScript type definitions and interfaces.
 *   `utils/`: Utility functions used across the backend.
 *   `validators/`: Functions or middleware for validating incoming request data.
@@ -83,6 +87,13 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 # Google Gemini API Key (Required for Mind Map generation)
 GEMINI_API_KEY=your_gemini_api_key
 
+# OpenAI API Key (Required for AI mentor functionality)
+OPENAI_API_KEY=your_openai_api_key
+
+# OpenAI Assistant IDs
+OPENAI_ASSISTANT_ID=your_openai_assistant_id
+OPENAI_MENTOR_ASSISTANT_ID=your_openai_mentor_assistant_id
+
 # Frontend URL (URL of the connected frontend application)
 FRONTEND_URL=http://localhost:3000 # Or your frontend's URL
 
@@ -92,13 +103,14 @@ NODE_ENV=development # Change to 'production' for production builds
 # Other variables as needed...
 ```
 
-**Note:** For production deployments (e.g., on Render), ensure the necessary environment variables (`MONGODB_URI`, `JWT_SECRET`, `CLOUDINARY_*`, `GEMINI_API_KEY`, `FRONTEND_URL`) are set in the hosting environment.
+**Note:** For production deployments (e.g., on Render), ensure the necessary environment variables (`MONGODB_URI`, `JWT_SECRET`, `CLOUDINARY_*`, `GEMINI_API_KEY`, `FRONTEND_URL`, `OPENAI_API_KEY`, `OPENAI_ASSISTANT_ID`, `OPENAI_MENTOR_ASSISTANT_ID`) are set in the hosting environment.
 
 ## Available Scripts
 
 -   **`npm start`**: Starts the production server (requires a prior build). Runs `node dist/app.js`.
 -   **`npm run dev`**: Starts the development server using `nodemon` for live reloading. Runs `nodemon src/app.ts`.
 -   **`npm run build`**: Compiles the TypeScript code to JavaScript in the `dist` directory. Runs `tsc`.
+-   **`npm run test:mentor-ai`**: Runs the test script for the mentor AI functionality. Runs `ts-node src/scripts/testMentorAi.ts`.
 
 ## Build Process
 
@@ -112,6 +124,32 @@ This project is configured for deployment on Render using the `render.yaml` file
 -   **Start Command:** `npm start`
 
 Render will automatically use these commands and the specified environment variables (which need to be configured in the Render service settings) to build and run the application.
+
+## AI Mentor Functionality
+
+The application includes an AI-powered mentorship feature that uses OpenAI's Assistants API. This feature allows users to:
+
+1. Chat with an AI mentor for career and professional development guidance
+2. Search for human mentors based on various criteria like expertise, languages, hourly rate, etc.
+
+### How It Works
+
+The AI mentor functionality is implemented in two main services:
+
+1. **mentorAiService.ts**: Manages conversations with the OpenAI Assistant and integrates the mentor search functionality
+2. **mentorSearchService.ts**: Provides search capabilities for finding mentors in the database
+
+The AI assistant is configured with a special tool that allows it to search the database for mentors based on user queries. When a user asks about finding mentors with specific qualifications, the assistant uses this tool to query the database and return relevant results.
+
+### Testing the Functionality
+
+You can test the AI mentor functionality using the provided test script:
+
+```bash
+npm run test:mentor-ai
+```
+
+This script simulates a conversation with the AI mentor, including queries about finding mentors with specific expertise, languages, and availability.
 
 ## Code Style & Linting
 

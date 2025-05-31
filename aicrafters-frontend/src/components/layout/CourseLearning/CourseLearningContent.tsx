@@ -4,7 +4,7 @@ import { Typography, IconButton, Button } from '@mui/material';
 import { VideoContent } from './content/VideoContent';
 import { ArticleContent } from './content/ArticleContent';
 import { QuizContent } from './content/QuizContent';
-import { ReactComponent as ExpandIcon } from '../../../assets/icons/Expand.svg';
+// import { ReactComponent as ExpandIcon } from '../../../assets/icons/Expand.svg';
 import MenuIcon from '@mui/icons-material/Menu';
 import { LessonContent } from '../../../types/course';
 import { useTranslation } from 'react-i18next';

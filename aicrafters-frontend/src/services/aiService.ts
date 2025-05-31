@@ -35,7 +35,7 @@ const getAuthToken = () => {
  */
 export const aiService = {
   /**
-   * Chat with the AI Coach
+   * Chat with the Adwina
    */
   async chat({ courseId, videoUrl, message, threadId }: ChatParams): Promise<ChatResponse> {
     try {
@@ -59,11 +59,11 @@ export const aiService = {
 
       return response.data.data;
     } catch (error: any) {
-      console.error('Error chatting with AI coach:', error);
+      console.error('Error chatting with Adwina:', error);
       if (error.response?.status === 401) {
         throw new Error('Authentication failed. Please log in again.');
       }
-      throw new Error(error.response?.data?.message || 'Failed to send message to AI coach');
+      throw new Error(error.response?.data?.message || 'Failed to send message to Adwina');
     }
   },
 

@@ -15,7 +15,7 @@ import { updateUser } from '../../../../store/slices/authSlice';
 import { DEFAULT_LANGUAGE } from '../../../../utils/constants';
 import { CongratulationsPopup } from '../../../../components/common/Popup/CongratulationsPopup';
 // import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
-import AICoach from '../../../../components/ai/AICoach';
+import Adwina from '../../../../components/ai/Adwina';
 import FloatingChatButton from '../../../../components/ai/FloatingChatButton';
 import config from '../../../../config';
 
@@ -79,7 +79,7 @@ const MainContent = styled.div`
   }
 `;
 
-const AICoachPanel = styled.div<{ isVisible: boolean }>`
+const AdwinaPanel = styled.div<{ isVisible: boolean }>`
   width: ${props => props.isVisible ? '450px' : '0'};
   max-width: 450px;
   flex-shrink: 0;
@@ -105,7 +105,7 @@ const AICoachPanel = styled.div<{ isVisible: boolean }>`
   }
 `;
 
-const AICoachContent = styled.div<{ isVisible: boolean }>`
+const AdwinaContent = styled.div<{ isVisible: boolean }>`
   width: 100%;
   height: 100%;
   opacity: ${props => props.isVisible ? 1 : 0};
@@ -162,7 +162,7 @@ export const CourseLearningPage: React.FC = () => {
 
   // Load chat state from localStorage on initial load
   useEffect(() => {
-    const savedChatState = localStorage.getItem('aiCoachChatOpen');
+    const savedChatState = localStorage.getItem('AdwinaChatOpen');
     if (savedChatState !== null) {
       setIsChatOpen(savedChatState === 'true');
     }
@@ -170,7 +170,7 @@ export const CourseLearningPage: React.FC = () => {
 
   // Save chat state to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('aiCoachChatOpen', isChatOpen.toString());
+    localStorage.setItem('AdwinaChatOpen', isChatOpen.toString());
   }, [isChatOpen]);
 
   // Toggle chat visibility
@@ -620,19 +620,19 @@ export const CourseLearningPage: React.FC = () => {
             </ContentWrapper>
           </MainContent>
           
-          {/* AI Coach Panel - only render if the current lesson has video content */}
+          {/* Adwina Panel - only render if the current lesson has video content */}
           {hasVideoContent && (
-            <AICoachPanel isVisible={isChatOpen}>
-              <AICoachContent isVisible={isChatOpen}>
-                <AICoach 
+            <AdwinaPanel isVisible={isChatOpen}>
+              <AdwinaContent isVisible={isChatOpen}>
+                <Adwina 
                   courseId={courseId || ''}
                   videoUrl={
                     (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
                   }
                   onClose={handleToggleChat}
                 />
-              </AICoachContent>
-            </AICoachPanel>
+              </AdwinaContent>
+            </AdwinaPanel>
           )}
         </PageLayout>
         

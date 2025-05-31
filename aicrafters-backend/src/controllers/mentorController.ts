@@ -8,6 +8,7 @@ import { mentorService } from '../services/mentorService';
 import { notificationService } from '../services/notificationService';
 import { processNamedItems } from '../utils/mentorUtils';
 import { uploadToCloudinary } from '../utils/fileUpload';
+import { chatWithMentor } from '../services/mentorAiService';
 
 export const mentorController = {
   /**
@@ -871,6 +872,46 @@ export const mentorController = {
       res.status(500).json({ 
         success: false, 
         error: error.message || 'An error occurred while fetching mentor profile'
+      });
+    }
+  },
+
+  /**
+   * Chat with the Adwina Mentor AI assistant
+   * @route GET /api/mentor/chat
+   */
+  mentorChat: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { mentorId, userId, message, threadId } = req.query;
+      const currentUserId = req.user?.id || 'anonymous';
+
+      // Validate required parameters
+      if (!message) {
+        res.status(400).json({ 
+          success: false,
+          error: 'Missing required parameter: message is required'
+        });
+        return;
+      }
+
+      // Chat with the mentor AI
+      const response = await chatWithMentor(
+        currentUserId,
+        message as string,
+        threadId as string | undefined,
+        mentorId as string | undefined
+      );
+
+      // Return the response
+      res.status(200).json({
+        success: true,
+        data: response
+      });
+    } catch (error: any) {
+      console.error('Error in mentor chat controller:', error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message || 'An error occurred while chatting with the mentor'
       });
     }
   },

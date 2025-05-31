@@ -26,11 +26,11 @@ interface FloatingChatButtonProps {
 
 const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ onClick }) => {
   return (
-    <Tooltip title="Open AI Coach" placement="left">
+    <Tooltip title="Adwina" placement="left">
       <StyledIconButton
         onClick={onClick}
         size="large"
-        aria-label="open ai coach"
+        aria-label="Adwina"
       >
         <ChatIcon fontSize="medium" />
       </StyledIconButton>

@@ -25,6 +25,13 @@ const upload = multer({
 const router = express.Router();
 
 /**
+ * @route   GET /api/mentor/chat
+ * @desc    Chat with the Adwina Mentor AI assistant
+ * @access  Private (requires authentication)
+ */
+router.get('/chat', authMiddleware, mentorController.mentorChat);
+
+/**
  * @route   GET /api/mentor/public/mentors
  * @desc    Get public list of mentors with filters
  * @access  Public

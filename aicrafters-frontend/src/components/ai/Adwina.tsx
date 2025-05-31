@@ -38,13 +38,13 @@ const ChatContent = styled(Box)`
   flex-direction: column;
 `;
 
-interface AICoachProps {
+interface AdwinaProps {
   courseId: string;
   videoUrl: string;
   onClose?: () => void;
 }
 
-const AICoach: React.FC<AICoachProps> = ({ courseId, videoUrl, onClose }) => {
+const Adwina: React.FC<AdwinaProps> = ({ courseId, videoUrl, onClose }) => {
   const {
     messages,
     chatLoading,
@@ -73,4 +73,4 @@ const AICoach: React.FC<AICoachProps> = ({ courseId, videoUrl, onClose }) => {
   );
 };
 
-export default AICoach; 
+export default Adwina; 

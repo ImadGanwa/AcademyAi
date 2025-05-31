@@ -15,8 +15,8 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import SendIcon from '@mui/icons-material/Send';
-import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+// import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+// import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
@@ -150,7 +150,7 @@ const StyledAvatar = styled(Avatar)`
   background-color: ${props => props.theme.palette.primary.main};
 `;
 
-const AICoachAvatar = styled(Avatar)`
+const AdwinaAvatar = styled(Avatar)`
   width: 40px;
   height: 40px;
   background-color: ${props => props.theme.palette.primary.light};
@@ -238,11 +238,11 @@ export const AIChat: React.FC<AIChatProps> = ({
     <ChatContainer elevation={0}>
       <ChatHeader className="ai-chat-header">
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <AICoachAvatar>
+          <AdwinaAvatar>
             <ChatIcon />
-          </AICoachAvatar>
+          </AdwinaAvatar>
           <Typography variant="subtitle1" fontWeight={600}>
-            AI Coach
+            Adwina
           </Typography>
         </Box>
       </ChatHeader>
@@ -251,15 +251,15 @@ export const AIChat: React.FC<AIChatProps> = ({
         {/* Static welcome message always shown */}
         <WelcomeContainer>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <AICoachAvatar>
+            <AdwinaAvatar>
               <ChatIcon />
-            </AICoachAvatar>
+            </AdwinaAvatar>
             <Box>
               <Typography variant="h6" fontWeight={600}>
                 Hey there! 👋
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                I'm your AI learning assistant. Ask me anything about this video!
+                I'm Adwina, your AI learning assistant. Ask me anything about this video!
               </Typography>
             </Box>
           </Box>
@@ -311,9 +311,9 @@ export const AIChat: React.FC<AIChatProps> = ({
                 </UserAvatar>
               )
             ) : (
-              <AICoachAvatar>
+              <AdwinaAvatar>
                 <ChatIcon />
-              </AICoachAvatar>
+              </AdwinaAvatar>
             )}
             
             <Box sx={{ maxWidth: '85%', display: 'flex', flexDirection: 'column' }}>

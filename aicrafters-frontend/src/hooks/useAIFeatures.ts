@@ -114,7 +114,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     setMindMapFetchAttempted(false);
   }, [videoUrl]);
 
-  // Send message to AI coach
+  // Send message to Adwina
   const sendMessage = useCallback(async (content: string) => {
     try {
       setChatLoading(true);
