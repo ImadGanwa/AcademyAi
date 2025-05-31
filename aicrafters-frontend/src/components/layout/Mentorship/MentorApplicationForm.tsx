@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, TextField, Button, Box, Chip, FormControl, FormControlLabel,  Checkbox, useTheme, MenuItem, Select, SelectChangeEvent, CircularProgress, Alert, Snackbar } from '@mui/material';
+import { Typography, TextField, Button, Box, Chip, FormControl, FormControlLabel,  Checkbox, useTheme, MenuItem, Select, SelectChangeEvent, CircularProgress, Alert, Snackbar, OutlinedInput, ListItemText } from '@mui/material';
 import styled from 'styled-components';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -7,6 +7,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { applyToBecomeMentor } from '../../../api/mentor';
 import { useTranslation } from 'react-i18next';
 import { COUNTRIES, getCountryCode } from '../../../utils/countryUtils';
+import { PROFESSIONAL_ROLES, AREAS_OF_INTEREST } from '../../../utils/constants';
 
 // Styled components
 const FormSection = styled.div`
@@ -55,6 +56,11 @@ const FieldLabel = styled(Typography)`
   font-weight: 500;
   color: ${props => props.theme.palette.text.secondary};
   margin-bottom: 8px;
+  
+  .required {
+    color: ${props => props.theme.palette.error.main};
+    margin-left: 2px;
+  }
 `;
 
 const LanguageChip = styled(Chip)`
@@ -71,7 +77,7 @@ const LanguageChip = styled(Chip)`
 
 const ButtonContainer = styled(Box)`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 30px;
 `;
 
@@ -147,12 +153,14 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   const [newInterest, setNewInterest] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     linkedinUrl: '',
     country: '',
+    bio: '',
     professionalRole: '',
     academicBackground: '',
     areasOfInterest: ['Digital Marketing', 'Data Science'],
@@ -163,7 +171,6 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       fundingAgency: false,
       internationalOrganization: false
     },
-    bio: '',
     expertise: [] as string[],
     experience: '',
     hourlyRate: 50,
@@ -212,6 +219,17 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
     }
   };
   
+  const handleAreasOfInterestChange = (event: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = event;
+    
+    setFormData(prev => ({
+      ...prev,
+      areasOfInterest: typeof value === 'string' ? value.split(',') : value,
+    }));
+  };
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -237,8 +255,70 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
     }
   };
   
+  const validateForm = (step: number): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+    
+    if (step === 1) {
+      if (!formData.fullName.trim()) {
+        newErrors.fullName = t('mentor.applicationForm.errors.fullNameRequired', 'Full name is required') as string;
+        isValid = false;
+      }
+      
+      if (!formData.email.trim()) {
+        newErrors.email = t('mentor.applicationForm.errors.emailRequired', 'Email is required') as string;
+        isValid = false;
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = t('mentor.applicationForm.errors.emailInvalid', 'Please enter a valid email address') as string;
+        isValid = false;
+      }
+      
+      if (!formData.linkedinUrl.trim()) {
+        newErrors.linkedinUrl = t('mentor.applicationForm.errors.linkedinRequired', 'LinkedIn URL is required') as string;
+        isValid = false;
+      }
+      
+      if (!formData.country.trim()) {
+        newErrors.country = t('mentor.applicationForm.errors.countryRequired', 'Country is required') as string;
+        isValid = false;
+      }
+      
+      if (!formData.bio.trim()) {
+        newErrors.bio = t('mentor.applicationForm.errors.bioRequired', 'Bio is required') as string;
+        isValid = false;
+      }
+    }
+    
+    if (step === 2) {
+      if (!formData.professionalRole.trim()) {
+        newErrors.professionalRole = t('mentor.applicationForm.errors.professionalRoleRequired', 'Professional role is required') as string;
+        isValid = false;
+      }
+      
+      if (!formData.experience.trim()) {
+        newErrors.experience = t('mentor.applicationForm.errors.experienceRequired', 'Professional experience is required') as string;
+        isValid = false;
+      }
+      
+      if (!formData.academicBackground.trim()) {
+        newErrors.academicBackground = t('mentor.applicationForm.errors.academicBackgroundRequired', 'Academic background is required') as string;
+        isValid = false;
+      }
+      
+      if (formData.areasOfInterest.length === 0) {
+        newErrors.areasOfInterest = t('mentor.applicationForm.errors.areasOfInterestRequired', 'At least one area of interest is required') as string;
+        isValid = false;
+      }
+    }
+    
+    setFormErrors(newErrors);
+    return isValid;
+  };
+  
   const handleNext = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 3));
+    if (validateForm(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, 3));
+    }
   };
   
   const handleBack = () => {
@@ -246,13 +326,17 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   };
   
   const handleSubmit = async () => {
+    if (!validateForm(currentStep)) {
+      return;
+    }
+    
     // Transform form data to match API expectations
     const applicationData = {
       fullName: formData.fullName,
       email: formData.email,
-      bio: formData.bio || `${formData.fullName} is a ${formData.professionalRole} with expertise in ${formData.areasOfInterest.join(', ')}.`,
+      bio: formData.bio,
       expertise: formData.areasOfInterest,
-      experience: formData.experience || formData.academicBackground,
+      experience: formData.experience,
       hourlyRate: Number(formData.hourlyRate),
       availability: {
         weekdays: formData.availability.weekdays,
@@ -308,7 +392,10 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       {currentStep === 1 && (
         <form>
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.fullName', 'Full Name') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.fullName', 'Full Name') as string}
+              <span className="required">*</span>
+            </FieldLabel>
             <TextField 
               fullWidth
               placeholder={t('mentor.applicationForm.fullNamePlaceholder', 'John Doe') as string}
@@ -316,11 +403,17 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               name="fullName"
               value={formData.fullName}
               onChange={handleInputChange}
+              required
+              error={!!formErrors.fullName}
+              helperText={formErrors.fullName}
             />
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.email', 'Email') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.email', 'Email') as string}
+              <span className="required">*</span>
+            </FieldLabel>
             <TextField 
               fullWidth
               placeholder={t('mentor.applicationForm.emailPlaceholder', 'email@example.com') as string}
@@ -329,11 +422,41 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              required
+              error={!!formErrors.email}
+              helperText={formErrors.email}
             />
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.linkedinUrl', 'LinkedIn URL') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.bio', 'Biography') as string}
+              <span className="required">*</span>
+              <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.palette.text.secondary }}>
+                ({formData.bio.length}/500 {t('mentor.applicationForm.characters', 'characters') as string})
+              </span>
+            </FieldLabel>
+            <TextField 
+              fullWidth
+              multiline
+              rows={4}
+              placeholder={t('mentor.applicationForm.bioPlaceholder', 'Briefly describe yourself, your background, and your expertise (max 100 words)') as string}
+              variant="outlined"
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              required
+              error={!!formErrors.bio}
+              helperText={formErrors.bio}
+              inputProps={{ maxLength: 500 }}
+            />
+          </FormField>
+          
+          <FormField>
+            <FieldLabel>
+              {t('mentor.applicationForm.linkedinUrl', 'LinkedIn URL') as string}
+              <span className="required">*</span>
+            </FieldLabel>
             <TextField 
               fullWidth
               placeholder={t('mentor.applicationForm.linkedinUrlPlaceholder', 'LinkedIn profile') as string}
@@ -341,6 +464,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               name="linkedinUrl"
               value={formData.linkedinUrl}
               onChange={handleInputChange}
+              required
+              error={!!formErrors.linkedinUrl}
+              helperText={formErrors.linkedinUrl}
               InputProps={{
                 startAdornment: (
                   <Box sx={{ display: 'flex', alignItems: 'center', marginRight: 1 }}>
@@ -354,28 +480,41 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.country', 'Country') as string}</FieldLabel>
-            <FormControl fullWidth>
-              <TextField
-                select
-                label={t('mentor.applicationForm.country', 'Country') as string}
+            <FieldLabel>
+              {t('mentor.applicationForm.country', 'Country') as string}
+              <span className="required">*</span>
+            </FieldLabel>
+            <FormControl fullWidth error={!!formErrors.country}>
+              <Select
+                displayEmpty
                 value={formData.country}
                 onChange={(e) => setFormData({...formData, country: e.target.value})}
                 variant="outlined"
                 required
+                error={!!formErrors.country}
               >
-                <option value="" disabled>{t('mentor.applicationForm.selectCountry', 'Select a country') as string}</option>
+                <MenuItem value="" disabled>
+                  {t('mentor.applicationForm.selectCountry', 'Select a country') as string}
+                </MenuItem>
                 {COUNTRIES.map((country) => (
-                  <option key={country} value={country}>
+                  <MenuItem key={country} value={country}>
                     {country}
-                  </option>
+                  </MenuItem>
                 ))}
-              </TextField>
+              </Select>
+              {formErrors.country && (
+                <Typography variant="caption" color="error">
+                  {formErrors.country}
+                </Typography>
+              )}
             </FormControl>
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentorship.applicationForm.languagesSpokenLabel', 'Languages Spoken') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentorship.applicationForm.languagesSpokenLabel', 'Languages Spoken') as string}
+              <span className="required">*</span>
+            </FieldLabel>
             <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '10px' }}>
               {selectedLanguages.map((language) => (
                 <LanguageChip
@@ -386,7 +525,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                 />
               ))}
             </div>
-            <FormControl fullWidth variant="outlined">
+            <FormControl fullWidth variant="outlined" required>
               <Select
                 displayEmpty
                 value={newLanguage}
@@ -424,59 +563,120 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       {currentStep === 2 && (
         <form>
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.professionalRole', 'Desired Professional Role') as string}</FieldLabel>
-            <TextField 
-              fullWidth
-              placeholder={t('mentor.applicationForm.professionalRolePlaceholder', 'e.g., Product Manager, UX Designer') as string}
-              variant="outlined"
-              name="professionalRole"
-              value={formData.professionalRole}
-              onChange={handleInputChange}
-            />
+            <FieldLabel>
+              {t('mentor.applicationForm.professionalRole', 'Desired Professional Role') as string}
+              <span className="required">*</span>
+            </FieldLabel>
+            <FormControl fullWidth error={!!formErrors.professionalRole}>
+              <Select
+                displayEmpty
+                value={formData.professionalRole}
+                onChange={(e) => setFormData({...formData, professionalRole: e.target.value})}
+                variant="outlined"
+                required
+                error={!!formErrors.professionalRole}
+              >
+                <MenuItem value="" disabled>
+                  {t('mentor.applicationForm.selectRole', 'Select a professional role') as string}
+                </MenuItem>
+                {PROFESSIONAL_ROLES.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
+              </Select>
+              {formErrors.professionalRole && (
+                <Typography variant="caption" color="error">
+                  {formErrors.professionalRole}
+                </Typography>
+              )}
+            </FormControl>
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.academicBackground', 'Academic Background') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.experience', 'Professional Experience') as string}
+              <span className="required">*</span>
+            </FieldLabel>
             <TextField 
               fullWidth
               multiline
               rows={4}
-              placeholder={t('mentor.applicationForm.academicBackgroundPlaceholder', 'Describe your academic and professional background') as string}
+              placeholder={t('mentor.applicationForm.experiencePlaceholder', 'Describe your professional experience, achievements, and skills') as string}
+              variant="outlined"
+              name="experience"
+              value={formData.experience}
+              onChange={handleInputChange}
+              required
+              error={!!formErrors.experience}
+              helperText={formErrors.experience}
+            />
+          </FormField>
+          
+          <FormField>
+            <FieldLabel>
+              {t('mentor.applicationForm.academicBackground', 'Academic Background') as string}
+              <span className="required">*</span>
+            </FieldLabel>
+            <TextField 
+              fullWidth
+              multiline
+              rows={4}
+              placeholder={t('mentor.applicationForm.academicBackgroundPlaceholder', 'Describe your academic qualifications and background') as string}
               variant="outlined"
               name="academicBackground"
               value={formData.academicBackground}
               onChange={handleInputChange}
+              required
+              error={!!formErrors.academicBackground}
+              helperText={formErrors.academicBackground}
             />
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.areasOfInterest', 'Areas of Interest') as string}</FieldLabel>
-            <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '10px' }}>
-              {formData.areasOfInterest.map((area) => (
-                <LanguageChip
-                  key={area}
-                  label={area}
-                  onDelete={() => {
-                    setFormData(prev => ({
-                      ...prev,
-                      areasOfInterest: prev.areasOfInterest.filter(a => a !== area)
-                    }));
-                  }}
-                />
-              ))}
-            </div>
-            <TextField 
-              fullWidth
-              placeholder={t('mentor.applicationForm.areasOfInterestPlaceholder', 'Type an area of interest and press Enter') as string}
-              variant="outlined"
-              value={newInterest}
-              onChange={(e) => setNewInterest(e.target.value)}
-              onKeyDown={handleAddInterest}
-            />
+            <FieldLabel>
+              {t('mentor.applicationForm.areasOfInterest', 'Areas of Interest') as string}
+              <span className="required">*</span>
+            </FieldLabel>
+            <FormControl fullWidth error={!!formErrors.areasOfInterest}>
+              <Select
+                multiple
+                displayEmpty
+                value={formData.areasOfInterest}
+                onChange={handleAreasOfInterestChange}
+                input={<OutlinedInput />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+                required
+                error={!!formErrors.areasOfInterest}
+              >
+                <MenuItem disabled value="">
+                  <em>{t('mentor.applicationForm.selectAreasOfInterest', 'Select areas of interest') as string}</em>
+                </MenuItem>
+                {AREAS_OF_INTEREST.map((area) => (
+                  <MenuItem key={area} value={area}>
+                    <Checkbox checked={formData.areasOfInterest.indexOf(area) > -1} />
+                    <ListItemText primary={area} />
+                  </MenuItem>
+                ))}
+              </Select>
+              {formErrors.areasOfInterest && (
+                <Typography variant="caption" color="error">
+                  {formErrors.areasOfInterest}
+                </Typography>
+              )}
+            </FormControl>
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.internationalExperience', 'International Experience') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.internationalExperience', 'International Experience') as string}
+            </FieldLabel>
             <FormControlLabel
               control={
                 <Checkbox 
@@ -510,7 +710,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       {currentStep === 3 && (
         <form>
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.desiredDuration', 'Desired Duration') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.desiredDuration', 'Desired Session Duration') as string}
+            </FieldLabel>
             <RadioOptionContainer>
               <RadioOption 
                 selected={formData.desiredDuration === '1h'}
@@ -540,7 +742,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
           </FormField>
           
           <FormField>
-            <FieldLabel>{t('mentor.applicationForm.mentorPreferences', 'Mentor Preferences') as string}</FieldLabel>
+            <FieldLabel>
+              {t('mentor.applicationForm.mentorPreferences', 'Mentor Preferences') as string}
+            </FieldLabel>
             <Box mt={2}>
               <FormControlLabel
                 control={
