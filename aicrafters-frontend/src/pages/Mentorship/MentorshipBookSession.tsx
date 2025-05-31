@@ -18,8 +18,6 @@ import BookingConfirmationPopup from '../../components/layout/Mentorship/booking
 import { getPublicMentorProfile } from '../../api/mentor';
 import { getMentorAvailableSlots, createBooking } from '../../api/booking';
 
-// Import mock data for fallback
-import { mockMentors } from '../../components/layout/Mentorship/card/mentorsMock';
 
 const PageContainer = styled(Container)`
   padding: 40px 20px;
@@ -109,23 +107,11 @@ const MentorshipBookSession: React.FC = () => {
         if (response && response.success && response.data) {
           setMentor(response.data);
         } else {
-          // Fallback to mock data for testing
-          const mockMentor = mockMentors.find(m => m.id === mentorId);
-          if (mockMentor) {
-            setMentor(mockMentor);
-          } else {
-            setError(t('mentorship.mentorNotFound') as string);
-          }
+          setError(t('mentorship.mentorNotFound') as string);
         }
       } catch (err) {
         console.error("Error fetching mentor profile:", err);
         setError(t('mentorship.failedToLoadMentor') as string);
-        
-        // Fallback to mock data
-        const mockMentor = mockMentors.find(m => m.id === mentorId);
-        if (mockMentor) {
-          setMentor(mockMentor);
-        }
       } finally {
         setLoading(false);
       }
