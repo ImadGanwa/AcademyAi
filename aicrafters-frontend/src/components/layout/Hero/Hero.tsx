@@ -112,14 +112,20 @@ const InputWrapper = styled(Box)`
   display: flex;
   gap: 16px;
   max-width: 500px;
-  justify-content: flex-start;
-  width: 100%;
+  justify-content: flex-start; 
+  width: 100%; 
 
   @media (max-width: 768px) {
     flex-direction: column;
-    max-width: 100%;
-    width: 100%;
-    justify-content: center;
+    max-width: 100%; 
+    align-items: center; 
+
+    & > a {
+      display: flex; 
+      justify-content: center !important; 
+      width: 80%; 
+      max-width: 300px; 
+    }
   }
 `;
 
@@ -151,15 +157,14 @@ const StyledButton = styled(Button)`
   && {
     min-width: 120px;
     font-size: 1.2rem;
-    padding: 12px 40px;
+    padding: 12px 40px; 
     border-radius: 30px;
     font-weight: 600;
-
-
+    
     @media (max-width: 768px) {
-      padding: 14px 0;
+      padding: 14px 0; 
       font-size: 1.2rem;
-      width: 80%;
+      width: 80%; 
       max-width: 300px;
     }
   }
