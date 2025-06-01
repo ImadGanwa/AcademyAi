@@ -64,13 +64,13 @@ const searchMentorsTool = {
   type: "function" as const,
   function: {
     name: "search_mentors",
-    description: "Search for mentors based on various criteria like expertise, languages, hourly rate, etc.",
+    description: "Search for mentors based on various criteria like skills, languages, hourly rate, etc.",
     parameters: {
       type: "object",
       properties: {
-        expertise: {
+        skills: {
           type: "string",
-          description: "Expertise area(s) to search for (e.g. 'machine learning', 'web development')"
+          description: "Skills area(s) to search for (e.g. 'machine learning', 'web development')"
         },
         languages: {
           type: "string",
@@ -121,12 +121,11 @@ async function handleToolCalls(threadId: string, runId: string, toolCalls: any[]
         // Format mentor data for readability
         const formattedMentors = mentors.map(mentor => ({
           fullName: mentor.fullName,
-          expertise: mentor.expertise,
+          skills: mentor.skills,
           hourlyRate: mentor.hourlyRate,
           languages: mentor.languages,
           countries: mentor.countries,
           bio: mentor.bio,
-          experience: mentor.experience,
           availability: mentor.availability,
           professionalInfo: mentor.professionalInfo
         }));

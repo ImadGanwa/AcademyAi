@@ -1,37 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IMentorApplication as IMentorApplicationBase } from './User';
 
-export interface IMentorApplication extends Document {
-  fullName: string;
-  email: string;
-  bio: string;
-  expertise: string[];
-  experience: string;
-  hourlyRate: number;
-  languages: string[];
-  countries: string[];
-  availability: {
-    weekdays?: boolean;
-    weekends?: boolean;
-    mornings?: boolean;
-    afternoons?: boolean;
-    evenings?: boolean;
-    [key: string]: any;
-  };
-  professionalInfo: {
-    role?: string;
-    linkedIn?: string;
-    academicBackground?: string;
-    [key: string]: any;
-  };
-  preferences: {
-    sessionDuration?: string;
-    [key: string]: any;
-  };
-  appliedAt: Date;
-  reviewedAt?: Date;
-  status: 'pending' | 'approved' | 'rejected';
-  adminNotes?: string;
-}
+// Re-export for compatibility
+export { IMentorApplication } from './User';
 
 const MentorApplicationSchema = new Schema({
   fullName: {
@@ -50,14 +21,9 @@ const MentorApplicationSchema = new Schema({
     required: true,
     trim: true
   },
-  expertise: {
+  skills: {
     type: [String],
     required: true
-  },
-  experience: {
-    type: String,
-    required: true,
-    trim: true
   },
   hourlyRate: {
     type: Number,
@@ -78,7 +44,8 @@ const MentorApplicationSchema = new Schema({
   },
   professionalInfo: {
     type: Schema.Types.Mixed,
-    default: {}
+    default: {},
+    required: true
   },
   preferences: {
     type: Schema.Types.Mixed,
@@ -102,4 +69,4 @@ const MentorApplicationSchema = new Schema({
   }
 }, { timestamps: true });
 
-export const MentorApplication = mongoose.model<IMentorApplication>('MentorApplication', MentorApplicationSchema); 
+export const MentorApplication = mongoose.model<IMentorApplicationBase>('MentorApplication', MentorApplicationSchema); 

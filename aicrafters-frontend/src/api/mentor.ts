@@ -13,16 +13,22 @@ interface MentorFilters {
 
 interface MentorApplicationData {
   bio: string;
-  expertise: string[];
-  experience: string;
+  skills: string[];
   availability: any; // Complex type, adjust as needed
   hourlyRate: number;
+  professionalInfo: {
+    role?: string;
+    linkedIn?: string;
+    experience?: string;
+    academicBackground?: string;
+    [key: string]: any;
+  };
   [key: string]: any; // Allow additional fields
 }
 
 interface MentorProfileData {
   bio?: string;
-  expertise?: string[];
+  skills?: string[];
   availability?: any;
   hourlyRate?: number;
   profileImage?: File;
@@ -117,9 +123,9 @@ export const updateMentorProfile = async (profileData: MentorProfileData) => {
       bio: profileData.bio,
       hourlyRate: profileData.hourlyRate || 50, // Default value
       country: profileData.country,
-      // Format expertise with IDs
-      expertise: Array.isArray(profileData.expertise) 
-        ? profileData.expertise.map(name => ({ name })) 
+      // Format skills with IDs
+      skills: Array.isArray(profileData.skills) 
+        ? profileData.skills.map(name => ({ name })) 
         : [],
       // Format languages with IDs
       languages: Array.isArray(profileData.languages) 

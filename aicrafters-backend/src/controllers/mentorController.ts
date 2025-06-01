@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { User } from '../models/User';
+import { User, MentorProfile, MentorProfessionalInfo, MentorAvailabilitySlot, IMentorApplication } from '../models/User';
 import { MentorshipBooking } from '../models/MentorshipBooking';
 import { MentorMessage } from '../models/MentorMessage';
 import { MentorApplication } from '../models/MentorApplication';
@@ -22,8 +22,7 @@ export const mentorController = {
         email,
         bio,
         hourlyRate,
-        expertise,
-        experience,
+        skills,
         availability,
         languages,
         professionalInfo,
@@ -34,10 +33,10 @@ export const mentorController = {
       console.log('Received mentor application data:', req.body);
 
       // Validate required fields
-      if (!email || !fullName || !bio || !expertise || !Array.isArray(expertise) || expertise.length === 0) {
+      if (!email || !fullName || !bio || !skills || !Array.isArray(skills) || skills.length === 0) {
         res.status(400).json({
           success: false,
-          error: 'Missing required fields: email, fullName, bio, and expertise are required. Expertise must be a non-empty array.'
+          error: 'Missing required fields: email, fullName, bio, and skills are required. Skills must be a non-empty array.'
         });
         return;
       }
@@ -48,15 +47,6 @@ export const mentorController = {
         res.status(400).json({
           success: false,
           error: 'Please provide a valid email address'
-        });
-        return;
-      }
-
-      // Validate experience field
-      if (!experience || typeof experience !== 'string' || experience.trim() === '') {
-        res.status(400).json({
-          success: false,
-          error: 'Professional experience is required'
         });
         return;
       }
@@ -73,7 +63,16 @@ export const mentorController = {
       if (!professionalInfo.role || !professionalInfo.linkedIn || !professionalInfo.academicBackground || !professionalInfo.experience) {
         res.status(400).json({
           success: false,
-          error: 'Professional role, LinkedIn URL, and academic background are required'
+          error: 'Professional role, LinkedIn URL, academic background, and experience are required'
+        });
+        return;
+      }
+
+      // Validate experience field within professionalInfo
+      if (!professionalInfo.experience || typeof professionalInfo.experience !== 'string' || professionalInfo.experience.trim() === '') {
+        res.status(400).json({
+          success: false,
+          error: 'Professional experience is required'
         });
         return;
       }
@@ -129,7 +128,7 @@ export const mentorController = {
         fullName: fullName.trim(),
         email: email.toLowerCase().trim(),
         bio: bio.trim(),
-        expertise: expertise.map((skill: string) => skill.trim()).filter((skill: string) => skill.length > 0),
+        skills: skills.map((skill: string) => skill.trim()).filter((skill: string) => skill.length > 0),
         hourlyRate: Number(hourlyRate) || 0,
         languages: languages.map((lang: string) => lang.trim()).filter((lang: string) => lang.length > 0),
         countries: countries.map((country: string) => country.trim()).filter((country: string) => country.length > 0),
@@ -158,13 +157,13 @@ export const mentorController = {
       try {
         await notificationService.notifyAdmins({
           title: 'New Mentor Application',
-          message: `${fullName} (${email}) has applied to become a mentor with expertise in ${expertise.join(', ')}.`,
+          message: `${fullName} (${email}) has applied to become a mentor with skills in ${skills.join(', ')}.`,
           type: 'mentor_application',
           data: {
             applicationId: application._id,
             userEmail: email,
             userName: fullName,
-            expertise: expertise
+            skills: skills
           }
         });
         console.log('Admin notification sent successfully');
@@ -289,7 +288,7 @@ export const mentorController = {
         fullName,
         bio,
         hourlyRate,
-        expertise,
+        skills,
         languages,
         professionalInfo,
         country,
@@ -336,27 +335,22 @@ export const mentorController = {
         profileImageUrl = '';
       }
       
-      // Process expertise/skills - prioritize expertise over skills for consistency
-      let processedExpertise: any[] | undefined;
-      const expertiseData = expertise; // Use expertise if available, fallback to skills
-      
-      if (expertiseData) {
+      // Process skills - Fixed to handle JSON string properly
+      let processedSkills: any[] | undefined;
+      if (skills !== undefined) {
         try {
-          // If expertise is a string (JSON), parse it
-          let parsedExpertiseData: any;
-          if (typeof expertiseData === 'string') {
-            parsedExpertiseData = JSON.parse(expertiseData);
-            console.log('Parsed expertise from JSON string:', parsedExpertiseData);
+          let skillsData: any;
+          if (typeof skills === 'string') {
+            skillsData = JSON.parse(skills);
+            console.log('Parsed skills from JSON string:', skillsData);
           } else {
-            parsedExpertiseData = expertiseData;
-            console.log('Expertise was already an object/array:', parsedExpertiseData);
+            skillsData = skills;
           }
-          // Use processNamedItems to ensure each expertise item has an id
-          processedExpertise = processNamedItems(parsedExpertiseData);
-          console.log('Processed expertise:', processedExpertise);
+          processedSkills = processNamedItems(skillsData);
+          console.log('Processed skills:', processedSkills);
         } catch (e) {
-          console.error('Error parsing expertise:', e);
-          processedExpertise = []; // Default to empty array if parsing fails
+          console.error('Error parsing skills:', e);
+          processedSkills = []; // Default to empty array if parsing fails
         }
       }
       
@@ -415,7 +409,7 @@ export const mentorController = {
           updateFields['mentorProfile.title'] = processedProfessionalInfo.role;
         }
       }
-      if (processedExpertise !== undefined) updateFields['mentorProfile.expertise'] = processedExpertise;
+      if (processedSkills !== undefined) updateFields['mentorProfile.skills'] = processedSkills;
       if (availability !== undefined) updateFields['mentorProfile.availability'] = availability;
       if (profileImageUrl !== undefined) updateFields['profileImage'] = profileImageUrl;
 
@@ -451,8 +445,8 @@ export const mentorController = {
         data: {
           profile: {
             ...(updatedUser.mentorProfile ? JSON.parse(JSON.stringify(updatedUser.mentorProfile)) : {}),
-            // Ensure backward compatibility by providing both field names
-            expertise: updatedUser.mentorProfile?.expertise
+            // Ensure backward compatibility by providing skills field
+            skills: updatedUser.mentorProfile?.skills
           },
           profileImage: updatedUser.profileImage,
           fullName: updatedUser.fullName,
@@ -981,8 +975,8 @@ export const mentorController = {
         'mentorProfile.isVerified': true
       }).select(
         'fullName email profileImage mentorProfile.title mentorProfile.bio mentorProfile.hourlyRate ' +
-        'mentorProfile.country mentorProfile.skills mentorProfile.languages mentorProfile.education mentorProfile.experience ' +
-        'mentorProfile.availability mentorProfile.socialLinks mentorProfile.mentorRating ' +
+        'mentorProfile.country mentorProfile.skills mentorProfile.languages mentorProfile.professionalInfo ' +
+        'mentorProfile.availability  mentorProfile.mentorRating ' +
         'mentorProfile.mentorReviewsCount mentorProfile.menteesCount mentorProfile.sessionsCount'
       );
       
@@ -1016,9 +1010,7 @@ export const mentorController = {
         country: mentor.mentorProfile?.country,
         skills: mentor.mentorProfile?.skills,
         languages: mentor.mentorProfile?.languages,
-        education: mentor.mentorProfile?.education,
         availability: mentor.mentorProfile?.availability,
-        socialLinks: mentor.mentorProfile?.socialLinks,
         stats: {
           rating: mentor.mentorProfile?.mentorRating,
           reviewsCount: mentor.mentorProfile?.mentorReviewsCount,

@@ -5,7 +5,7 @@ import { MentorApplication, IMentorApplication } from '../models/MentorApplicati
  * Search for mentors based on various criteria
  */
 export async function searchMentors(params: {
-  expertise?: string | string[];
+  skills?: string | string[];
   languages?: string | string[];
   countries?: string | string[];
   hourlyRateMin?: number;
@@ -16,7 +16,7 @@ export async function searchMentors(params: {
 }): Promise<IMentorApplication[]> {
   try {
     const {
-      expertise,
+      skills,
       languages,
       countries,
       hourlyRateMin,
@@ -31,10 +31,10 @@ export async function searchMentors(params: {
       status: 'approved' // Only return approved mentors
     };
 
-    // Add expertise filter
-    if (expertise) {
-      const expertiseArray = Array.isArray(expertise) ? expertise : [expertise];
-      filter.expertise = { $in: expertiseArray };
+    // Add skills filter
+    if (skills) {
+      const skillsArray = Array.isArray(skills) ? skills : [skills];
+      filter.skills = { $in: skillsArray };
     }
 
     // Add languages filter
@@ -77,7 +77,7 @@ export async function searchMentors(params: {
       filter.$or = [
         { fullName: { $regex: query, $options: 'i' } },
         { bio: { $regex: query, $options: 'i' } },
-        { experience: { $regex: query, $options: 'i' } },
+        { 'professionalInfo.experience': { $regex: query, $options: 'i' } },
         { 'professionalInfo.role': { $regex: query, $options: 'i' } },
         { 'professionalInfo.academicBackground': { $regex: query, $options: 'i' } }
       ];

@@ -29,7 +29,7 @@ interface ProfileData {
   name: string;
   email: string;
   bio: string;
-  expertise: string[];
+  skills: string[];
   languages: string[];
   country: string;
   professionalInfo: {
@@ -114,12 +114,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
     // On autofill we get a stringified value.
     setProfileData(prev => ({
       ...prev,
-      expertise: typeof value === 'string' ? value.split(',') : value,
+      skills: typeof value === 'string' ? value.split(',') : value,
     }));
     
     // Clear skills error when user selects skills
-    if (formErrors.expertise) {
-      setFormErrors({ ...formErrors, expertise: '' });
+    if (formErrors.skills) {
+      setFormErrors({ ...formErrors, skills: '' });
     }
   };
 
@@ -447,16 +447,16 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
       </Grid>
 
       <Box sx={{ mt: 3 }}>
-        <FormControl fullWidth margin="normal" required error={!!formErrors.expertise}>
-          <InputLabel id="areas-expertise-label">
-            {`${t('mentor.settings.areasOfExpertise', 'Areas of Expertise') as string} `}
+        <FormControl fullWidth margin="normal" required error={!!formErrors.skills}>
+          <InputLabel id="areas-skills-label">
+            {`${t('mentor.settings.areasOfskills', 'Areas of skills') as string} `}
           </InputLabel>
           <Select
-            labelId="areas-expertise-label"
+            labelId="areas-skills-label"
             multiple
-            value={profileData.expertise}
+            value={profileData.skills}
             onChange={handleSkillsChange}
-            input={<OutlinedInput label={`${t('mentor.settings.areasOfExpertise', 'Areas of Expertise') as string} `} />}
+            input={<OutlinedInput label={`${t('mentor.settings.areasOfskills', 'Areas of skills') as string} `} />}
             renderValue={(selected) => (
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                 {selected.map((value) => (
@@ -467,14 +467,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           >
             {AREAS_OF_INTEREST.map((area) => (
               <MenuItem key={area} value={area}>
-                <Checkbox checked={profileData.expertise.indexOf(area) > -1} />
+                <Checkbox checked={profileData.skills.indexOf(area) > -1} />
                 <ListItemText primary={area} />
               </MenuItem>
             ))}
           </Select>
-          {formErrors.expertise && (
+          {formErrors.skills && (
             <Typography variant="caption" color="error">
-              {formErrors.expertise}
+              {formErrors.skills}
             </Typography>
           )}
         </FormControl>

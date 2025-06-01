@@ -105,6 +105,7 @@ export const CoursesSection: React.FC<CoursesSectionProps> = ({ onCourseClick })
       // Transform and filter courses
       const publishedCourses = allCourses
         .filter((course: any) => course.status === 'published')
+        .filter((course: any) => course.id !== '67f92f8db05f25155fe50ca1') // Exclude Adwin course
         .map((course: any) => ({
           id: course.id,
           title: course.title,

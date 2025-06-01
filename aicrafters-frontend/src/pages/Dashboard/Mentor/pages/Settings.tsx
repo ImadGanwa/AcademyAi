@@ -10,14 +10,12 @@ import {
 
 import { getMentorProfile, updateMentorProfile } from '../../../../api/mentor';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
 import { 
   ProfileTab, 
   NotificationsTab, 
   AccountTab,
   TabPanel,
 } from '../components/Settings';
-import { availableLanguages } from '../../../../utils/countryUtils';
 
 
 
@@ -26,7 +24,7 @@ interface ProfileData {
   name: string;
   email: string;
   bio: string;
-  expertise: string[];
+  skills: string[];
   languages: string[];
   country: string;
   professionalInfo: {
@@ -53,7 +51,7 @@ export const Settings: React.FC = () => {
     name: '',
     email: '',
     bio: '',
-    expertise: [],
+    skills: [],
     languages: [],
     country: '',
     professionalInfo: {
@@ -172,7 +170,7 @@ export const Settings: React.FC = () => {
           name: fullName || '',
           email: email || '',
           bio: profile.bio || '',
-          expertise: processedSkills,
+          skills: processedSkills,
           languages: processedLanguages,
           country: processedCountry,
           professionalInfo: {
@@ -248,8 +246,8 @@ export const Settings: React.FC = () => {
       isValid = false;
     }
     
-    if (profileData.expertise.length === 0) {
-      newErrors.expertise = t('mentor.settings.errors.skillsRequired', 'At least one area of expertise is required') as string;
+    if (profileData.skills.length === 0) {
+      newErrors.skills = t('mentor.settings.errors.skillsRequired', 'At least one area of skills is required') as string;
       isValid = false;
     }
     
@@ -276,7 +274,7 @@ export const Settings: React.FC = () => {
       const updateData: any = {
         fullName: profileData.name, // Use name as fullName for the API
         bio: profileData.bio,
-        expertise: profileData.expertise,
+        skills: profileData.skills,
         languages: profileData.languages,
         country: profileData.country,
         professionalInfo: {

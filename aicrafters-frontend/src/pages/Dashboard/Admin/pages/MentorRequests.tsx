@@ -85,8 +85,7 @@ interface MentorApplication {
   fullName: string;
   email: string;
   bio: string;
-  expertise: string[];
-  experience: string;
+  skills: string[];
   hourlyRate: number;
   languages: string[];
   countries: string[];
@@ -95,6 +94,7 @@ interface MentorApplication {
     role?: string;
     linkedIn?: string;
     academicBackground?: string;
+    experience?: string;
     [key: string]: any;
   };
   preferences: {
@@ -116,10 +116,10 @@ const transformApplicationToRequest = (application: MentorApplication) => {
     linkedinUrl: application.professionalInfo?.linkedIn || 'Not provided',
     country: application.countries?.[0] || 'Not provided',
     professionalRole: application.professionalInfo?.role || 'Not provided',
-    academicBackground: application.professionalInfo?.academicBackground || application.experience || 'Not provided',
+    academicBackground: application.professionalInfo?.academicBackground || application.professionalInfo?.experience || 'Not provided',
     hasInternationalExperience: Boolean(application.preferences?.internationalExperience),
     desiredDuration: application.preferences?.sessionDuration || '1h',
-    areasOfInterest: application.expertise || [],
+    areasOfInterest: application.skills || [],
     languages: application.languages || [],
     submittedAt: application.appliedAt,
     status: application.status === 'approved' ? 'accepted' : (application.status === 'rejected' ? 'denied' : 'pending')

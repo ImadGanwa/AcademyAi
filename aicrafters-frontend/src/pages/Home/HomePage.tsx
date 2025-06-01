@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Layout } from '../../components/layout/Layout/Layout';
 import { Hero } from '../../components/layout/Hero/Hero';
 import { CoursesSection } from '../../components/layout/Courses/CoursesSection';
+import { AdwinCourseSection } from '../../components/layout/Courses/AdwinCourseSection';
 import { useNavigate} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Course } from '../../types/course';
@@ -205,6 +206,8 @@ export const HomePage: React.FC = () => {
           </ImageItem>
         </ImagesGrid>
       </TracePlusSection>
+      
+      <AdwinCourseSection />
       
       <CoursesSection onCourseClick={handleCourseClick} />
     </Layout>

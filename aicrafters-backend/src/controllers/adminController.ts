@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
-import { User } from '../models/User';
+import { User, MentorProfile, MentorProfessionalInfo, IMentorApplication } from '../models/User';
 import { Course, ICourse } from '../models/Course';
 import { Category } from '../models/Category';
 import { MentorApplication } from '../models/MentorApplication';
@@ -12,6 +12,7 @@ import bcryptjs from 'bcryptjs';
 import { Organization } from '../models/Organization';
 import { generateRandomPassword } from '../utils/passwordGenerator';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/fileUpload';
+import { notificationService } from '../services/notificationService';
 
 interface EmailError extends Error {
   message: string;
@@ -967,19 +968,15 @@ export const adminController = {
               bio: application.bio,
               hourlyRate: application.hourlyRate,
               country: application.countries?.[0] ,
-              skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
-              expertise: application.expertise.map(name => ({ id: String(Math.random()), name })),
+              skills: application.skills.map(name => ({ id: String(Math.random()), name })),
               languages: application.languages.map(name => ({ id: String(Math.random()), name })),
-              education: [],
               professionalInfo: {
                 role: application.professionalInfo?.role || 'Professional Mentor',
                 linkedIn: application.professionalInfo?.linkedIn || '',
-                academicBackground: application.professionalInfo?.academicBackground || ''
+                academicBackground: application.professionalInfo?.academicBackground || '',
+                experience: application.professionalInfo?.experience || ''
               },
               availability: Array.isArray(application.availability) ? application.availability : [],
-              socialLinks: {
-                linkedin: application.professionalInfo?.linkedIn || '',
-              },
               isVerified: true,
               menteesCount: 0,
               sessionsCount: 0,
@@ -1014,20 +1011,15 @@ export const adminController = {
                 bio: application.bio,
                 hourlyRate: application.hourlyRate,
                 country: application.countries?.[0] || 'United States',
-                skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
-                expertise: application.expertise.map(name => ({ id: String(Math.random()), name })),
+                skills: application.skills.map(name => ({ id: String(Math.random()), name })),
                 languages: application.languages.map(name => ({ id: String(Math.random()), name })),
-                education: [],
-                experience: application.experience || '',
                 professionalInfo: {
                   role: application.professionalInfo?.role || 'Professional Mentor',
                   linkedIn: application.professionalInfo?.linkedIn || '',
-                  academicBackground: application.professionalInfo?.academicBackground || ''
+                  academicBackground: application.professionalInfo?.academicBackground || '',
+                  experience: application.professionalInfo?.experience || ''
                 },
                 availability: Array.isArray(application.availability) ? application.availability : [],
-                socialLinks: {
-                  linkedin: application.professionalInfo?.linkedIn || '',
-                },
                 isVerified: true,
                 menteesCount: 0,
                 sessionsCount: 0,

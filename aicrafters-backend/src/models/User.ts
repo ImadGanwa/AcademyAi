@@ -1,6 +1,89 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+// Exportable Mentor Schema Types for consistency across the application
+export interface MentorSkill {
+  id: string;
+  name: string;
+}
+
+export interface MentorLanguage {
+  id: string;
+  name: string;
+}
+
+export interface MentorProfessionalInfo {
+  role?: string;
+  linkedIn?: string;
+  academicBackground?: string;
+  experience?: string;
+  [key: string]: any;
+}
+
+export interface MentorAvailabilitySlot {
+  day: number;
+  startTime: string;
+  endTime: string;
+  weekKey?: string;
+}
+
+
+
+export interface MentorProfile {
+  title: string;
+  bio: string;
+  hourlyRate: number;
+  country?: string;
+  skills: Array<MentorSkill>;
+  languages: Array<MentorLanguage>;
+  professionalInfo?: MentorProfessionalInfo;
+  availability: Array<MentorAvailabilitySlot>;
+  isVerified: boolean;
+  menteesCount: number;
+  sessionsCount: number;
+  mentorRating: number;
+  mentorReviewsCount: number;
+  appliedAt: Date;
+  approvedAt: Date | null;
+}
+
+export interface MentorProfileUpdate {
+  title?: string;
+  bio?: string;
+  hourlyRate?: number;
+  skills?: Array<string | { id?: string; name: string }>;
+  languages?: Array<string | { id?: string; name: string }>;
+}
+
+export interface MentorApplicationAvailability {
+  weekdays?: boolean;
+  weekends?: boolean;
+  mornings?: boolean;
+  afternoons?: boolean;
+  evenings?: boolean;
+  [key: string]: any;
+}
+
+export interface IMentorApplication extends Document {
+  fullName: string;
+  email: string;
+  bio: string;
+  skills: string[];
+  hourlyRate: number;
+  languages: string[];
+  countries: string[];
+  availability: MentorApplicationAvailability;
+  professionalInfo: MentorProfessionalInfo;
+  preferences: {
+    sessionDuration?: string;
+    [key: string]: any;
+  };
+  appliedAt: Date;
+  reviewedAt?: Date;
+  status: 'pending' | 'approved' | 'rejected';
+  adminNotes?: string;
+}
+
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   email: string;
@@ -47,57 +130,7 @@ export interface IUser extends Document {
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
   // Mentor specific fields
-  mentorProfile?: {
-    title: string;
-    bio: string;
-    hourlyRate: number;
-    country?: string;
-    skills: Array<{
-      id: string;
-      name: string;
-    }>;
-    expertise?: Array<{ // This property exists in IUser
-      id: string;
-      name: string;
-    }>;
-    languages: Array<{
-      id: string;
-      name: string;
-    }>;
-    education: Array<{
-      institution: string;
-      degree: string;
-      field: string;
-      startYear: number;
-      endYear: number | null;
-    }>;
-    professionalInfo?: { // This property exists in IUser
-      role?: string;
-      linkedIn?: string;
-      academicBackground?: string;
-      experience?: string;
-      [key: string]: any;
-    };
-    availability: Array<{
-      day: number;
-      startTime: string;
-      endTime: string;
-      weekKey?: string;
-    }>;
-    socialLinks: {
-      linkedin?: string;
-      twitter?: string;
-      github?: string;
-      website?: string;
-    };
-    isVerified: boolean;
-    menteesCount: number;
-    sessionsCount: number;
-    mentorRating: number;
-    mentorReviewsCount: number;
-    appliedAt: Date;
-    approvedAt: Date | null;
-  };
+  mentorProfile?: MentorProfile;
 }
 
 interface IUserModel extends Model<IUser> {
@@ -136,57 +169,7 @@ export interface SafeUser {
       completedLessons: Array<string>;
     };
   }>;
-  mentorProfile?: { // Updated to match IUser.mentorProfile structure for direct assignment
-    title: string;
-    bio: string;
-    hourlyRate: number;
-    country?: string;
-    skills: Array<{
-      id: string;
-      name: string;
-    }>;
-    expertise?: Array<{ // Added from IUser.mentorProfile
-      id: string;
-      name: string;
-    }>;
-    languages: Array<{
-      id: string;
-      name: string;
-    }>;
-    education: Array<{
-      institution: string;
-      degree: string;
-      field: string;
-      startYear: number;
-      endYear: number | null;
-    }>;
-    professionalInfo?: { // Added from IUser.mentorProfile
-      role?: string;
-      linkedIn?: string;
-      academicBackground?: string;
-      experience?: string;
-      [key: string]: any; // To match IUser.mentorProfile.professionalInfo
-    };
-    availability: Array<{
-      day: number;
-      startTime: string;
-      endTime: string;
-      weekKey?: string;
-    }>;
-    socialLinks: {
-      linkedin?: string;
-      twitter?: string;
-      github?: string;
-      website?: string;
-    };
-    isVerified: boolean;
-    menteesCount: number;
-    sessionsCount: number;
-    mentorRating: number;
-    mentorReviewsCount: number;
-    appliedAt: Date;
-    approvedAt: Date | null;
-  };
+  mentorProfile?: MentorProfile; // Updated to use the centralized MentorProfile type
 }
 
 const userSchema = new Schema({
@@ -377,17 +360,6 @@ const userSchema = new Schema({
         trim: true
       }
     }],
-    expertise: [{
-      id: {
-        type: String,
-        required: true
-      },
-      name: {
-        type: String,
-        required: true,
-        trim: true
-      }
-    }],
     languages: [{
       id: {
         type: String,
@@ -399,32 +371,6 @@ const userSchema = new Schema({
         trim: true
       }
     }],
-    education: [{
-      institution: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      degree: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      field: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      startYear: {
-        type: Number,
-        required: true
-      },
-      endYear: {
-        type: Number,
-        default: null
-      }
-    }],
-    
     professionalInfo: {
       role: {
         type: String,
@@ -466,24 +412,6 @@ const userSchema = new Schema({
         trim: true
       }
     }],
-    socialLinks: {
-      linkedin: {
-        type: String,
-        trim: true
-      },
-      twitter: {
-        type: String,
-        trim: true
-      },
-      github: {
-        type: String,
-        trim: true
-      },
-      website: {
-        type: String,
-        trim: true
-      }
-    },
     isVerified: {
       type: Boolean,
       default: false

@@ -171,7 +171,6 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       fundingAgency: false,
       internationalOrganization: false
     },
-    expertise: [] as string[],
     experience: '',
     hourlyRate: 50,
     availability: {
@@ -332,8 +331,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       fullName: formData.fullName,
       email: formData.email,
       bio: formData.bio,
-      expertise: formData.areasOfInterest,
-      experience: formData.experience,
+      skills: formData.areasOfInterest,
       hourlyRate: Number(formData.hourlyRate),
       availability: {
         weekdays: formData.availability.weekdays,
@@ -346,7 +344,8 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       professionalInfo: {
         role: formData.professionalRole,
         linkedIn: formData.linkedinUrl,
-        academicBackground: formData.academicBackground
+        academicBackground: formData.academicBackground,
+        experience: formData.experience
       },
       preferences: {
         sessionDuration: formData.desiredDuration,

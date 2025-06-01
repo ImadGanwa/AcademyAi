@@ -1,75 +1,8 @@
-import { User } from '../models/User';
+import { User, MentorProfile, MentorProfileUpdate, MentorSkill, MentorLanguage, MentorAvailabilitySlot } from '../models/User';
 import { MentorshipBooking } from '../models/MentorshipBooking';
 import { MentorMessage } from '../models/MentorMessage';
 import mongoose from 'mongoose';
 import { processNamedItems } from '../utils/mentorUtils';
-
-interface MentorProfile {
-  title: string;
-  bio: string;
-  hourlyRate: number;
-  skills: Array<{
-    id: string;
-    name: string;
-  }>;
-  languages: Array<{
-    id: string;
-    name: string;
-  }>;
-  education: Array<{
-    institution: string;
-    degree: string;
-    field: string;
-    startYear: number;
-    endYear: number | null;
-  }>;
-  experience: Array<{
-    company: string;
-    position: string;
-    description: string;
-    startYear: number;
-    endYear: number | null;
-  }>;
-  availability?: Array<{
-    day: number;
-    startTime: string;
-    endTime: string;
-  }>;
-  socialLinks?: {
-    linkedin?: string;
-    twitter?: string;
-    github?: string;
-    website?: string;
-  };
-}
-
-interface MentorProfileUpdate {
-  title?: string;
-  bio?: string;
-  hourlyRate?: number;
-  skills?: Array<string | { id?: string; name: string }>;
-  languages?: Array<string | { id?: string; name: string }>;
-  education?: Array<{
-    institution: string;
-    degree: string;
-    field: string;
-    startYear: number;
-    endYear: number | null;
-  }>;
-  experience?: Array<{
-    company: string;
-    position: string;
-    description: string;
-    startYear: number;
-    endYear: number | null;
-  }>;
-  socialLinks?: {
-    linkedin?: string;
-    twitter?: string;
-    github?: string;
-    website?: string;
-  };
-}
 
 export const mentorService = {
   /**
@@ -100,7 +33,6 @@ export const mentorService = {
       const mentorProfile = {
         ...profileData,
         availability: profileData.availability || [],
-        socialLinks: profileData.socialLinks || {},
         isVerified: false,
         menteesCount: 0,
         sessionsCount: 0,
@@ -188,9 +120,7 @@ export const mentorService = {
       if (profileUpdate.hourlyRate !== undefined) updateFields['mentorProfile.hourlyRate'] = profileUpdate.hourlyRate;
       if (processedSkills !== undefined) updateFields['mentorProfile.skills'] = processedSkills;
       if (processedLanguages !== undefined) updateFields['mentorProfile.languages'] = processedLanguages;
-      if (profileUpdate.education !== undefined) updateFields['mentorProfile.education'] = profileUpdate.education;
-      if (profileUpdate.experience !== undefined) updateFields['mentorProfile.experience'] = profileUpdate.experience;
-      if (profileUpdate.socialLinks !== undefined) updateFields['mentorProfile.socialLinks'] = profileUpdate.socialLinks;
+      
       
       // Validate if there's anything to update
       if (Object.keys(updateFields).length === 0) {
@@ -899,33 +829,6 @@ function validateMentorProfile(profile: MentorProfile): boolean {
     return false;
   }
   
-  // Validate education
-  if (!profile.education || !Array.isArray(profile.education) || profile.education.length === 0) {
-    return false;
-  }
-  
-  // Validate education entries
-  if (!profile.education.every(edu => 
-    edu.institution && 
-    edu.degree && 
-    edu.field && 
-    typeof edu.startYear === 'number')) {
-    return false;
-  }
-  
-  // Validate experience
-  if (!profile.experience || !Array.isArray(profile.experience) || profile.experience.length === 0) {
-    return false;
-  }
-  
-  // Validate experience entries
-  if (!profile.experience.every(exp => 
-    exp.company && 
-    exp.position && 
-    exp.description && 
-    typeof exp.startYear === 'number')) {
-    return false;
-  }
   
   return true;
 }
