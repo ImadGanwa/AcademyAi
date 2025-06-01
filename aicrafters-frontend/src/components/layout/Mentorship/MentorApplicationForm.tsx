@@ -6,7 +6,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { applyToBecomeMentor } from '../../../api/mentor';
 import { useTranslation } from 'react-i18next';
-import { COUNTRIES, getCountryCode } from '../../../utils/countryUtils';
+import { COUNTRIES, getCountryCode, availableLanguages } from '../../../utils/countryUtils';
 import { PROFESSIONAL_ROLES, AREAS_OF_INTEREST } from '../../../utils/constants';
 
 // Styled components
@@ -186,11 +186,8 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   // Extract the language prefix from the current URL
   const langPrefix = location.pathname.split('/')[1];
   
-  // List of available languages
-  const availableLanguages = [
-    'English', 'Spanish', 'French', 'German', 'Portuguese', 'Arabic', 
-    'Chinese', 'Japanese', 'Russian', 'Hindi', 'Italian', 'Swahili'
-  ].filter(lang => !selectedLanguages.includes(lang));
+  // Filter out already selected languages
+  const filteredLanguages = availableLanguages.filter(lang => !selectedLanguages.includes(lang));
   
   const handleLanguageDelete = (languageToDelete: string) => {
     setSelectedLanguages((languages) => 
@@ -540,7 +537,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
                 <MenuItem value="" disabled>
                   <em>{t('mentor.applicationForm.selectLanguage', 'Select a language') as string}</em>
                 </MenuItem>
-                {availableLanguages.map((language) => (
+                {filteredLanguages.map((language) => (
                   <MenuItem key={language} value={language}>
                     {language}
                   </MenuItem>

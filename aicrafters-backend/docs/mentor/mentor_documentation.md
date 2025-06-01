@@ -38,31 +38,11 @@ mentorProfile: {
     id: String,
     name: String,
   }],
-  education: [{                         // Educational background
-    institution: String,
-    degree: String,
-    field: String,
-    startYear: Number,
-    endYear: Number,
-  }],
-  experience: [{                        // Professional experience
-    company: String,
-    position: String,
-    description: String,
-    startYear: Number,
-    endYear: Number,
-  }],
   availability: [{                      // Weekly availability slots
     day: Number,                        // 0-6 (Sunday-Saturday)
     startTime: String,                  // HH:MM format
     endTime: String,                    // HH:MM format
   }],
-  socialLinks: {                        // Professional social links
-    linkedin: String,
-    twitter: String,
-    github: String,
-    website: String,
-  },
   isVerified: {                         // Whether the mentor is verified
     type: Boolean,
     default: false
@@ -85,6 +65,7 @@ mentorProfile: {
   },
   appliedAt: Date,                      // When the mentor applied
   approvedAt: Date,                     // When the mentor was approved
+  
 }
 ```
 

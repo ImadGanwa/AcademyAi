@@ -17,6 +17,7 @@ import {
   AccountTab,
   TabPanel,
 } from '../components/Settings';
+import { availableLanguages } from '../../../../utils/countryUtils';
 
 
 
@@ -79,12 +80,6 @@ export const Settings: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  // Available languages
-  const availableLanguages = [
-    'English', 'Spanish', 'French', 'German', 'Portuguese', 'Arabic', 
-    'Chinese', 'Japanese', 'Russian', 'Hindi', 'Italian', 'Swahili'
-  ];
 
   const displayImageUrl = useMemo(() => {
     if (previewImage) {
@@ -342,64 +337,66 @@ export const Settings: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        {t('mentor.settings.title', 'Settings') as string}
+    <Box sx={{ width: '100%', p: { xs: 2, md: 4 } }}>
+      <Typography variant="h5" sx={{ mb: 4, fontWeight: 600 }}>
+        {t('mentor.settings.title', 'Settings')}
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        {t('mentor.settings.accountDescription', 'Manage your account settings and preferences') as string}
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {success}
-        </Alert>
-      )}
-
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="settings tabs">
-          <Tab label={t('mentor.settings.tabs.profile', 'Profile') as string} />
-          <Tab label={t('mentor.settings.tabs.notifications', 'Notifications') as string} />
-          <Tab label={t('mentor.settings.tabs.account', 'Account') as string} />
+      
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          aria-label="settings tabs"
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 500,
+              fontSize: '1rem',
+              px: 3
+            }
+          }}
+        >
+          <Tab label={t('mentor.settings.tabs.profile', 'Profile')} />
+          <Tab label={t('mentor.settings.tabs.notifications', 'Notifications')} />
+          <Tab label={t('mentor.settings.tabs.account', 'Account')} />
         </Tabs>
       </Box>
-
-      <TabPanel value={tabValue} index={0}>
-        <ProfileTab 
-          profileData={profileData}
-          setProfileData={setProfileData}
-          formErrors={formErrors}
-          setFormErrors={setFormErrors}
-          saveLoading={saveLoading}
-          imageLoading={imageLoading}
-          setImageLoading={setImageLoading}
-          error={error}
-          success={success}
-          previewImage={previewImage}
-          setPreviewImage={setPreviewImage}
-          handleSaveProfile={handleSaveProfile}
-          displayImageUrl={displayImageUrl}
-          availableLanguages={availableLanguages}
-        />
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={1}>
-        <NotificationsTab
-          notificationSettings={notificationSettings}
-          setNotificationSettings={setNotificationSettings}
-          handleSaveNotifications={handleSaveNotifications}
-        />
-      </TabPanel>
-
-      <TabPanel value={tabValue} index={2}>
-        <AccountTab />
-      </TabPanel>
+      
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <TabPanel value={tabValue} index={0}>
+            <ProfileTab 
+              profileData={profileData}
+              setProfileData={setProfileData}
+              formErrors={formErrors}
+              setFormErrors={setFormErrors}
+              saveLoading={saveLoading}
+              imageLoading={imageLoading}
+              setImageLoading={setImageLoading}
+              error={error}
+              success={success}
+              previewImage={previewImage}
+              setPreviewImage={setPreviewImage}
+              handleSaveProfile={handleSaveProfile}
+              displayImageUrl={displayImageUrl}
+            />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1}>
+            <NotificationsTab 
+              notificationSettings={notificationSettings}
+              setNotificationSettings={setNotificationSettings}
+              handleSaveNotifications={handleSaveNotifications}
+            />
+          </TabPanel>
+          <TabPanel value={tabValue} index={2}>
+            <AccountTab />
+          </TabPanel>
+        </>
+      )}
     </Box>
   );
 }; 

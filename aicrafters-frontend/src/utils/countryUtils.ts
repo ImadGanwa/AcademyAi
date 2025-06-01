@@ -231,6 +231,39 @@ export const getCountryName = (code: string): string => {
   return countryMap[code.toLowerCase()] || code;
 };
 
+// List of available languages for mentor profiles and applications
+export const availableLanguages = [
+  'English',
+  'Spanish',
+  'French',
+  'German',
+  'Arabic',
+  'Mandarin',
+  'Hindi',
+  'Portuguese',
+  'Russian',
+  'Japanese',
+  'Korean',
+  'Italian',
+  'Dutch',
+  'Turkish',
+  'Polish',
+  'Swedish',
+  'Norwegian',
+  'Danish',
+  'Finnish',
+  'Greek',
+  'Hebrew',
+  'Thai',
+  'Vietnamese',
+  'Indonesian',
+  'Malay',
+  'Tagalog',
+  'Urdu',
+  'Bengali',
+  'Persian'
+];
+
 // Country code to flag URL mapping using flagcdn.com
 export const COUNTRY_FLAG_MAP: Record<string, string> = {
   // Primary 2-letter codes with flag URLs

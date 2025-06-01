@@ -19,7 +19,7 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import { useTranslation } from 'react-i18next';
 import { AREAS_OF_INTEREST, PROFESSIONAL_ROLES } from '../../../../../utils/constants';
-import { COUNTRIES } from '../../../../../utils/countryUtils';
+import { COUNTRIES, availableLanguages } from '../../../../../utils/countryUtils';
 import { ProfileAvatar, AvatarWrapper, AvatarContainer, AvatarUploadButton, SettingsSection, SettingTitle } from './StyledComponents';
 import { Chip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -56,7 +56,6 @@ interface ProfileTabProps {
   setPreviewImage: React.Dispatch<React.SetStateAction<string | null>>;
   handleSaveProfile: () => Promise<void>;
   displayImageUrl: string;
-  availableLanguages: string[];
 }
 
 const ProfileTab: React.FC<ProfileTabProps> = ({
@@ -72,8 +71,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
   previewImage,
   setPreviewImage,
   handleSaveProfile,
-  displayImageUrl,
-  availableLanguages
+  displayImageUrl
 }) => {
   const { t } = useTranslation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -340,7 +338,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             value={profileData.email}
             onChange={handleProfileChange}
             margin="normal"
-            required
+            disabled
             error={!!formErrors.email}
             helperText={formErrors.email}
           />

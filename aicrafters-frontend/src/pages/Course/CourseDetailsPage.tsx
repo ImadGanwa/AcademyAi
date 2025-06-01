@@ -674,7 +674,10 @@ export const CourseDetailsPage: React.FC = () => {
                   </MobileBannerTitle>
                 </MobileBannerInfo>
                 <StartLearningButton 
-                  onClick={() => navigate(`/dashboard/user/learning/${course.id}`)}
+                  onClick={() => {
+                    navigate(`/dashboard/user/learning/${course.id}`);
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   Start Learning
                 </StartLearningButton>
