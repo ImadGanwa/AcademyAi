@@ -387,6 +387,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             error={!!formErrors['professionalInfo.linkedIn']}
             helperText={formErrors['professionalInfo.linkedIn']}
             required
+
           />
         </Grid>
         <Grid item xs={12}>

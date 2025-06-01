@@ -698,7 +698,7 @@ export const Navbar: React.FC = () => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const currentLang = i18n.language;
-    navigate(`/${currentLang}/`, { replace: true });
+    window.location.href = 'https://adwin.global';
   };
 
 
@@ -718,7 +718,7 @@ export const Navbar: React.FC = () => {
     <NavbarWrapper position="sticky">
       <NavContainer>
         <LogoContainer>
-          <RouterLink to="/" onClick={handleLogoClick} style={{display: 'block', lineHeight: .8}}>
+          <RouterLink to="https://adwin.global" onClick={handleLogoClick} style={{display: 'block', lineHeight: .8}}>
             <Logo />
           </RouterLink>
         </LogoContainer>

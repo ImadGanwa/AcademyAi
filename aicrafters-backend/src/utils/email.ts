@@ -1311,7 +1311,6 @@ export const sendMentorBookingNotificationEmail = async (
     throw error;
   }
 };
-
 export const sendMenteeBookingConfirmationEmail = async (
   menteeEmail: string,
   menteeName: string,
@@ -1321,15 +1320,15 @@ export const sendMenteeBookingConfirmationEmail = async (
   scheduledDate: string, // YYYY-MM-DD
   startTime: string, // HH:MM (24h)
   endTime: string, // HH:MM (24h)
-  price: number, // Assuming price is passed
-  meetingLink?: string // Optional meeting link if provided by mentor immediately
+  price: number,
+  meetingLink?: string
 ) => {
-  const subject = `Your Mentorship Session with ${mentorName} is Confirmed! - ${ADWIN_SERVICE_NAME}`;
-  console.log(`Attempting to send mentee booking confirmation to: ${menteeEmail} with subject: "${subject}"`);
+  const subject = `Mentorship Session Request Sent to ${mentorName} - ${ADWIN_SERVICE_NAME}`;
+  console.log(`Attempting to send mentee booking request notification to: ${menteeEmail} with subject: "${subject}"`);
   try {
     const formattedDisplayDate = formatDateForDisplay(scheduledDate);
     const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}`;
-    const preheaderText = `Confirmed: Your session with ${mentorName} on ${formattedDisplayDate} at ${startTime}. Price: $${price.toFixed(2)}.`;
+    const preheaderText = `Your session request with ${mentorName} on ${formattedDisplayDate} at ${startTime} has been sent. Price: $${price.toFixed(2)}.`;
 
     const sessionDetails = [
       `<strong>Mentor:</strong> ${mentorName}`,
@@ -1338,73 +1337,53 @@ export const sendMenteeBookingConfirmationEmail = async (
       `<strong>Time:</strong> ${startTime} - ${endTime}`,
       `<strong>Price:</strong> $${price.toFixed(2)}`
     ];
-     if (meetingLink) {
-        sessionDetails.push(`<strong>Meeting Link:</strong> <a href="${meetingLink}" target="_blank" style="color: ${theme.palette.primary.main};">${meetingLink}</a>`);
-    } else {
-        sessionDetails.push(`<strong>Meeting Link:</strong> Your mentor will provide the meeting link via your dashboard before the session.`);
-    }
 
     const sessionDetailsCardContent = sessionDetails.map(detail => `<p style="margin: 0 0 8px 0; font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; line-height: 1.6;">${detail}</p>`).join('');
-    const sessionDetailsCard = createStyledCard(`<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Session Confirmed:</h3>${sessionDetailsCardContent}`, theme.palette.background.default);
+    const sessionDetailsCard = createStyledCard(`<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Session Request Details:</h3>${sessionDetailsCardContent}`, theme.palette.background.default);
 
     const importantInfo = [
-      meetingLink ? "Your meeting link is included above. Please test it beforehand." : "Your mentor will add a meeting link to the booking details in your dashboard. Please check for updates.",
-      "You can typically cancel or reschedule this booking up to 24 hours before the scheduled time (check platform policy).",
-      "Prepare any questions or topics you'd like to discuss in advance to make the most of your session.",
-      "Ensure you have a stable internet connection and a quiet environment for the session."
+      "Your request has been sent to the mentor for confirmation.",
+      "You will receive another email once the mentor confirms your booking.",
+      "You can typically cancel or reschedule this request up to 24 hours before the scheduled time (check platform policy).",
+      "Prepare any questions or topics you'd like to discuss in advance to make the most of your session."
     ];
     const importantInfoCardContent = `<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Important Information:</h3> ${createStyledList(importantInfo)}`;
     const importantInfoCard = createStyledCard(importantInfoCardContent, theme.palette.info.main + '1A');
-
-    // Calendar Integration
-    const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
-    const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
-    const calendarDescription = `Mentorship Session with ${mentorName}\nTopic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}`: 'Meeting link will be provided via dashboard.'}`;
-    const icsData = createIcsContent(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const calendarSection = createCalendarSectionHtml(icsData, googleCalendarUrl);
-
 
     const contentHtml = `
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-bottom: 15px; line-height: 1.6;">
         Hello ${menteeName},
       </p>
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-bottom: 20px; line-height: 1.6;">
-        Great news! Your mentorship session with <strong>${mentorName}</strong> on the ${ADWIN_SERVICE_NAME} platform has been successfully booked and confirmed.
+        Your mentorship session request with <strong>${mentorName}</strong> on the ${ADWIN_SERVICE_NAME} platform has been sent successfully.
       </p>
       ${sessionDetailsCard}
-      ${calendarSection}
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-top: 25px; margin-bottom: 20px; line-height: 1.6;">
-        You can view the complete details of your booking, including any updates from your mentor, through your dashboard:
+        You can track the status of your booking request through your dashboard:
       </p>
       <div style="text-align: center; margin: 30px 0;">
-        ${createStyledButton('View Your Booking', bookingDetailsLink, 'primary')}
+        ${createStyledButton('View Booking Request', bookingDetailsLink, 'primary')}
       </div>
       ${importantInfoCard}
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-top: 25px; margin-bottom: 0; line-height: 1.6;">
-        We hope you have a productive and insightful mentorship session!
+        We'll notify you once the mentor confirms your session request.
       </p>
     `;
 
-    const emailHtml = createBaseEmailHtml('Booking Confirmed!', contentHtml, preheaderText);
+    const emailHtml = createBaseEmailHtml('Booking Request Sent', contentHtml, preheaderText);
 
     await transporter.sendMail({
       from: FROM_EMAIL_ADDRESS,
       to: menteeEmail,
       subject: subject,
       html: emailHtml,
-      replyTo: REPLY_TO_EMAIL_ADDRESS,
-       attachments: [{
-          filename: 'mentorship-session.ics',
-          content: icsData,
-          contentType: 'text/calendar; charset=utf-8; method=REQUEST'
-      }]
+      replyTo: REPLY_TO_EMAIL_ADDRESS
     });
-    console.log(`Mentee booking confirmation email sent successfully to: ${menteeEmail}`);
+    console.log(`Mentee booking request notification email sent successfully to: ${menteeEmail}`);
   } catch (error) {
-    console.error(`Error sending mentee booking confirmation email to ${menteeEmail}:`, error);
+    console.error(`Error sending mentee booking request notification email to ${menteeEmail}:`, error);
     if (error instanceof Error) {
-      console.error('Detailed error (mentee booking confirmation):', {
+      console.error('Detailed error (mentee booking request notification):', {
         message: error.message,
         stack: error.stack,
         recipient: menteeEmail,
@@ -1513,9 +1492,7 @@ export const sendMentorBookingConfirmedEmail = async ( // Note: Renamed from the
   }
 };
 
-// Overload for sendMenteeBookingConfirmedEmail from user provided code
-// This one does not have the `price` parameter, which the one above has.
-// I'll create this specific version as requested.
+
 export const sendMenteeBookingConfirmedEmail = async ( // This is the second version from the user's input
   menteeEmail: string,
   menteeName: string,
