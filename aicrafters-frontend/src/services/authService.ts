@@ -171,9 +171,7 @@ export const authService = {
 
   async updatePassword(currentPassword: string, newPassword: string): Promise<AuthResponse> {
     try {
-      
       const currentToken = store.getState().auth.token;
-      
 
       const response = await axios.put<AuthResponse>(`${API_URL}/user/password`, {
         currentPassword,
@@ -181,14 +179,12 @@ export const authService = {
       }, {
         headers: {
           Authorization: `Bearer ${currentToken}`
-        }
+        },
+        timeout: 10000 // 10-second timeout to prevent infinite loading
       });
-
-
 
       return response.data;
     } catch (error) {
-      
       throw error;
     }
   },

@@ -23,57 +23,151 @@ export const mentorController = {
         bio,
         hourlyRate,
         expertise,
-        languages,
-        education,
         experience,
         availability,
-        socialLinks,
+        languages,
         professionalInfo,
         preferences,
         countries
       } = req.body;
 
+      console.log('Received mentor application data:', req.body);
+
       // Validate required fields
-      if (!email || !fullName || !bio || !expertise || !expertise.length) {
+      if (!email || !fullName || !bio || !expertise || !Array.isArray(expertise) || expertise.length === 0) {
         res.status(400).json({
           success: false,
-          error: 'Missing required fields: email, fullName, bio, and expertise are required'
+          error: 'Missing required fields: email, fullName, bio, and expertise are required. Expertise must be a non-empty array.'
         });
         return;
       }
 
-      // Create application record without linking to user yet
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        res.status(400).json({
+          success: false,
+          error: 'Please provide a valid email address'
+        });
+        return;
+      }
+
+      // Validate experience field
+      if (!experience || typeof experience !== 'string' || experience.trim() === '') {
+        res.status(400).json({
+          success: false,
+          error: 'Professional experience is required'
+        });
+        return;
+      }
+
+      // Validate professionalInfo structure
+      if (!professionalInfo || typeof professionalInfo !== 'object') {
+        res.status(400).json({
+          success: false,
+          error: 'Professional information is required'
+        });
+        return;
+      }
+
+      if (!professionalInfo.role || !professionalInfo.linkedIn || !professionalInfo.academicBackground || !professionalInfo.experience) {
+        res.status(400).json({
+          success: false,
+          error: 'Professional role, LinkedIn URL, and academic background are required'
+        });
+        return;
+      }
+
+      // Validate LinkedIn URL format
+      const linkedInRegex = /^https?:\/\/(www\.)?linkedin\.com\/.+/i;
+      if (!linkedInRegex.test(professionalInfo.linkedIn)) {
+        res.status(400).json({
+          success: false,
+          error: 'Please provide a valid LinkedIn URL'
+        });
+        return;
+      }
+
+      // Validate languages array
+      if (!languages || !Array.isArray(languages) || languages.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'At least one language is required'
+        });
+        return;
+      }
+
+      // Validate countries array
+      if (!countries || !Array.isArray(countries) || countries.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Country information is required'
+        });
+        return;
+      }
+
+      // Check if application already exists for this email
+      const existingApplication = await MentorApplication.findOne({ 
+        email: email.toLowerCase().trim(),
+        status: { $in: ['pending', 'approved'] }
+      });
+
+      if (existingApplication) {
+        const statusMessage = existingApplication.status === 'approved' 
+          ? 'You have already been approved as a mentor' 
+          : 'You have already submitted a mentor application that is pending review';
+        
+        res.status(400).json({
+          success: false,
+          error: statusMessage
+        });
+        return;
+      }
+
+      // Create application record with validated data
       const applicationData = {
-        fullName,
-        email,
-        bio,
-        expertise,
-        experience,
+        fullName: fullName.trim(),
+        email: email.toLowerCase().trim(),
+        bio: bio.trim(),
+        expertise: expertise.map((skill: string) => skill.trim()).filter((skill: string) => skill.length > 0),
         hourlyRate: Number(hourlyRate) || 0,
-        languages: languages || [],
+        languages: languages.map((lang: string) => lang.trim()).filter((lang: string) => lang.length > 0),
+        countries: countries.map((country: string) => country.trim()).filter((country: string) => country.length > 0),
         availability: availability || {},
-        professionalInfo: professionalInfo || {},
+        professionalInfo: {
+          role: professionalInfo.role.trim(),
+          linkedIn: professionalInfo.linkedIn.trim(),
+          experience: professionalInfo.experience.trim(),
+          academicBackground: professionalInfo.academicBackground.trim(),
+          ...professionalInfo
+        },
         preferences: preferences || {},
-        countries: countries || [],
         appliedAt: new Date(),
-        status: 'pending'
+        status: 'pending' as const
       };
+
+      console.log('Processed application data:', applicationData);
 
       // Store the application data in the MentorApplication model
       const application = new MentorApplication(applicationData);
       await application.save();
+
+      console.log('Application saved successfully with ID:', application._id);
       
       // Send notification to admins
       try {
         await notificationService.notifyAdmins({
           title: 'New Mentor Application',
-          message: `${fullName} has applied to become a mentor.`,
+          message: `${fullName} (${email}) has applied to become a mentor with expertise in ${expertise.join(', ')}.`,
           type: 'mentor_application',
           data: {
+            applicationId: application._id,
             userEmail: email,
-            userName: fullName
+            userName: fullName,
+            expertise: expertise
           }
         });
+        console.log('Admin notification sent successfully');
       } catch (notifyError) {
         console.error('Failed to send admin notification:', notifyError);
         // Continue anyway since this is not critical
@@ -82,15 +176,38 @@ export const mentorController = {
       // Return success response
       res.status(200).json({
         success: true,
-        message: 'Mentor application submitted successfully',
+        message: 'Mentor application submitted successfully! We will review your application and get back to you within 5-7 business days.',
         data: {
+          applicationId: application._id,
           applicationDate: applicationData.appliedAt,
-          status: 'pending'
+          status: 'pending',
+          fullName: applicationData.fullName,
+          email: applicationData.email
         }
       });
 
     } catch (error: any) {
       console.error('Error in mentor application:', error);
+      
+      // Handle specific MongoDB validation errors
+      if (error.name === 'ValidationError') {
+        const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+        res.status(400).json({
+          success: false,
+          error: `Validation error: ${validationErrors.join(', ')}`
+        });
+        return;
+      }
+
+      // Handle duplicate key errors
+      if (error.code === 11000) {
+        res.status(400).json({
+          success: false,
+          error: 'An application with this email already exists'
+        });
+        return;
+      }
+
       res.status(500).json({
         success: false,
         error: error.message || 'An error occurred during the mentor application process'
@@ -169,24 +286,18 @@ export const mentorController = {
 
       const userId = req.user._id;
       const {
-        title,
+        fullName,
         bio,
         hourlyRate,
-        skills,
+        expertise,
         languages,
-        education,
-        experience,
-        socialLinks,
+        professionalInfo,
         country,
+        availability,
         removeProfileImage
       } = req.body;
 
-      // Add detailed logging for skills
-      console.log('Received skills in request body:', skills);
-      console.log('Skills type:', typeof skills);
-      
-      // Log the raw request body for debugging
-      console.log('Raw request body:', req.body);
+      console.log('Received mentor profile update data:', req.body);
 
       // Check if user exists and has a mentor profile
       const user = await User.findById(userId);
@@ -225,41 +336,87 @@ export const mentorController = {
         profileImageUrl = '';
       }
       
-      // Process skills and languages to ensure they have proper IDs
-      let parsedSkills;
-      if (skills) {
+      // Process expertise/skills - prioritize expertise over skills for consistency
+      let processedExpertise: any[] | undefined;
+      const expertiseData = expertise; // Use expertise if available, fallback to skills
+      
+      if (expertiseData) {
         try {
-          // If skills is a string (JSON), parse it
-          if (typeof skills === 'string') {
-            parsedSkills = JSON.parse(skills);
-            console.log('Parsed skills from JSON string:', parsedSkills);
+          // If expertise is a string (JSON), parse it
+          let parsedExpertiseData: any;
+          if (typeof expertiseData === 'string') {
+            parsedExpertiseData = JSON.parse(expertiseData);
+            console.log('Parsed expertise from JSON string:', parsedExpertiseData);
           } else {
-            parsedSkills = skills;
-            console.log('Skills was already an object/array:', parsedSkills);
+            parsedExpertiseData = expertiseData;
+            console.log('Expertise was already an object/array:', parsedExpertiseData);
           }
+          // Use processNamedItems to ensure each expertise item has an id
+          processedExpertise = processNamedItems(parsedExpertiseData);
+          console.log('Processed expertise:', processedExpertise);
         } catch (e) {
-          console.error('Error parsing skills:', e);
-          parsedSkills = skills; // Use as is if parsing fails
+          console.error('Error parsing expertise:', e);
+          processedExpertise = []; // Default to empty array if parsing fails
         }
       }
       
-      const processedSkills = parsedSkills !== undefined ? processNamedItems(parsedSkills) : undefined;
-      console.log('Processed skills after processNamedItems:', processedSkills);
+      // Process languages - Fixed to handle JSON string properly
+      let processedLanguages: any[] | undefined;
+      if (languages !== undefined) {
+        try {
+          let languagesData: any;
+          if (typeof languages === 'string') {
+            languagesData = JSON.parse(languages);
+            console.log('Parsed languages from JSON string:', languagesData);
+          } else {
+            languagesData = languages;
+          }
+          processedLanguages = processNamedItems(languagesData);
+          console.log('Processed languages:', processedLanguages);
+        } catch (e) {
+          console.error('Error parsing languages:', e);
+          processedLanguages = []; // Default to empty array if parsing fails
+        }
+      }
       
-      const processedLanguages = languages !== undefined ? processNamedItems(languages) : undefined;
+      // Process professional info - Fixed to handle JSON string properly
+      let processedProfessionalInfo: any | undefined;
+      if (professionalInfo !== undefined) {
+        try {
+          if (typeof professionalInfo === 'string') {
+            processedProfessionalInfo = JSON.parse(professionalInfo);
+            console.log('Parsed professionalInfo from JSON string:', processedProfessionalInfo);
+          } else if (typeof professionalInfo === 'object') {
+            processedProfessionalInfo = professionalInfo;
+          }
+        } catch (e) {
+          console.error('Error parsing professionalInfo:', e);
+          processedProfessionalInfo = undefined; // Don't update if parsing fails
+        }
+      }
       
       // Prepare update object with only provided fields
-      const updateFields: any = {};
+      const updateFields: Record<string, any> = {};
 
-      if (title !== undefined) updateFields['mentorProfile.title'] = title;
-      if (bio !== undefined) updateFields['mentorProfile.bio'] = bio;
-      if (hourlyRate !== undefined) updateFields['mentorProfile.hourlyRate'] = hourlyRate;
-      if (country !== undefined) updateFields['mentorProfile.country'] = country;
-      if (processedSkills !== undefined) updateFields['mentorProfile.skills'] = processedSkills;
+      // Update fullName at user level if provided
+      if (fullName !== undefined && fullName.trim() !== '') {
+        updateFields['fullName'] = fullName.trim();
+      }
+
+      // Update mentor profile fields
+      if (bio !== undefined) updateFields['mentorProfile.bio'] = bio.trim();
+      if (hourlyRate !== undefined) updateFields['mentorProfile.hourlyRate'] = Number(hourlyRate) || 0;
+      if (country !== undefined) updateFields['mentorProfile.country'] = country.trim();
       if (processedLanguages !== undefined) updateFields['mentorProfile.languages'] = processedLanguages;
-      if (education !== undefined) updateFields['mentorProfile.education'] = education;
-      if (experience !== undefined) updateFields['mentorProfile.experience'] = experience;
-      if (socialLinks !== undefined) updateFields['mentorProfile.socialLinks'] = socialLinks;
+      if (processedProfessionalInfo !== undefined) {
+        updateFields['mentorProfile.professionalInfo'] = processedProfessionalInfo;
+        // Update title from professionalInfo.role
+        if (processedProfessionalInfo.role) {
+          updateFields['mentorProfile.title'] = processedProfessionalInfo.role;
+        }
+      }
+      if (processedExpertise !== undefined) updateFields['mentorProfile.expertise'] = processedExpertise;
+      if (availability !== undefined) updateFields['mentorProfile.availability'] = availability;
       if (profileImageUrl !== undefined) updateFields['profileImage'] = profileImageUrl;
 
       console.log('Final update fields:', updateFields);
@@ -285,19 +442,37 @@ export const mentorController = {
         return;
       }
 
-      console.log('Updated user skills:', updatedUser.mentorProfile?.skills);
+      console.log('Updated user professionalInfo:', updatedUser.mentorProfile?.professionalInfo);
 
-      // Return updated profile
+      // Return updated profile with consistent field names
       res.status(200).json({
         success: true,
         message: 'Mentor profile updated successfully',
         data: {
-          profile: updatedUser.mentorProfile,
-          profileImage: updatedUser.profileImage
+          profile: {
+            ...(updatedUser.mentorProfile ? JSON.parse(JSON.stringify(updatedUser.mentorProfile)) : {}),
+            // Ensure backward compatibility by providing both field names
+            expertise: updatedUser.mentorProfile?.expertise
+          },
+          profileImage: updatedUser.profileImage,
+          fullName: updatedUser.fullName,
+          bio: updatedUser.bio,
+          title: updatedUser.mentorProfile?.title || updatedUser.mentorProfile?.professionalInfo?.role
         }
       });
     } catch (error: any) {
       console.error('Error updating mentor profile:', error);
+      
+      // Handle specific MongoDB validation errors
+      if (error.name === 'ValidationError') {
+        const validationErrors = Object.values(error.errors).map((err: any) => err.message);
+        res.status(400).json({
+          success: false,
+          error: `Validation error: ${validationErrors.join(', ')}`
+        });
+        return;
+      }
+
       res.status(500).json({ 
         success: false, 
         error: error.message || 'An error occurred while updating mentor profile' 
@@ -842,7 +1017,6 @@ export const mentorController = {
         skills: mentor.mentorProfile?.skills,
         languages: mentor.mentorProfile?.languages,
         education: mentor.mentorProfile?.education,
-        experience: mentor.mentorProfile?.experience,
         availability: mentor.mentorProfile?.availability,
         socialLinks: mentor.mentorProfile?.socialLinks,
         stats: {

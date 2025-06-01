@@ -219,18 +219,32 @@ export const userController = {
       user.password = newPassword;
       await user.save();
 
-      // Send confirmation email
-      try {
-        await sendPasswordResetConfirmationEmail(user.email, user.fullName);
-      } catch (emailError) {
-        console.error('Failed to send password reset confirmation email:', emailError);
-        // Don't block the password update if email fails
-      }
-
-      return res.json({
+      // First send success response to client
+      const response = {
         message: 'Password updated successfully',
         user: User.getSafeUser(user)
-      });
+      };
+      
+      res.json(response);
+
+      // Then try to send the confirmation email asynchronously
+      // This won't block the response and won't cause issues if it fails
+      setTimeout(async () => {
+        try {
+          await sendPasswordResetConfirmationEmail(user.email, user.fullName);
+          console.log(`Password reset confirmation email sent to ${user.email}`);
+        } catch (emailError) {
+          console.error('Failed to send password reset confirmation email:', emailError);
+          // Log more detailed error information for debugging
+          if (emailError instanceof Error) {
+            console.error('Error name:', emailError.name);
+            console.error('Error message:', emailError.message);
+            console.error('Error stack:', emailError.stack);
+          }
+          // Email failure is logged but doesn't affect the password update
+        }
+      }, 0);
+      
     } catch (error) {
       console.error('Update password error:', error);
       return res.status(500).json({ message: 'Internal server error' });

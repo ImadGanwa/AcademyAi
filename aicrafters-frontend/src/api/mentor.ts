@@ -23,11 +23,18 @@ interface MentorApplicationData {
 interface MentorProfileData {
   bio?: string;
   expertise?: string[];
-  experience?: string;
   availability?: any;
   hourlyRate?: number;
   profileImage?: File;
   removeProfileImage?: boolean;
+  languages?: string[];
+  professionalInfo?: {
+    role?: string;
+    linkedIn?: string;
+    experience?: string;
+    academicBackground?: string;
+    [key: string]: any;
+  };
   [key: string]: any; // Allow additional fields
 }
 
@@ -104,24 +111,40 @@ export const updateMentorProfile = async (profileData: MentorProfileData) => {
     // Use FormData to handle file uploads
     const formData = new FormData();
     
-    // Add text fields to FormData
-    Object.keys(profileData).forEach(key => {
-      if (key !== 'profileImage') {
-        // Special handling for skills array to ensure it's properly formatted
-        if (key === 'skills') {
-          console.log('Skills before stringify:', profileData[key]);
-          // Make sure skills is passed as a JSON string with the proper format
-          const skillsJson = JSON.stringify(profileData[key]);
-          console.log('Skills after stringify:', skillsJson);
-          formData.append(key, skillsJson);
-        }
-        // Handle other arrays or objects
-        else if (Array.isArray(profileData[key]) || (typeof profileData[key] === 'object' && profileData[key] !== null)) {
-          formData.append(key, JSON.stringify(profileData[key]));
-        } 
-        // Handle primitive values
-        else if (profileData[key] !== null && profileData[key] !== undefined) {
-          formData.append(key, String(profileData[key]));
+    // Prepare structured data according to the required schema
+    const structuredData = {
+      fullName: profileData.fullName || profileData.name,
+      bio: profileData.bio,
+      hourlyRate: profileData.hourlyRate || 50, // Default value
+      country: profileData.country,
+      // Format expertise with IDs
+      expertise: Array.isArray(profileData.expertise) 
+        ? profileData.expertise.map(name => ({ name })) 
+        : [],
+      // Format languages with IDs
+      languages: Array.isArray(profileData.languages) 
+        ? profileData.languages.map(name => ({ name })) 
+        : [],
+      // Structure professionalInfo correctly
+      professionalInfo: {
+        role: profileData.professionalInfo?.role || 'Professional Mentor',
+        linkedIn: profileData.professionalInfo?.linkedIn || '',
+        academicBackground: profileData.professionalInfo?.academicBackground || '',
+        experience: profileData.professionalInfo?.experience || ''
+      },
+    };
+    
+    console.log('Structured data for API:', structuredData);
+    
+    // Add all fields from the structured data to FormData
+    Object.entries(structuredData).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        // For objects and arrays, stringify them
+        if (typeof value === 'object') {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          // For primitive values, convert to string
+          formData.append(key, String(value));
         }
       }
     });

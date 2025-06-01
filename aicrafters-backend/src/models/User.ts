@@ -56,6 +56,10 @@ export interface IUser extends Document {
       id: string;
       name: string;
     }>;
+    expertise?: Array<{ // This property exists in IUser
+      id: string;
+      name: string;
+    }>;
     languages: Array<{
       id: string;
       name: string;
@@ -67,13 +71,13 @@ export interface IUser extends Document {
       startYear: number;
       endYear: number | null;
     }>;
-    experience: Array<{
-      company: string;
-      position: string;
-      description: string;
-      startYear: number;
-      endYear: number | null;
-    }>;
+    professionalInfo?: { // This property exists in IUser
+      role?: string;
+      linkedIn?: string;
+      academicBackground?: string;
+      experience?: string;
+      [key: string]: any;
+    };
     availability: Array<{
       day: number;
       startTime: string;
@@ -100,6 +104,7 @@ interface IUserModel extends Model<IUser> {
   getSafeUser(user: IUser): SafeUser;
 }
 
+// MODIFIED SafeUser interface:
 export interface SafeUser {
   id: string;
   email: string;
@@ -116,21 +121,31 @@ export interface SafeUser {
   usersCount?: number;
   coursesCount?: number;
   lastActive?: Date;
-  courses: Array<{
+  courses: Array<{ // Updated to match IUser.courses structure for direct assignment
     courseId: mongoose.Types.ObjectId;
     status: 'in progress' | 'saved' | 'completed';
+    organizationId?: mongoose.Types.ObjectId; // Added
     completedAt?: Date;
     certificateId?: string;
     certificateImageUrl?: string;
     rating?: number;
     comment?: string;
+    progress?: { // Added
+      timeSpent: number;
+      percentage: number;
+      completedLessons: Array<string>;
+    };
   }>;
-  mentorProfile?: {
+  mentorProfile?: { // Updated to match IUser.mentorProfile structure for direct assignment
     title: string;
     bio: string;
     hourlyRate: number;
     country?: string;
     skills: Array<{
+      id: string;
+      name: string;
+    }>;
+    expertise?: Array<{ // Added from IUser.mentorProfile
       id: string;
       name: string;
     }>;
@@ -145,17 +160,18 @@ export interface SafeUser {
       startYear: number;
       endYear: number | null;
     }>;
-    experience: Array<{
-      company: string;
-      position: string;
-      description: string;
-      startYear: number;
-      endYear: number | null;
-    }>;
+    professionalInfo?: { // Added from IUser.mentorProfile
+      role?: string;
+      linkedIn?: string;
+      academicBackground?: string;
+      experience?: string;
+      [key: string]: any; // To match IUser.mentorProfile.professionalInfo
+    };
     availability: Array<{
       day: number;
       startTime: string;
       endTime: string;
+      weekKey?: string;
     }>;
     socialLinks: {
       linkedin?: string;
@@ -274,7 +290,7 @@ const userSchema = new Schema({
         default: 0
       },
       completedLessons: [{
-        type: String,
+        type: String, // Mongoose will interpret this as Array<String>
         default: []
       }]
     }
@@ -361,6 +377,17 @@ const userSchema = new Schema({
         trim: true
       }
     }],
+    expertise: [{
+      id: {
+        type: String,
+        required: true
+      },
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      }
+    }],
     languages: [{
       id: {
         type: String,
@@ -397,31 +424,26 @@ const userSchema = new Schema({
         default: null
       }
     }],
-    experience: [{
-      company: {
+    
+    professionalInfo: {
+      role: {
         type: String,
-        required: true,
         trim: true
       },
-      position: {
+      linkedIn: {
         type: String,
-        required: true,
         trim: true
       },
-      description: {
+      academicBackground: {
         type: String,
-        required: true,
         trim: true
       },
-      startYear: {
-        type: Number,
-        required: true
-      },
-      endYear: {
-        type: Number,
-        default: null
+      experience: {
+        type: String,
+        trim: true
       }
-    }],
+      // Note: The schema doesn't define [key: string]: any, Mongoose subdocuments are strict by default.
+    },
     availability: [{
       day: {
         type: Number,
@@ -513,42 +535,44 @@ userSchema.index({ 'mentorProfile.isVerified': 1, 'mentorProfile.mentorRating': 
 // Update password hashing middleware
 userSchema.pre('save', async function(next) {
   try {
-    // Only hash the password if it has been modified (or is new)
     if (!this.isModified('password')) {
       return next();
     }
     
-    // Make sure there is a password to hash
     if (!this.password) {
-      console.error('Password hashing middleware: No password provided');
+      // console.error('Password hashing middleware: No password provided'); // Original comment.
+      // If password is not required (e.g. social login) and not provided, this is fine.
+      // The `required` function for password field already handles this.
+      // This check could be relevant if password was set to null/undefined after being required.
       return next();
     }
     
-    console.log(`Hashing password for user: ${this.email}`);
+    // console.log(`Hashing password for user: ${this.email}`); // Original comment.
     
-    // Generate a salt and hash the password
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     
-    console.log(`Password successfully hashed for user: ${this.email}`);
+    // console.log(`Password successfully hashed for user: ${this.email}`); // Original comment.
     next();
   } catch (error) {
-    console.error('Error hashing password:', error);
+    // console.error('Error hashing password:', error); // Original comment.
     next(error as Error);
   }
 });
 
 // Update password comparison method
 userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
-  if (!this.password) {
-    console.error('Password comparison failed: No password available on user object');
+  if (!this.password) { // password field has select: false, so it might not be populated
+    // console.error('Password comparison failed: No password available on user object. Ensure password field is selected in query.'); // Original comment.
+    // This can happen if the user document was fetched without selecting the password.
+    // For comparePassword to work, the document must have the password field.
     return false;
   }
 
   try {
     return await bcrypt.compare(candidatePassword, this.password);
   } catch (error) {
-    console.error('Password comparison error:', error);
+    // console.error('Password comparison error:', error); // Original comment.
     return false;
   }
 };
@@ -571,8 +595,8 @@ userSchema.statics.getSafeUser = function(user: IUser): SafeUser {
     usersCount: user.usersCount,
     coursesCount: user.coursesCount,
     lastActive: user.lastActive,
-    courses: user.courses,
-    mentorProfile: user.mentorProfile
+    courses: user.courses, // Now compatible due to SafeUser.courses update
+    mentorProfile: user.mentorProfile // Now compatible due to SafeUser.mentorProfile update
   };
 };
 

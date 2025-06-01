@@ -963,15 +963,20 @@ export const adminController = {
             
             // Initialize mentor profile with application data
             user.mentorProfile = {
-              title: application.professionalInfo?.role || 'Professional Mentor',
+              title: application.professionalInfo?.role || '',
               bio: application.bio,
               hourlyRate: application.hourlyRate,
-              country: application.countries?.[0] || 'United States',
+              country: application.countries?.[0] ,
               skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
+              expertise: application.expertise.map(name => ({ id: String(Math.random()), name })),
               languages: application.languages.map(name => ({ id: String(Math.random()), name })),
               education: [],
-              experience: [],
-              availability: [],
+              professionalInfo: {
+                role: application.professionalInfo?.role || 'Professional Mentor',
+                linkedIn: application.professionalInfo?.linkedIn || '',
+                academicBackground: application.professionalInfo?.academicBackground || ''
+              },
+              availability: Array.isArray(application.availability) ? application.availability : [],
               socialLinks: {
                 linkedin: application.professionalInfo?.linkedIn || '',
               },
@@ -1010,10 +1015,16 @@ export const adminController = {
                 hourlyRate: application.hourlyRate,
                 country: application.countries?.[0] || 'United States',
                 skills: application.expertise.map(name => ({ id: String(Math.random()), name })),
+                expertise: application.expertise.map(name => ({ id: String(Math.random()), name })),
                 languages: application.languages.map(name => ({ id: String(Math.random()), name })),
                 education: [],
-                experience: [],
-                availability: [],
+                experience: application.experience || '',
+                professionalInfo: {
+                  role: application.professionalInfo?.role || 'Professional Mentor',
+                  linkedIn: application.professionalInfo?.linkedIn || '',
+                  academicBackground: application.professionalInfo?.academicBackground || ''
+                },
+                availability: Array.isArray(application.availability) ? application.availability : [],
                 socialLinks: {
                   linkedin: application.professionalInfo?.linkedIn || '',
                 },

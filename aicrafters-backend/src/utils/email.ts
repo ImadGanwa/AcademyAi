@@ -1935,5 +1935,4 @@ export const sendSessionCompletionEmail = async (
     throw error;
   }
 };
-
 console.log('Email service module fully loaded and initialized.');
