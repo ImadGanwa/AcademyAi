@@ -35,15 +35,32 @@ async function getOrCreateMentorThreadForUser(userId: string): Promise<string> {
     const thread = await openai.beta.threads.create();
     mentorThreadsByUser.set(userId, thread.id);
     
-    // Add initial context for mentorship
+    // Add initial context for mentorship with enhanced search capabilities
     const mentorshipContext = `You are Adwina Mentor, an AI assistant specialized in mentorship and career guidance. 
     You help users with:
-    - Finding the right mentors for their career goals
+    - Finding the right mentors for their career goals by matching their needs with mentor profiles
     - Preparing for mentorship sessions
     - Understanding different mentorship styles
     - Career development advice
     - Professional networking guidance
     - Skill development recommendations
+    
+    When helping users find mentors, you have enhanced intelligent matching capabilities that focus on:
+    - Skills and expertise areas (with partial and semantic matching)
+    - Professional background including job roles and experience
+    - Academic background and qualifications
+    - Languages spoken
+    - Countries/locations
+    - Detailed bio analysis to find mentors with relevant experience
+    
+    All mentors on this platform offer their services for free to support the growth and development of others.
+    
+    You can search for mentors using a combination of these criteria to find the best matches.
+    For example, you can help users find mentors who specialize in "machine learning" and speak "Spanish"
+    or find mentors with experience in "startup" environments with academic backgrounds in business.
+    
+    When suggesting mentors, focus on matching the user's needs with the mentor's skills, professional experience, 
+    and background for the most relevant recommendations.
     
     Be supportive, professional, and provide actionable advice. Focus on mentorship-related topics and career development.`;
     
@@ -64,37 +81,25 @@ const searchMentorsTool = {
   type: "function" as const,
   function: {
     name: "search_mentors",
-    description: "Search for mentors based on various criteria like skills, languages, hourly rate, etc.",
+    description: "Intelligently match users with mentors based on skills, professional background, academic experience, bio, languages, and countries.",
     parameters: {
       type: "object",
       properties: {
         skills: {
           type: "string",
-          description: "Skills area(s) to search for (e.g. 'machine learning', 'web development')"
+          description: "Skills and expertise areas to match (e.g. 'machine learning', 'web development', 'javascript'). Uses semantic matching to find relevant mentors even with partial matches."
         },
         languages: {
           type: "string",
-          description: "Language(s) that the mentor speaks"
+          description: "Language(s) that the mentor speaks (e.g. 'English', 'French', 'Spanish'). Important for ensuring good communication between mentor and mentee."
         },
         countries: {
           type: "string",
-          description: "Country or countries where the mentor is from or based"
-        },
-        hourlyRateMin: {
-          type: "number",
-          description: "Minimum hourly rate"
-        },
-        hourlyRateMax: {
-          type: "number",
-          description: "Maximum hourly rate"
-        },
-        availability: {
-          type: "string",
-          description: "Availability preferences (e.g. 'weekdays', 'weekends', 'mornings', 'afternoons', 'evenings')"
+          description: "Country or countries where the mentor is from or based (e.g. 'USA', 'Canada', 'France'). Helps find mentors with relevant cultural and regional expertise."
         },
         query: {
           type: "string",
-          description: "Free text search query to find in mentor profiles"
+          description: "Free text search that analyzes mentor profiles holistically. Matches against bio text, professional experience, roles, academic background and more. Ideal for finding specialized expertise or specific backgrounds."
         },
         limit: {
           type: "number",
@@ -118,16 +123,31 @@ async function handleToolCalls(threadId: string, runId: string, toolCalls: any[]
         const args = JSON.parse(toolCall.function.arguments);
         const mentors = await searchMentors(args);
         
-        // Format mentor data for readability
+        // Enhanced format for mentor data with more context
         const formattedMentors = mentors.map(mentor => ({
           fullName: mentor.fullName,
           skills: mentor.skills,
-          hourlyRate: mentor.hourlyRate,
           languages: mentor.languages,
           countries: mentor.countries,
           bio: mentor.bio,
           availability: mentor.availability,
-          professionalInfo: mentor.professionalInfo
+          professionalInfo: mentor.professionalInfo,
+          // Add detailed explanation of how matches were determined
+          matchDetails: `This mentor was matched based on ${
+            [
+              args.skills ? "skills and expertise areas" : "",
+              args.languages ? "language proficiency" : "",
+              args.countries ? "country/location" : "",
+              args.query ? "profile information including bio text, professional background, and academic experience" : ""
+            ].filter(Boolean).join(", ") || "your search criteria"
+          }.
+          
+          ${mentor.bio ? `Their bio highlights their expertise: "${mentor.bio.substring(0, 100)}${mentor.bio.length > 100 ? '...' : ''}"` : ''}
+          ${mentor.professionalInfo?.role ? `They work as: ${mentor.professionalInfo.role}` : ''}
+          ${mentor.professionalInfo?.academicBackground ? `Academic background: ${mentor.professionalInfo.academicBackground}` : ''}
+          ${mentor.skills?.length > 0 ? `Key skills: ${mentor.skills.join(', ')}` : ''}
+          ${mentor.languages?.length > 0 ? `Languages: ${mentor.languages.join(', ')}` : ''}
+          ${mentor.countries?.length > 0 ? `Location: ${mentor.countries.join(', ')}` : ''}`
         }));
         
         toolOutputs.push({

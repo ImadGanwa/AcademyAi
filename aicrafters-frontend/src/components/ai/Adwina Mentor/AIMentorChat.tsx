@@ -19,8 +19,8 @@ import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlin
 import TipsAndUpdatesOutlinedIcon from '@mui/icons-material/TipsAndUpdatesOutlined';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import MarkdownRenderer from '../../common/MarkdownRenderer';
-import { ReactComponent as ChatIcon } from '../../../assets/icons/Chat.svg';
 import { ReactComponent as UserIcon } from '../../../assets/icons/user.svg';
+import adwinaImage from '../../../assets/images/adwina.png';
 
 // Animations
 const fadeIn = keyframes`
@@ -237,13 +237,30 @@ const WelcomeContainer = styled(Box)`
 const AdwinaMentorAvatar = styled(Avatar)`
   width: 38px;
   height: 38px;
-  background-color: ${props => props.theme.palette.secondary.main}; 
+  background-color: #ffffff ; 
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 2px;
+  position: relative;
   
-  svg {
-    width: 22px;
-    height: 22px;
-    fill: white;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: ${props => props.theme.palette.secondary.main};
+    border-radius: 50%;
+    z-index: -1;
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    position: relative;
+    z-index: 1;
   }
 `;
 
@@ -429,7 +446,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
       <ChatHeader>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <AdwinaMentorAvatar>
-            <ChatIcon />
+            <img src={adwinaImage} alt="Adwina" />
           </AdwinaMentorAvatar>
           <Box>
             <Typography variant="subtitle1" fontWeight={600} color="textPrimary">
@@ -446,7 +463,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
         <WelcomeContainer>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
             <AdwinaMentorAvatar>
-              <ChatIcon />
+              <img src={adwinaImage} alt="Adwina" />
             </AdwinaMentorAvatar>
             <Box>
               <Typography variant="h6" component="div" fontWeight={600} sx={{fontSize: '1.1rem'}} color="textPrimary">
@@ -512,7 +529,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
               )
             ) : (
               <AdwinaMentorAvatar>
-                <ChatIcon />
+                <img src={adwinaImage} alt="Adwina" />
               </AdwinaMentorAvatar>
             )}
             
@@ -541,7 +558,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
         {loading && (
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mt: 0.5, mb: 2 }}>
             <AdwinaMentorAvatar>
-              <ChatIcon />
+              <img src={adwinaImage} alt="Adwina" />
             </AdwinaMentorAvatar>
             <TypingIndicator>
               <TypingDot />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { IconButton, Tooltip, Zoom } from '@mui/material';
-import SchoolIcon from '@mui/icons-material/School';
+import adwinaImage from '../../../assets/images/adwina.png';
 
 const pulse = keyframes`
   0% {
@@ -35,6 +35,7 @@ const StyledIconButton = styled(IconButton)<{ $pulsing: boolean }>`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: ${css`${float}`} 3s infinite ease-in-out;
+  position: relative;
   
   &::before {
     content: '';
@@ -56,12 +57,14 @@ const StyledIconButton = styled(IconButton)<{ $pulsing: boolean }>`
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
   
-  svg {
-    font-size: 28px;
+  img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
     transition: transform 0.3s ease;
   }
   
-  &:hover svg {
+  &:hover img {
     transform: scale(1.1);
   }
 `;
@@ -88,7 +91,7 @@ const FloatingMentorChatButton: React.FC<FloatingMentorChatButtonProps> = ({ onC
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <SchoolIcon />
+        <img src={adwinaImage} alt="Adwina Mentor" />
       </StyledIconButton>
     </Tooltip>
   );
