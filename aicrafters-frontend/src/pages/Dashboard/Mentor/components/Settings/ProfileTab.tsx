@@ -375,6 +375,23 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         <Grid item xs={12}>
           <TextField
             fullWidth
+            label={`${t('mentor.settings.linkedIn', 'LinkedIn Profile') as string} `}
+            name="professionalInfo.linkedIn"
+            value={profileData.professionalInfo.linkedIn}
+            onChange={handleProfileChange}
+            margin="normal"
+            placeholder="https://linkedin.com/in/your-profile"
+            inputProps={{ 
+              pattern: "https://linkedin.com/in/.*|https://www.linkedin.com/in/.*|http://linkedin.com/in/.*|http://www.linkedin.com/in/.*" 
+            }}
+            error={!!formErrors['professionalInfo.linkedIn']}
+            helperText={formErrors['professionalInfo.linkedIn']}
+            required
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
             label={
               <>
                 {`${t('mentor.settings.bio', 'Bio') as string} `}
