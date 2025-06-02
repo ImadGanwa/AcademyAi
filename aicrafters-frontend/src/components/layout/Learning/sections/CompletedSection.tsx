@@ -15,6 +15,10 @@ export const CompletedSection: React.FC<CompletedSectionProps> = ({ courses }) =
     navigate(`/dashboard/user/certificate/${courseId}`);
   };
 
+  const handleCourseClick = (courseId: string) => {
+    navigate(`/dashboard/user/learning/${courseId}`);
+  };
+
   const handleShare = (course: CourseData) => {
     // Create the sharing text with proper formatting
     const shareText = `I just completed ${course.title}!\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${course.id}\n\n#ADWIN`;
@@ -42,6 +46,7 @@ export const CompletedSection: React.FC<CompletedSectionProps> = ({ courses }) =
           onShare={() => handleShare(course)}
           showCertificate={true}
           onButtonClick={() => handleDownloadCertificate(course.id)}
+          onCardClick={() => handleCourseClick(course.id)}
           buttonText="Download Certificate"
         />
       ))}

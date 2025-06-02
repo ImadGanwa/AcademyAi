@@ -172,26 +172,87 @@ const LectureList = styled.div`
   padding: 16px 6px;
 `;
 
-const LectureItem = styled.div`
+const LectureItem = styled.div<{ isClickable?: boolean }>`
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;
+  transition: all 0.2s ease;
+  border-radius: 8px;
   
-  &:hover {
-    background: #ffffff;
-    border-radius: 8px;
-  }
+  ${props => props.isClickable && `
+    cursor: pointer;
+    
+    &:hover {
+      background: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      background: #ffffff;
+      border: 1px solid ${props.theme.palette.secondary.main}20;
+      margin: 4px 0;
+      
+      &:active {
+        background: ${props.theme.palette.secondary.main}10;
+        transform: scale(0.98);
+      }
+    }
+  `}
+  
+  ${props => !props.isClickable && `
+    &:hover {
+      background: #ffffff;
+      border-radius: 8px;
+    }
+  `}
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled.div<{ isClickable?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+  
+  ${props => props.isClickable && `
+    padding: 8px;
+    border-radius: 50%;
+    background: ${props.theme.palette.secondary.main}15;
+    
+    @media (max-width: 768px) {
+      background: ${props.theme.palette.secondary.main}25;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      animation: pulse 2s infinite;
+      
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 0 ${props.theme.palette.secondary.main}40;
+        }
+        70% {
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 8px transparent;
+        }
+        100% {
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 0 transparent;
+        }
+      }
+    }
+  `}
   
   svg {
     width: 18px;
     height: 18px;
+    
+    ${props => props.isClickable && `
+      path {
+        fill: ${props.theme.palette.secondary.main};
+      }
+      
+      @media (max-width: 768px) {
+        width: 20px;
+        height: 20px;
+      }
+    `}
   }
 `;
 
@@ -216,9 +277,28 @@ const PreviewTag = styled.span`
   color: ${props => props.theme.palette.secondary.main};
   font-size: 0.9rem;
   margin: 0 12px;
+  font-weight: 600;
 
   @media (max-width: 768px) {
+    display: inline-block;
+    font-size: 0.8rem;
+    margin: 0 8px;
+    padding: 2px 6px;
+    background: ${props => props.theme.palette.secondary.main}15;
+    border-radius: 4px;
+    border: 1px solid ${props => props.theme.palette.secondary.main}30;
+  }
+`;
+
+const MobilePreviewHint = styled.div`
   display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+    font-size: 0.7rem;
+    color: ${props => props.theme.palette.text.secondary};
+    margin-top: 2px;
+    font-style: italic;
   }
 `;
 
@@ -365,16 +445,19 @@ export const CourseContentList: React.FC<CourseContentListProps> = ({ content })
             
             {expandedSections.includes(section.id) && (
               <LectureList>
-                {section.lessons.map((lesson, lessonIndex) => (
+                {section.lessons.map((lesson, lessonIndex) => {
+                  const isClickable = sectionIndex === 0 && lessonIndex === 0 && lesson.preview;
+                  
+                  return (
                     <LectureItem 
                       key={lesson.id}
+                      isClickable={isClickable}
                       onClick={() => handleLessonClick(lesson, sectionIndex, lessonIndex)}
-                      style={{ cursor: (sectionIndex === 0 && lessonIndex === 0 && lesson.preview) ? 'pointer' : 'default' }}
                     >
-                      <IconWrapper>
-                      {lesson.type === 'lesson' && (
-                        lesson.contentItems?.[0]?.type === 'text' ? <ArticleIcon /> : <PlayIcon />
-                      )}
+                      <IconWrapper isClickable={isClickable}>
+                        {lesson.type === 'lesson' && (
+                          lesson.contentItems?.[0]?.type === 'text' ? <ArticleIcon /> : <PlayIcon />
+                        )}
                         {lesson.type === 'quiz' && <QuizIcon />}
                       </IconWrapper>
                       <LectureInfo>
@@ -382,16 +465,22 @@ export const CourseContentList: React.FC<CourseContentListProps> = ({ content })
                           {lesson.title}
                         </LectureName>
                         <Duration>
-                          {sectionIndex === 0 && lessonIndex === 0 && lesson.preview && (
+                          {isClickable && (
                             <PreviewTag>
                               {t('course.content.preview')}
                             </PreviewTag>
                           )}
                           {lesson.duration ? `${lesson.duration}min` : ''}
                         </Duration>
+                        {isClickable && (
+                          <MobilePreviewHint>
+                            {t('course.content.tapToWatch', { defaultValue: 'Tap to watch preview' })}
+                          </MobilePreviewHint>
+                        )}
                       </LectureInfo>
                     </LectureItem>
-                ))}
+                  );
+                })}
               </LectureList>
             )}
           </CourseItem>

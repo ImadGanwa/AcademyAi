@@ -260,23 +260,10 @@ export const MentorsList: React.FC = () => {
         if (searchTerm) filters.search = searchTerm;
         if (category) filters.category = category;
         if (skill) filters.skill = skill;
-        if (country) {
-          // Convert country name back to code for API
-          let countryCode = country;
-          if (country === 'United States') countryCode = 'USA';
-          else if (country === 'France') countryCode = 'FR';
-          else if (country === 'Germany') countryCode = 'DE';
-          else if (country === 'United Kingdom') countryCode = 'GB';
-          else if (country === 'Canada') countryCode = 'CA';
-          else if (country === 'Australia') countryCode = 'AU';
-          else if (country === 'India') countryCode = 'IN';
-          else if (country === 'Brazil') countryCode = 'BR';
-          else if (country === 'Japan') countryCode = 'JP';
-          else if (country === 'China') countryCode = 'CN';
-          else countryCode = getCountryCode(country);
-          
-          filters.country = countryCode;
-        }
+        // Temporarily disable backend country filtering to debug data format
+        // if (country) {
+        //   filters.country = country;
+        // }
         if (language) filters.language = language;
         
         console.log('Calling getPublicMentorList API with filters:', filters);
@@ -320,20 +307,19 @@ export const MentorsList: React.FC = () => {
           if (country) {
             filteredResults = filteredResults.filter(mentor => {
               if (mentor.country) {
-                // Get the full country name from mentor's country (could be code or name)
-                const mentorCountryName = getCountryName(mentor.country);
+                // Handle both country codes and full names in mentor data
+                let mentorCountryCode = mentor.country;
+                if (mentor.country.length > 3) {
+                  // If mentor.country is a full name, convert to code
+                  mentorCountryCode = getCountryCode(mentor.country);
+                }
                 
-                // The filter value is a full country name, so compare with mentorCountryName
-                // Also check direct match in case they're both codes
-                const matches = mentorCountryName === country || mentor.country === country;
-                return matches;
+                // The filter value is now a country code, so compare directly
+                return mentorCountryCode.toLowerCase() === country.toLowerCase();
               } else if (mentor.countryFlag) {
                 // Fallback to extracting from countryFlag URL for backward compatibility
                 const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
-                if (countryCode) {
-                  const countryName = getCountryName(countryCode);
-                  return countryName === country;
-                }
+                return countryCode && countryCode.toLowerCase() === country.toLowerCase();
               }
               return false;
             });

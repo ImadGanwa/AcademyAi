@@ -446,6 +446,7 @@ export interface Translations {
       lectures: string;
       preview: string;
       sections: string;
+      tapToWatch: string;
       learning: {
         title: string;
         langchain: string;
@@ -456,6 +457,7 @@ export interface Translations {
         understand: string;
         llc: string;
       };
+      
     };
     relatedTopics: {
       title: string;

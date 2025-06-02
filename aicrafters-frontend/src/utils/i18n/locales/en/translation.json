@@ -464,6 +464,7 @@
       "preview": "Preview",
       "lectures": "Lectures",
       "sections": "Sections",
+      "tapToWatch": "Tap to watch preview",
       "learning": {
         "title": "What you'll learn",
         "langchain": "Learn LangChain from scratch",

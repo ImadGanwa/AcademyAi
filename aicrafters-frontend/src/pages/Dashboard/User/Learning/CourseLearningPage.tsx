@@ -7,13 +7,14 @@ import { Layout } from '../../../../components/layout/Layout/Layout';
 import { CourseLearningHero } from '../../../../components/layout/CourseLearning/CourseLearningHero';
 import { CourseLearningContent } from '../../../../components/layout/CourseLearning/CourseLearningContent';
 import { CourseLearningNavigation } from '../../../../components/layout/CourseLearning/CourseLearningNavigation';
-import { Container, CircularProgress} from '@mui/material';
+import { Container, CircularProgress, Button } from '@mui/material';
 import { Section, Lesson, LessonContent } from '../../../../types/course';
 import { api } from '../../../../services/api';
 import { coursesService } from '../../../../services/coursesService';
 import { updateUser } from '../../../../store/slices/authSlice';
 import { DEFAULT_LANGUAGE } from '../../../../utils/constants';
 import { CongratulationsPopup } from '../../../../components/common/Popup/CongratulationsPopup';
+import { useTranslation } from 'react-i18next';
 // import { ReactComponent as LinkedInIcon } from '../../../../assets/icons/linkedin.svg';
 import Adwina from '../../../../components/ai/Adwina';
 import FloatingChatButton from '../../../../components/ai/FloatingChatButton';
@@ -138,6 +139,7 @@ export const CourseLearningPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { t } = useTranslation();
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -173,6 +175,11 @@ export const CourseLearningPage: React.FC = () => {
     localStorage.setItem('AdwinaChatOpen', isChatOpen.toString());
   }, [isChatOpen]);
 
+  // Debug courseProgress
+  useEffect(() => {
+    console.log('Debug - courseProgress changed to:', courseProgress);
+  }, [courseProgress]);
+
   // Toggle chat visibility
   const handleToggleChat = () => {
     setIsChatOpen(prevState => !prevState);
@@ -192,6 +199,10 @@ export const CourseLearningPage: React.FC = () => {
         if (userCourse?.progress?.percentage) {
           setCourseProgress(userCourse.progress.percentage);
         }
+
+        // Debug: Log course progress
+        console.log('Debug - Course progress:', userCourse?.progress?.percentage);
+        console.log('Debug - User course data:', userCourse);
 
         // Transform the course data to match our frontend structure
         const transformedSections: Section[] = courseData.courseContent.sections.map((section: any) => ({
@@ -579,7 +590,9 @@ export const CourseLearningPage: React.FC = () => {
         <CourseLearningHero 
           title={courseTitle || ''}
           progress={courseProgress}
+          courseId={courseId || ''}
         />
+        
         <PageLayout>
           <MainContent>
             <ContentWrapper expanded={hasVideoContent && !isChatOpen}>

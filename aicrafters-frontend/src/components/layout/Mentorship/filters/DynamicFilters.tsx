@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { KeyboardArrowDown as ArrowDownIcon } from '@mui/icons-material';
 import { Mentor } from '../card/MentorCard';
-import { getCountryName } from '../../../../utils/countryUtils';
+import { getCountryName, getCountryCode } from '../../../../utils/countryUtils';
 
 // Define unique filter options
 interface FilterOption {
@@ -325,23 +325,29 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
       const uniqueCountries = new Set<string>();
       mentors.forEach(mentor => {
         if (mentor.country) {
-          // Convert country code to full name for display
-          const countryName = getCountryName(mentor.country);
-          uniqueCountries.add(countryName);
+          // Store the country code as value for consistent filtering
+          let countryCode = mentor.country;
+          // If it's already a full name, convert to code
+          if (mentor.country.length > 3) {
+            countryCode = getCountryCode(mentor.country);
+          }
+          uniqueCountries.add(countryCode);
         } else if (mentor.countryFlag) {
           // Fallback to extracting from countryFlag URL for backward compatibility
           const countryCode = mentor.countryFlag.split('/').pop()?.split('.')[0];
           if (countryCode) {
-            const countryName = getCountryName(countryCode);
-            uniqueCountries.add(countryName);
+            uniqueCountries.add(countryCode.toUpperCase());
           }
         }
       });
       
-      const countryOptions = Array.from(uniqueCountries).map(country => ({
-        value: country,
-        label: country
-      }));
+      const countryOptions = Array.from(uniqueCountries).map(countryCode => {
+        const countryName = getCountryName(countryCode);
+        return {
+          value: countryCode, // Use country code as value for consistent filtering
+          label: countryName  // Display full country name to user
+        };
+      });
       setCountries(countryOptions);
       
       // Extract and deduplicate languages

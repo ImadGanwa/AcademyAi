@@ -182,6 +182,8 @@ const ButtonWithIcon = styled(Button)`
     gap: 8px;
     color: ${props => props.theme.palette.text.title};
     border-color: ${props => props.theme.palette.text.title};
+    background-color: ${props => props.theme.palette.secondary.main};
+    color: black;
 
     svg {
       width: 16px;
@@ -196,26 +198,48 @@ const ButtonWithIcon = styled(Button)`
 
 const StyledDialog = styled(Dialog)`
   .MuiDialog-paper {
-    max-width: 90vw;
-    max-height: 90vh;
+    max-width: 95vw;
+    max-height: 95vh;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 16px;
+    position: relative;
+    background: #f8f9fa;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   }
 `;
 
 const DialogImage = styled.img`
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 90vh;
   object-fit: contain;
+  display: block;
+  border-radius: 12px;
+  margin: 20px;
+  max-width: calc(100% - 40px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 `;
 
 const CloseButton = styled(IconButton)`
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(255, 255, 255, 0.8);
+  top: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  transition: all 0.3s ease;
+  
   &:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(1.05);
+  }
+  
+  svg {
+    width: 24px;
+    height: 24px;
   }
 `;
 
@@ -246,6 +270,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
     const fetchData = async () => {
       try {
         // Fetch certificate image
+        console.log('Debug - Fetching certificate image for courseId:', courseId);
         const imageResponse = await fetch(
           `${process.env.REACT_APP_API_URL}/api/certificates/${courseId}/image`,
           {
@@ -256,10 +281,12 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
         );
 
         if (!imageResponse.ok) {
+          console.log('Debug - Certificate image fetch failed:', imageResponse.status, imageResponse.statusText);
           throw new Error('Failed to fetch certificate image');
         }
 
         const imageData = await imageResponse.json();
+        console.log('Debug - Certificate image data:', imageData);
         setCertificateImage(imageData.imageUrl);
 
         // Check if user has rated the course
@@ -286,6 +313,8 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
 
       } catch (error) {
         console.error('Error fetching data:', error);
+        // Use default certificate image if API fails
+        setCertificateImage(defaultCertificateImage);
       }
     };
 
@@ -444,13 +473,26 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
         open={isImagePopupOpen}
         onClose={handleClosePopup}
         maxWidth={false}
+        onClick={(e) => {
+          // Close dialog when clicking on backdrop
+          if (e.target === e.currentTarget) {
+            handleClosePopup();
+          }
+        }}
       >
-        <CloseButton onClick={handleClosePopup}>
+        <CloseButton onClick={handleClosePopup} title="Close Preview">
           <CloseIcon />
         </CloseButton>
         <DialogImage 
           src={certificateImage || defaultCertificateImage} 
-          alt="Certificate"
+          alt="Certificate Preview"
+          onError={(e) => {
+            console.log('Debug - Certificate image failed to load, using default');
+            e.currentTarget.src = defaultCertificateImage;
+          }}
+          onLoad={() => {
+            console.log('Debug - Certificate image loaded successfully');
+          }}
         />
       </StyledDialog>
 

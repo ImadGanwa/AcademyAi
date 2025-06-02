@@ -26,7 +26,7 @@ interface LearningCardProps {
   previewButtonText?: string;
   onButtonClick?: () => void;
   onPreviewClick?: () => void;
-  onCartLinkClick?: () => void;
+  onCardClick?: () => void;
 }
 
 const Card = styled.div`
@@ -455,6 +455,7 @@ export const LearningCard: React.FC<LearningCardProps> = ({
   previewButtonText = 'Preview Course',
   onButtonClick,
   onPreviewClick,
+  onCardClick,
 }) => {
   const { t } = useTranslation();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -470,7 +471,12 @@ export const LearningCard: React.FC<LearningCardProps> = ({
     ) {
       return;
     }
+    // Use onCardClick if provided, otherwise fall back to onButtonClick for backward compatibility
+    if (onCardClick) {
+      onCardClick();
+    } else {
       onButtonClick?.();
+    }
   };
 
   return (

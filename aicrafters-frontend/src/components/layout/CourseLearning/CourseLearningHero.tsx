@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Container, Breadcrumbs } from '@mui/material';
+import { Typography, Container, Breadcrumbs, Button } from '@mui/material';
 import { RouterLink } from '../../common/RouterLink/RouterLink';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useTranslation } from 'react-i18next';
+import { useLocalizedNavigate } from '../../../hooks/useLocalizedNavigate';
 
 const HeroContainer = styled.div`
   width: 100%;
@@ -102,16 +103,50 @@ const ProgressCompleted = styled(Typography)`
   }
 `;
 
+const CertificateButton = styled(Button)`
+  && {
+    background: ${props => props.theme.palette.secondary.main};
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-transform: none;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    width: fit-content;
+    
+    &:hover {
+      background: ${props => props.theme.palette.secondary.dark};
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 1rem;
+    }
+  }
+`;
+
 interface CourseLearningHeroProps {
   title: string;
   progress?: number;
+  courseId?: string;
 }
 
 export const CourseLearningHero: React.FC<CourseLearningHeroProps> = ({ 
   title,
-  progress = 50 
+  progress = 50,
+  courseId
 }) => {
   const { t } = useTranslation();
+  const navigate = useLocalizedNavigate();
+
+  const handleCertificateClick = () => {
+    if (courseId) {
+      navigate(`/dashboard/user/certificate/${courseId}`);
+    }
+  };
 
   return (
     <HeroContainer>
@@ -137,6 +172,14 @@ export const CourseLearningHero: React.FC<CourseLearningHeroProps> = ({
           <ProgressCompleted>
             {Math.round(progress)}% {t('user.learning.completed')}
           </ProgressCompleted>
+          {progress === 100 && courseId && (
+            <CertificateButton
+              variant="contained"
+              onClick={handleCertificateClick}
+            >
+              🏆 {t('user.courseLearning.getCertificate', { defaultValue: 'View Certificate' })}
+            </CertificateButton>
+          )}
         </ProgressSection>
       </HeroContent>
     </HeroContainer>

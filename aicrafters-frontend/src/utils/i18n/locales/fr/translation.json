@@ -464,6 +464,7 @@
       "preview": "Aperçu",
       "lectures": "Leçons",
       "sections": "Sections",
+      "tapToWatch": "Appuyez pour voir l'aperçu",
       "learning": {
         "title": "Ce que vous apprendrez",
         "langchain": "Apprendre LangChain à partir de zéro",
