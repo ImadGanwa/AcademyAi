@@ -559,7 +559,9 @@ export const Navbar: React.FC = () => {
                          location.pathname.includes('/dashboard/user/learning') ||
                          location.pathname.includes('/courses/') ||
                          location.pathname.includes('/dashboard/user/learning/') ||
-                         location.pathname.includes('/');
+                         location.pathname === '/' || 
+                         location.pathname === `/${i18n.language}` || 
+                         location.pathname === `/${i18n.language}/`;
 
   const isConfidenceActive = location.pathname.includes('/mentorship') || 
                              location.pathname.includes('/dashboard/user/booking');
