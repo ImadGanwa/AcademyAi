@@ -554,8 +554,15 @@ export const Navbar: React.FC = () => {
   const showCurrencySwitcher = location.pathname.includes('/cart') || location.pathname.includes('/checkout');
 
   // Check active path for skills vs confidence sections
-  const isSkillsActive = location.pathname.includes('/teach') || location.pathname.includes('/courses');
-  const isConfidenceActive = location.pathname.includes('/mentorship');
+  const isSkillsActive = location.pathname.includes('/teach') || 
+                         location.pathname.includes('/courses') || 
+                         location.pathname.includes('/dashboard/user/learning') ||
+                         location.pathname.includes('/courses/') ||
+                         location.pathname.includes('/dashboard/user/learning/') ||
+                         location.pathname.includes('/');
+
+  const isConfidenceActive = location.pathname.includes('/mentorship') || 
+                             location.pathname.includes('/dashboard/user/booking');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
