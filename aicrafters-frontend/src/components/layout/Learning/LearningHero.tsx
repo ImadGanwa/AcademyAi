@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Container, Typography, Button } from '@mui/material';
-import { ReactComponent as HeroBg } from '../../../assets/images/HeroBg.svg';
+import { ReactComponent as HeroBg } from '../../../assets/images/WinSkills.svg';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,10 +20,10 @@ const HeroSection = styled.section`
 
 const BackgroundImage = styled(HeroBg)`
   position: absolute;
-  right: 0;
+  right: 13%;
   top: 50%;
   transform: translateY(-50%);
-  height: 100%;
+  height: 80%;
   width: auto;
   pointer-events: none;
 

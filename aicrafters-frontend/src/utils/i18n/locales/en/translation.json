@@ -1818,5 +1818,25 @@
     "60min": "1 hour",
     "90min": "1.5 hours",
     "120min": "2 hours"
+  },
+  "AILearning": {
+    "chat": {
+      "welcome": "Hey there! 👋",
+      "welcomeDescription": "I'm Adwina, your AI learning assistant. Ask me anything about this video, Section, Course!",
+      "tryAskingMe": "Try asking me:",
+      "giveMePracticeQuestions": "Give me practice questions",
+      "explainThisConcept": "Explain this concept",
+      "summarizeKeyPoints": "Summarize key points"
+    }
+  },
+  "AIMentor": {
+    "chat": {
+      "welcome": "Welcome to Mentorship! ✨",
+      "welcomeDescription": "How can I assist you today?",
+      "findAMentor": "Find a mentor",
+      "mentorshipTips": "Mentorship tips",
+      "preparationAdvice": "Preparation advice",
+      "mentorshipStyles": "Mentorship styles"
+    }
   }
 }

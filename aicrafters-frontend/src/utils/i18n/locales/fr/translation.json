@@ -1818,5 +1818,25 @@
       "description": "Accédez à du contenu premium en streaming, des ressources éducatives et des cours spécialisés organisés par votre institution via l'écosystème Trace+.",
       "button": "Explorer Trace+"
     }
+  },
+  "AILearning": {
+    "chat": {
+      "welcome": "Bonjour! 👋",
+      "welcomeDescription": "Je suis Adwina, votre assistant d'apprentissage IA. Posez-moi toutes vos questions sur cette vidéo , Section , Cours!",
+      "tryAskingMe": "Essayez de me demander :",
+      "giveMePracticeQuestions": "Donne-moi des questions d'entraînement",
+      "explainThisConcept": "Explique-moi ce concept",
+      "summarizeKeyPoints": "Résume les points clés"
+    }
+  },
+  "AIMentor": {
+    "chat": {
+      "welcome": "Bienvenue dans la Mentorship! ✨",
+      "welcomeDescription": "Comment puis-je vous aider aujourd'hui ?",
+      "findAMentor": "Trouver un mentor",
+      "mentorshipTips": "Conseils pour la Mentorship",
+      "preparationAdvice": "Conseils pour la préparation",
+      "mentorshipStyles": "Styles de Mentorship"
+    }
   }
 }

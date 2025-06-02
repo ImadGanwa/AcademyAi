@@ -21,6 +21,7 @@ import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import MarkdownRenderer from '../../common/MarkdownRenderer';
 import { ReactComponent as UserIcon } from '../../../assets/icons/user.svg';
 import adwinaImage from '../../../assets/images/adwina.png';
+import { useTranslation } from 'react-i18next';
 
 // Animations
 const fadeIn = keyframes`
@@ -380,6 +381,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatBodyRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
+  const { t } = useTranslation();
   const user = useSelector((state: RootState) => state.auth.user);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [lastMessageIndex, setLastMessageIndex] = useState(-1);
@@ -467,10 +469,10 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
             </AdwinaMentorAvatar>
             <Box>
               <Typography variant="h6" component="div" fontWeight={600} sx={{fontSize: '1.1rem'}} color="textPrimary">
-                Welcome to Mentorship! ✨
+                {t('AIMentor.chat.welcome')}
               </Typography>
               <Typography variant="body2" color="textSecondary" sx={{ mt: 0.25, fontSize: '0.85rem'}}>
-                How can I assist you today?
+                {t('AIMentor.chat.welcomeDescription')}
               </Typography>
             </Box>
           </Box>
@@ -482,7 +484,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                     startIcon={<SchoolOutlinedIcon sx={{fontSize: '1rem'}}/>}
                     onClick={() => handleSuggestionClick('How do I find the right mentor?')}
                   >
-                    Find a mentor
+                    {t('AIMentor.chat.findAMentor')}
                   </SuggestionButton>
                 </Zoom>
                 <Zoom in={true} style={{ transitionDelay: '200ms' }}>
@@ -490,7 +492,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                     startIcon={<QuestionAnswerOutlinedIcon sx={{fontSize: '1rem'}}/>}
                     onClick={() => handleSuggestionClick('Mentorship session tips?')}
                   >
-                    Mentorship tips
+                    {t('AIMentor.chat.mentorshipTips')}
                   </SuggestionButton>
                 </Zoom>
                 <Zoom in={true} style={{ transitionDelay: '300ms' }}>
@@ -498,7 +500,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                     startIcon={<TipsAndUpdatesOutlinedIcon sx={{fontSize: '1rem'}}/>}
                     onClick={() => handleSuggestionClick('Prepare for first meeting?')}
                   >
-                    Preparation advice
+                    {t('AIMentor.chat.preparationAdvice')}
                   </SuggestionButton>
                 </Zoom>
                 <Zoom in={true} style={{ transitionDelay: '400ms' }}>
@@ -506,7 +508,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                     startIcon={<PsychologyOutlinedIcon sx={{fontSize: '1rem'}}/>}
                     onClick={() => handleSuggestionClick('Different mentorship styles?')}
                   >
-                    Mentorship styles
+                    {t('AIMentor.chat.mentorshipStyles')}
                   </SuggestionButton>
                 </Zoom>
             </Box>

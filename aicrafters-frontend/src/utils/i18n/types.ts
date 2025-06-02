@@ -1173,6 +1173,27 @@ export interface Translations {
     sidebarAvailability: string;
     sidebarSettings: string;
   };
+  AILearning: {
+    chat: {
+      welcome: string;
+      welcomeDescription: string;
+      tryAskingMe: string;
+      giveMePracticeQuestions: string;
+      explainThisConcept: string;
+      summarizeKeyPoints: string;
+    };
+  };
+  AIMentor: {
+    chat: {
+      welcome: string;
+      welcomeDescription: string;
+      findAMentor: string;
+      mentorshipTips: string;
+      preparationAdvice: string;
+      mentorshipStyles: string;
+      
+    };
+  };
 }
 
 declare module 'i18next' {

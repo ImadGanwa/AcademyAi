@@ -8,7 +8,6 @@ import {
   Paper, 
   CircularProgress, 
   Avatar, 
-  Divider,
   Button,
   useTheme
 } from '@mui/material';
@@ -21,8 +20,9 @@ import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import MarkdownRenderer from '../common/MarkdownRenderer';
-import { ReactComponent as ChatIcon } from '../../assets/icons/Chat.svg';
 import { ReactComponent as UserIcon } from '../../assets/icons/user.svg';
+import AdwinaImage from '../../assets/images/adwina.png';
+import { useTranslation } from 'react-i18next';
 
 const ChatContainer = styled(Paper)`
   display: flex;
@@ -108,20 +108,20 @@ const MessageTimestamp = styled(Typography)`
   margin-top: 2px;
 `;
 
-const MessageContent = styled(Typography)<{ isUser: boolean }>`
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.6;
+// const MessageContent = styled(Typography)<{ isUser: boolean }>`
+//   white-space: pre-wrap;
+//   word-break: break-word;
+//   line-height: 1.6;
   
-  a {
-    color: ${props => props.isUser ? '#fff' : props.theme.palette.primary.main};
-    text-decoration: underline;
-  }
+//   a {
+//     color: ${props => props.isUser ? '#fff' : props.theme.palette.primary.main};
+//     text-decoration: underline;
+//   }
   
-  b, strong {
-    font-weight: 600;
-  }
-`;
+//   b, strong {
+//     font-weight: 600;
+//   }
+// `;
 
 const SuggestionButton = styled(Button)`
   text-transform: none;
@@ -145,24 +145,25 @@ const WelcomeContainer = styled(Box)`
   gap: 16px;
 `;
 
-const StyledAvatar = styled(Avatar)`
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: ${props => props.theme.palette.primary.main};
-`;
+// const StyledAvatar = styled(Avatar)`
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+//   background-color: ${props => props.theme.palette.primary.main};
+// `;
 
 const AdwinaAvatar = styled(Avatar)`
   width: 40px;
   height: 40px;
-  background-color: ${props => props.theme.palette.primary.light};
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid #e0e0e0;
+  padding: 0;
   
-  svg {
-    width: 24px;
-    height: 24px;
-    fill: white;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 `;
 
@@ -202,8 +203,8 @@ export const AIChat: React.FC<AIChatProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const theme = useTheme();
   const user = useSelector((state: RootState) => state.auth.user);
+  const { t, i18n } = useTranslation();
 
   // Scroll to bottom of messages when messages change
   useEffect(() => {
@@ -239,7 +240,7 @@ export const AIChat: React.FC<AIChatProps> = ({
       <ChatHeader className="ai-chat-header">
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <AdwinaAvatar>
-            <ChatIcon />
+            <img src={AdwinaImage} alt="Adwina" />
           </AdwinaAvatar>
           <Typography variant="subtitle1" fontWeight={600}>
             Adwina
@@ -252,14 +253,14 @@ export const AIChat: React.FC<AIChatProps> = ({
         <WelcomeContainer>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <AdwinaAvatar>
-              <ChatIcon />
+              <img src={AdwinaImage} alt="Adwina" />
             </AdwinaAvatar>
             <Box>
               <Typography variant="h6" fontWeight={600}>
-                Hey there! 👋
+                {t('AILearning.chat.welcome')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                I'm Adwina, your AI learning assistant. Ask me anything about this video!
+                {t('AILearning.chat.welcomeDescription')}
               </Typography>
             </Box>
           </Box>
@@ -269,7 +270,7 @@ export const AIChat: React.FC<AIChatProps> = ({
         {messages.length === 0 && (
           <Box sx={{ mx: 3, my: 2 }}>
             <Typography variant="subtitle2" color="text.secondary" fontWeight={600} sx={{ mb: 1 }}>
-              Try asking me:
+              {t('AILearning.chat.tryAskingMe')}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               <SuggestionButton
@@ -277,7 +278,7 @@ export const AIChat: React.FC<AIChatProps> = ({
                 startIcon={<QuizOutlinedIcon />}
                 onClick={() => handleSuggestionClick('Give me practice questions about this topic')}
               >
-                Give me practice questions
+                {t('AILearning.chat.giveMePracticeQuestions')}
               </SuggestionButton>
               
               <SuggestionButton
@@ -285,7 +286,7 @@ export const AIChat: React.FC<AIChatProps> = ({
                 startIcon={<LightbulbOutlinedIcon />}
                 onClick={() => handleSuggestionClick('Explain this concept in simple terms')}
               >
-                Explain this concept
+                {t('AILearning.chat.explainThisConcept')}
               </SuggestionButton>
               
               <SuggestionButton
@@ -293,7 +294,7 @@ export const AIChat: React.FC<AIChatProps> = ({
                 startIcon={<SummarizeOutlinedIcon />}
                 onClick={() => handleSuggestionClick('Summarize the key points')}
               >
-                Summarize key points
+                {t('AILearning.chat.summarizeKeyPoints')}
               </SuggestionButton>
             </Box>
           </Box>
@@ -312,7 +313,7 @@ export const AIChat: React.FC<AIChatProps> = ({
               )
             ) : (
               <AdwinaAvatar>
-                <ChatIcon />
+                <img src={AdwinaImage} alt="Adwina" />
               </AdwinaAvatar>
             )}
             
