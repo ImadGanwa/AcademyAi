@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Container, Typography, Button } from '@mui/material';
+import { Box, Container, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import winConfidenceLogo from '../../../assets/images/win-confidence.png';
 
@@ -19,24 +18,6 @@ const HeroSection = styled.section`
   @media (max-width: 768px) {
     padding: 30px 16px;
   }
-`;
-
-const FloatingElement = styled(motion.div)`
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
-`;
-
-const FloatingElement2 = styled(motion.div)`
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
-  border-radius: 50%;
-  pointer-events: none;
 `;
 
 const HeroContainer = styled(Container)`
@@ -152,8 +133,13 @@ const BackgroundIcon = styled(motion.div)`
 `;
 
 export const BookingHero: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('translation');
   const navigate = useNavigate();
+
+  // Debug logging
+  console.log('BookingHero - Current language:', i18n.language);
+  console.log('BookingHero - Translation test:', t('mentor.booking.hero.title'));
+  console.log('BookingHero - Simple translation test:', t('common.loading'));
 
   const handleFindMentorClick = () => {
     const currentLang = i18n.language;
@@ -180,14 +166,14 @@ export const BookingHero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {t('booking.hero.title', 'My Mentorship Sessions') as string}
+            {t('mentor.booking.hero.title') || 'My Mentorship Sessions'}
           </Title>
           <Description
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            {t('booking.hero.description', 'Manage your mentorship sessions, view upcoming appointments, and track your learning journey with expert mentors.') as string}
+            {t('mentor.booking.hero.description') || 'Manage your mentorship sessions, view upcoming appointments, and track your learning journey with expert mentors.'}
           </Description>
           <ActionButtonsWrapper
             initial={{ opacity: 0, y: 30 }}
@@ -199,7 +185,7 @@ export const BookingHero: React.FC = () => {
               startIcon={<PersonSearchIcon />}
               onClick={handleFindMentorClick}
             >
-              {t('booking.hero.findMentor', 'Find a Mentor') as string}
+              {t('mentor.booking.hero.findMentor') || 'Find a Mentor'}
             </AllBookingsButton>
           </ActionButtonsWrapper>
         </ContentWrapper>

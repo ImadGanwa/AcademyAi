@@ -951,6 +951,7 @@
       "calendarDetails": "Topic: {{topic}}\nJoin here: {{meetingLink}}",
       "status": {
         "scheduled": "Scheduled",
+        "pending": "Pending",
         "completed": "Completed",
         "cancelled": "Cancelled",
         "no-show": "No Show"

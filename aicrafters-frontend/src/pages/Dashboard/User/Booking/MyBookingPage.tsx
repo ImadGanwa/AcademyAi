@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Typography, Box, Card, Chip, Button, Dialog, Grid, CircularProgress, Paper,
+  Typography, Box, Button, Dialog, CircularProgress,
   Avatar, Container, Stack, Alert, Divider
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import styled, { ThemeProvider } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import CloseIcon from '@mui/icons-material/Close';
 
 // Icons
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -312,6 +312,11 @@ const NoBookingsContainer = styled(motion.div)`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   @media (max-width: 768px) {
     border-radius: 16px;
@@ -400,7 +405,7 @@ const MyBookingPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('translation');
   const navigate = useNavigate();
   const currentLanguage = i18n.language;
 
@@ -414,12 +419,12 @@ const MyBookingPage: React.FC = () => {
           setBookings(response.data.bookings);
         } else {
           console.error("Unexpected API response structure:", response);
-          setError(t('booking.error.unexpectedResponse', "Received an unexpected response from the server.") as string);
+          setError("Received an unexpected response from the server.");
           setBookings([]);
         }
       } catch (err: any) {
         console.error("Error fetching bookings:", err);
-        setError(t('booking.error.fetchFailed', "Failed to load bookings. Please check your connection and try again.") as string);
+        setError("Failed to load bookings. Please check your connection and try again.");
         setBookings([]);
       } finally {
         setLoading(false);
@@ -427,51 +432,59 @@ const MyBookingPage: React.FC = () => {
     };
 
     fetchBookings();
-  }, [t]);
+  }, []);
 
-  const handleOpenDetails = (booking: any) => {
+  const handleOpenDetails = useCallback((booking: any) => {
     setSelectedBooking(booking);
     setOpenDialog(true);
-  };
+  }, []);
 
-  const handleCloseDialog = () => setOpenDialog(false);
+  const handleCloseDialog = useCallback(() => setOpenDialog(false), []);
 
-  const handleZoomLink = (bookingToOpen?: any) => {
+  const handleZoomLink = useCallback((bookingToOpen?: any) => {
     const booking = bookingToOpen || selectedBooking;
     if (booking && booking.meetingLink) {
       window.open(booking.meetingLink, '_blank', 'noopener,noreferrer');
     }
-  };
+  }, [selectedBooking]);
 
-  const handleAddToCalendar = () => {
+  const handleAddToCalendar = useCallback(() => {
     if (!selectedBooking) return;
-    const mentorName = selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('booking.unknownMentor', 'your mentor') as string;
+    const mentorName = selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('mentor.booking.unknownMentor', 'your mentor') as string;
     const startDateTime = `${selectedBooking.date}T${selectedBooking.startTime}:00`;
     const endDateTime = `${selectedBooking.date}T${selectedBooking.endTime}:00`;
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t('booking.calendarTitle', `Mentorship: ${selectedBooking.topic} with ${mentorName}`, { topic: selectedBooking.topic, mentorName }))}&details=${encodeURIComponent(t('booking.calendarDetails', `Topic: ${selectedBooking.topic}\nJoin here: ${selectedBooking.meetingLink || 'Online'}`, { topic: selectedBooking.topic, meetingLink: selectedBooking.meetingLink || 'Online' }))}&location=${encodeURIComponent(selectedBooking.meetingLink || 'Online Meeting')}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}`;
+    const calendarTitle = t('mentor.booking.calendarTitle', 'Mentorship: {{topic}} with {{mentorName}}', { 
+      topic: selectedBooking.topic, 
+      mentorName 
+    }) as string;
+    const calendarDetails = t('mentor.booking.calendarDetails', 'Topic: {{topic}}\nJoin here: {{meetingLink}}', { 
+      topic: selectedBooking.topic, 
+      meetingLink: selectedBooking.meetingLink || 'Online' 
+    }) as string;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(calendarTitle)}&details=${encodeURIComponent(calendarDetails)}&location=${encodeURIComponent(selectedBooking.meetingLink || 'Online Meeting')}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}`;
     window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer');
-  };
+  }, [selectedBooking, t]);
 
-  const handleFindMentor = () => navigate(`/${currentLanguage}/mentorship`);
+  const handleFindMentor = useCallback(() => navigate(`/${currentLanguage}/mentorship`), [navigate, currentLanguage]);
 
-  const formatDate = (dateString: string | undefined): string => {
-    if (!dateString) return t('booking.dateNotSpecified', 'Date not specified') as string;
+  const formatDate = useCallback((dateString: string | undefined): string => {
+    if (!dateString) return t('mentor.booking.dateNotSpecified', 'Date not specified') as string;
     try {
       return new Date(dateString).toLocaleDateString(
         currentLanguage === 'fr' ? 'fr-FR' : 'en-US', 
         { day: 'numeric', month: 'long', year: 'numeric' }
       );
-    } catch { return t('booking.invalidDateFormat', 'Invalid date') as string; }
-  };
+    } catch { return t('mentor.booking.invalidDateFormat', 'Invalid date') as string; }
+  }, [currentLanguage, t]);
 
-  const formatTime = (timeString: string | undefined, scheduledAt?: string): string => {
+  const formatTime = useCallback((timeString: string | undefined, scheduledAt?: string): string => {
     if (!timeString && scheduledAt) {
       try {
         const date = new Date(scheduledAt);
         if (!isNaN(date.getTime())) timeString = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
       } catch {}
     }
-    if (!timeString) return t('booking.timeNotSpecified', 'Time not specified') as string;
+    if (!timeString) return t('mentor.booking.timeNotSpecified', 'Time not specified') as string;
     
     const locale = currentLanguage === 'fr' ? 'fr-FR' : 'en-US';
     try {
@@ -488,11 +501,23 @@ const MyBookingPage: React.FC = () => {
                  return `${hourInt % 12 || 12}:${minute}${hourInt >= 12 ? ' PM' : ' AM'}`;
             }
         }
-        return t('booking.invalidTimeFormat', 'Invalid time') as string;
+        return t('mentor.booking.invalidTimeFormat', 'Invalid time') as string;
     }
-  };
+  }, [currentLanguage, t]);
 
-  const getStatusLabel = (status: string): string => t(`booking.status.${status}`, status.charAt(0).toUpperCase() + status.slice(1)) as string;
+  const getStatusLabel = useCallback((status: string): string => t(`mentor.booking.status.${status}`, status.charAt(0).toUpperCase() + status.slice(1)) as string, [t]);
+
+  // Translate error messages after component mounts
+  const translatedError = useMemo(() => {
+    if (!error) return null;
+    if (error.includes('unexpected response')) {
+      return t('mentor.booking.error.unexpectedResponse', "Received an unexpected response from the server.") as string;
+    }
+    if (error.includes('Failed to load')) {
+      return t('mentor.booking.error.fetchFailed', "Failed to load bookings. Please check your connection and try again.") as string;
+    }
+    return error;
+  }, [error, t]);
 
   if (loading) {
     return (
@@ -514,7 +539,7 @@ const MyBookingPage: React.FC = () => {
                     <CircularProgress size={60} thickness={4} />
                   </motion.div>
                   <Typography variant="h6" sx={{ mt: 3, color: 'text.secondary', fontWeight: 500 }}>
-                    {t('booking.loadingBookings', 'Loading your bookings...') as string}
+                    {t('mentor.booking.loadingBookings', 'Loading your bookings...') as string}
                   </Typography>
                 </LoadingContainer>
               </Container>
@@ -533,7 +558,7 @@ const MyBookingPage: React.FC = () => {
           <ContentSection id="bookings-section">
             <ContentWrapper>
               <AnimatePresence>
-                {error && (
+                {translatedError && (
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -541,13 +566,13 @@ const MyBookingPage: React.FC = () => {
                     transition={{ duration: 0.3 }}
                   >
                     <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>
-                      {error}
+                      {translatedError}
                     </Alert>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {!loading && !error && bookings.length === 0 ? (
+              {!loading && !translatedError && bookings.length === 0 ? (
                 <NoBookingsContainer
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -561,10 +586,10 @@ const MyBookingPage: React.FC = () => {
                     <EventBusyIcon />
                   </IllustrationContainer>
                   <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 700, color: 'text.primary', mb: 2 }}>
-                    {t('booking.noBookingsTitle', 'No Bookings Yet') as string}
+                    {t('mentor.booking.noBookingsTitle', 'No Bookings Yet') as string}
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: '400px', lineHeight: 1.6 }}>
-                    {t('booking.noBookingsDescription', "It looks like you haven't scheduled any mentorship sessions. Find a mentor to get started!") as string}
+                    {t('mentor.booking.noBookingsDescription', "It looks like you haven't scheduled any mentorship sessions. Find a mentor to get started!") as string}
                   </Typography>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -576,7 +601,7 @@ const MyBookingPage: React.FC = () => {
                       onClick={handleFindMentor}
                       size="large"
                     >
-                      {t('booking.findMentor', 'Find a Mentor') as string}
+                      {t('mentor.booking.findMentor', 'Find a Mentor') as string}
                     </PrimaryButton>
                   </motion.div>
                 </NoBookingsContainer>
@@ -603,10 +628,10 @@ const MyBookingPage: React.FC = () => {
                             </MentorAvatar>
                             <MentorDetails>
                               <MentorName variant="h6">
-                                {booking.mentorId?.fullName || booking.mentorName || t('booking.unknownMentor', 'Unknown Mentor') as string}
+                                {booking.mentorId?.fullName || booking.mentorName || t('mentor.booking.unknownMentor', 'Unknown Mentor') as string}
                               </MentorName>
                               <MentorTitle variant="caption">
-                                {t('booking.mentor', 'Mentor') as string}
+                                {t('mentor.booking.mentor', 'Mentor') as string}
                               </MentorTitle>
                             </MentorDetails>
                           </MentorInfo>
@@ -617,7 +642,7 @@ const MyBookingPage: React.FC = () => {
 
                         <CardContent>
                           <BookingTopic variant="subtitle1">
-                            {booking.topic || t('booking.noTopic', 'No topic specified') as string}
+                            {booking.topic || t('mentor.booking.noTopic', 'No topic specified') as string}
                           </BookingTopic>
 
                           <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
@@ -642,7 +667,7 @@ const MyBookingPage: React.FC = () => {
                               <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper">
                                 <TimerIcon />
                               </StyledIconWrapper>
-                              <span>{booking.duration || 30} {t('booking.minutes', 'min') as string}</span>
+                              <span>{booking.duration || 30} {t('mentor.booking.minutes', 'min') as string}</span>
                             </DetailItem>
                           </BookingDetails>
 
@@ -654,7 +679,7 @@ const MyBookingPage: React.FC = () => {
                               startIcon={<InfoOutlinedIcon />}
                               onClick={() => handleOpenDetails(booking)}
                             >
-                              {t('booking.viewDetails', 'View Details') as string}
+                              {t('mentor.booking.viewDetails', 'View Details') as string}
                             </SecondaryButton>
                             {booking.status === 'scheduled' && (
                               <PrimaryButton
@@ -662,7 +687,7 @@ const MyBookingPage: React.FC = () => {
                                 startIcon={<VideocamIcon />}
                                 onClick={() => handleZoomLink(booking)}
                               >
-                                {t('booking.joinSession', 'Join Session') as string}
+                                {t('mentor.booking.joinSession', 'Join Session') as string}
                               </PrimaryButton>
                             )}
                           </ActionButtons>
@@ -678,7 +703,7 @@ const MyBookingPage: React.FC = () => {
           <ConfirmationDialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
             <DialogHeader>
               <DialogTitleStyled>
-                {t('booking.sessionDetails', 'Session Details') as string}
+                {t('mentor.booking.sessionDetails', 'Session Details') as string}
               </DialogTitleStyled>
               <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ color: 'white' }}>
                 <CloseIcon />
@@ -690,8 +715,8 @@ const MyBookingPage: React.FC = () => {
                 <>
                   <Box sx={{ mb: 3 }}>
                     <Typography variant="h6" component="h3" fontWeight={600} color="text.primary" marginBottom={2}>
-                      {t('booking.sessionWith', 'Session with ')}
-                      {selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('booking.unknownMentor', 'Unknown Mentor') as string}
+                      {t('mentor.booking.sessionWith', 'Session with ')}
+                      {selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('mentor.booking.unknownMentor', 'Unknown Mentor') as string}
                     </Typography>
                     
                     <Stack spacing={1.5} sx={{ mb: 2 }}>
@@ -708,14 +733,14 @@ const MyBookingPage: React.FC = () => {
                       <DetailItem>
                         <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper"><TimerIcon /></StyledIconWrapper>
                         <TimerIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
-                        <span>{selectedBooking.duration} {t('booking.minutes', 'min') as string}</span>
+                        <span>{selectedBooking.duration} {t('mentor.booking.minutes', 'min') as string}</span>
                       </DetailItem>
                     </Stack>
 
                     <Divider sx={{ mt: 2, mb: 2 }} />
 
                     <Typography variant="h6" component="h4" fontWeight={600} color="text.primary" marginBottom={1}>
-                      {t('booking.topic', 'Topic')}:
+                      {t('mentor.booking.topic', 'Topic')}:
                     </Typography>
                     <Typography variant="body1" color="text.secondary" sx={{ mb: selectedBooking.notes?.sharedNotes ? 2 : 0 }}>
                       {selectedBooking.topic}
@@ -724,7 +749,7 @@ const MyBookingPage: React.FC = () => {
                     {selectedBooking.notes?.sharedNotes && (
                       <>
                         <Typography variant="h6" component="h4" fontWeight={600} color="text.primary" marginTop={2} marginBottom={1}>
-                          {t('booking.sessionNotes', 'Session Notes')}:
+                          {t('mentor.booking.sessionNotes', 'Session Notes')}:
                         </Typography>
                         <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
                           {selectedBooking.notes.sharedNotes}
@@ -743,7 +768,7 @@ const MyBookingPage: React.FC = () => {
                         fullWidth
                         size="large"
                       >
-                        {t('booking.joinZoomMeeting', 'Join Zoom Meeting') as string}
+                        {t('mentor.booking.joinZoomMeeting', 'Join Zoom Meeting') as string}
                       </PrimaryButton>
                       <SecondaryButton
                         variant="outlined"
@@ -752,7 +777,7 @@ const MyBookingPage: React.FC = () => {
                         fullWidth
                         size="large"
                       >
-                        {t('booking.addToCalendar', 'Add to Calendar') as string}
+                        {t('mentor.booking.addToCalendar', 'Add to Calendar') as string}
                       </SecondaryButton>
                     </Stack>
                   )}

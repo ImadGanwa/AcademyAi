@@ -934,7 +934,7 @@
       "viewDetails": "Voir les Détails",
       "joinSession": "Rejoindre la Session",
       "sessionDetails": "Détails de la Session",
-      "sessionWith": "Session avec",
+      "sessionWith": "Session avec ",
       "unknownMentor": "Mentor Inconnu",
       "topic": "Sujet",
       "noTopic": "Aucun sujet spécifié",
@@ -951,6 +951,7 @@
       "calendarDetails": "Sujet : {{topic}}\nRejoindre ici : {{meetingLink}}",
       "status": {
         "scheduled": "Planifié",
+        "pending": "En attente",
         "completed": "Terminé",
         "cancelled": "Annulé",
         "no-show": "Absent"
