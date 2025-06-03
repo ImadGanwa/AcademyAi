@@ -1214,7 +1214,6 @@ const createCalendarSectionHtml = (icsContent: string, googleLink: string): stri
   `;
 };
 
-
 export const sendMentorBookingNotificationEmail = async (
   mentorEmail: string,
   mentorName: string,
@@ -1226,12 +1225,12 @@ export const sendMentorBookingNotificationEmail = async (
   endTime: string, // HH:MM (24h)
   meetingLink?: string // Optional meeting link
 ) => {
-  const subject = `New Mentorship Session Booked with ${menteeName} - ${ADWIN_SERVICE_NAME}`;
-  console.log(`Attempting to send mentor booking notification to: ${mentorEmail} with subject: "${subject}"`);
+  const subject = `New Mentorship Session Request from ${menteeName} - ${ADWIN_SERVICE_NAME}`;
+  console.log(`Attempting to send mentor booking request notification to: ${mentorEmail} with subject: "${subject}"`);
   try {
     const formattedDisplayDate = formatDateForDisplay(scheduledDate);
-    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/mentor/bookings/${bookingId}`;
-    const preheaderText = `New booking from ${menteeName} for ${formattedDisplayDate} at ${startTime}.`;
+    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/mentor/bookings`;
+    const preheaderText = `New session request from ${menteeName} for ${formattedDisplayDate} at ${startTime}.`;
 
     const sessionDetails = [
       `<strong>Mentee:</strong> ${menteeName}`,
@@ -1239,70 +1238,50 @@ export const sendMentorBookingNotificationEmail = async (
       `<strong>Date:</strong> ${formattedDisplayDate}`,
       `<strong>Time:</strong> ${startTime} - ${endTime}`,
     ];
-    if (meetingLink) {
-        sessionDetails.push(`<strong>Meeting Link:</strong> <a href="${meetingLink}" target="_blank" style="color: ${theme.palette.primary.main};">${meetingLink}</a>`);
-    } else {
-        sessionDetails.push(`<strong>Meeting Link:</strong> Please add a meeting link via your dashboard.`);
-    }
 
     const sessionDetailsCardContent = sessionDetails.map(detail => `<p style="margin: 0 0 8px 0; font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; line-height: 1.6;">${detail}</p>`).join('');
-    const sessionDetailsCard = createStyledCard(`<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Session Details:</h3>${sessionDetailsCardContent}`, theme.palette.background.default);
+    const sessionDetailsCard = createStyledCard(`<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Session Request Details:</h3>${sessionDetailsCardContent}`, theme.palette.background.default);
 
     const nextSteps = [
-      "Review the session details and mentee's request.",
-      meetingLink ? "Confirm the meeting link is correct and accessible." : "<strong>Crucial: Add a meeting link for this session via your dashboard.</strong>",
-      "Prepare any necessary materials or topics for discussion.",
-      "Contact the mentee through the platform if you need more information beforehand."
+      "Review the session request details carefully.",
+      "Accept or decline this request through your dashboard.",
+      "If accepting, add a meeting link for the session.",
+      "Contact the mentee through the platform if you need more information."
     ];
     const nextStepsCardContent = `<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Next Steps:</h3> ${createStyledList(nextSteps)}`;
     const nextStepsCard = createStyledCard(nextStepsCardContent, theme.palette.info.main + '1A');
-
-    // Calendar Integration
-    const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
-    const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
-    const calendarDescription = `Mentorship Session with ${menteeName}\nTopic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link to be provided via dashboard.'}`;
-    const icsData = createIcsContent(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const calendarSection = createCalendarSectionHtml(icsData, googleCalendarUrl);
-
 
     const contentHtml = `
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-bottom: 15px; line-height: 1.6;">
         Hello ${mentorName},
       </p>
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-bottom: 20px; line-height: 1.6;">
-        You have a new mentorship session booking from <strong>${menteeName}</strong> on the ${ADWIN_SERVICE_NAME} platform.
+        You have received a new mentorship session request from <strong>${menteeName}</strong> on the ${ADWIN_SERVICE_NAME} platform.
       </p>
       ${sessionDetailsCard}
-      ${calendarSection}
       <p style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; margin-top: 25px; margin-bottom: 20px; line-height: 1.6;">
-        You can view the complete details and manage this booking (e.g., add/update meeting link, share notes) through your mentor dashboard:
+        Please review this request and take action through your mentor dashboard:
       </p>
       <div style="text-align: center; margin: 30px 0;">
-        ${createStyledButton('View Booking Details', bookingDetailsLink, 'primary')}
+        ${createStyledButton('Review Request', bookingDetailsLink, 'primary')}
       </div>
       ${nextStepsCard}
     `;
 
-    const emailHtml = createBaseEmailHtml('New Mentorship Booking', contentHtml, preheaderText);
+    const emailHtml = createBaseEmailHtml('New Mentorship Session Request', contentHtml, preheaderText);
 
     await transporter.sendMail({
       from: FROM_EMAIL_ADDRESS,
       to: mentorEmail,
       subject: subject,
       html: emailHtml,
-      replyTo: REPLY_TO_EMAIL_ADDRESS,
-      attachments: [{
-          filename: 'mentorship-session.ics',
-          content: icsData,
-          contentType: 'text/calendar; charset=utf-8; method=REQUEST'
-      }]
+      replyTo: REPLY_TO_EMAIL_ADDRESS
     });
-    console.log(`Mentor booking notification email sent successfully to: ${mentorEmail}`);
+    console.log(`Mentor booking request notification email sent successfully to: ${mentorEmail}`);
   } catch (error) {
-    console.error(`Error sending mentor booking notification email to ${mentorEmail}:`, error);
+    console.error(`Error sending mentor booking request notification email to ${mentorEmail}:`, error);
     if (error instanceof Error) {
-      console.error('Detailed error (mentor booking notification):', {
+      console.error('Detailed error (mentor booking request notification):', {
         message: error.message,
         stack: error.stack,
         recipient: mentorEmail,
