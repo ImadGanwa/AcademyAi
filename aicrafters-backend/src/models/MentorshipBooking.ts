@@ -18,6 +18,7 @@ export interface IMentorshipBooking extends Document {
     submittedAt?: Date;
   };
   meetingLink?: string;
+  googleEventId?: string; // Google Calendar event ID for meeting management
   price: number;
   mentorAvailabilityId?: string; // Reference to specific availability slot
   createdAt: Date;
@@ -107,6 +108,10 @@ const MentorshipBookingSchema = new Schema({
     }
   },
   meetingLink: {
+    type: String,
+    trim: true
+  },
+  googleEventId: {
     type: String,
     trim: true
   },

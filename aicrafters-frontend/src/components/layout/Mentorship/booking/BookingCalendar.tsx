@@ -364,7 +364,8 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     // Call the onBookSession prop with form data
     onBookSession(topic, message);
     
-    setIsSubmitting(false);
+    // Note: Don't set isSubmitting to false here since onBookSession should handle that
+    // and provide feedback about the booking result
   };
   
   const calendarDays = generateCalendarData();

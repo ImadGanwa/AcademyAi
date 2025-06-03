@@ -436,10 +436,8 @@ export const Mentees: React.FC = () => {
   };
 
   const generateMeetingLink = () => {
-    // In a real app, this would generate a meeting link from your backend
-    // For now, we'll create a dummy Zoom link
-    const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `https://zoom.us/j/8745${randomId}XXX`;
+    // Removed fake Zoom link generation - Google Meet links are now created automatically by the backend
+    return '';
   };
 
   const handleConfirmSchedule = async () => {
@@ -447,9 +445,13 @@ export const Mentees: React.FC = () => {
     if (!selectedMentee) return;
     
     try {
-      // First update the booking status to 'scheduled'
+      // Update the booking status to 'scheduled' - Google Meet link will be created automatically
       const response = await updateBooking(selectedMentee.bookingId!, {
-        status: 'scheduled'
+        status: 'scheduled',
+        // Removed: meetingLink: generatedMeetingLink, - Let backend create Google Meet link
+        notes: {
+          mentorNotes: `Session confirmed by mentor. Meeting scheduled for ${selectedDate} at ${selectedTime} (${duration} minutes).`
+        }
       });
       
       if (response.success) {
@@ -461,15 +463,18 @@ export const Mentees: React.FC = () => {
       
         // Generate meeting details
         setConfirmationDetails(formatConfirmationDetails());
-        setMeetingLink(generateMeetingLink());
+        // Use the meeting link from the backend response (Google Meet link)
+        setMeetingLink(response.data?.booking?.meetingLink || '');
         
         // Close the scheduling dialog and open the confirmation
         setOpenScheduleDialog(false);
         setOpenConfirmationDialog(true);
+      } else {
+        alert(t('mentorship.mentees.error.scheduleUpdateFailed', 'Failed to update booking schedule. Please try again.') as string);
       }
     } catch (err: any) {
-      console.error('Error accepting booking:', err);
-      alert(err.response?.data?.error || 'Failed to accept booking');
+      console.error('Error confirming schedule:', err);
+      alert(err.response?.data?.error || t('mentorship.mentees.error.scheduleUpdateFailed', 'Failed to update booking schedule. Please try again.') as string);
     }
   };
 
@@ -489,6 +494,11 @@ export const Mentees: React.FC = () => {
           m.id === mentee.id ? { ...m, status: 'rejected' as const } : m
         );
         setAllMentees(updatedMentees);
+        
+        // Provide feedback that the slot is now available again
+        console.log('Booking rejected successfully. The time slot is now available for other mentees to book.');
+      } else {
+        alert(t('mentorship.mentees.error.rejectFailed', 'Failed to reject booking. Please try again.') as string);
       }
     } catch (err: any) {
       console.error('Error rejecting booking:', err);
@@ -509,7 +519,9 @@ export const Mentees: React.FC = () => {
     
     // Generate meeting details
     setConfirmationDetails(formatConfirmationDetails());
-    setMeetingLink(generateMeetingLink());
+    // Note: In a real implementation, you would call updateBooking API here
+    // and get the meeting link from the response instead of generating a fake one
+    setMeetingLink(''); // No fake link generation
     
     // Close the rescheduling dialog and open the confirmation
     setOpenRescheduleDialog(false);
@@ -527,14 +539,12 @@ export const Mentees: React.FC = () => {
       setSelectedTime('10:00');
       setDuration('30');
       
-      // Open the scheduling dialog without updating status yet
+      // Open the scheduling dialog to set meeting details
       setOpenScheduleDialog(true);
       
     } catch (err: any) {
-      console.error('Error accepting booking:', err);
-      alert(t('mentorship.mentees.error.acceptFailed', 'Failed to accept booking. Please try again.') as string);
       console.error('Error preparing to accept booking:', err);
-      alert(err.response?.data?.error || 'Failed to prepare booking acceptance');
+      alert(t('mentorship.mentees.error.acceptFailed', 'Failed to accept booking. Please try again.') as string);
     }
   };
 

@@ -1371,9 +1371,6 @@ export const sendMenteeBookingConfirmationEmail = async (
   }
 };
 
-// Overload for sendMentorBookingConfirmationEmail from user provided code
-// This seems to be a duplicate intention to the one above for mentors.
-// I'll create a new distinct one as requested based on the final functions in the input.
 export const sendMentorBookingConfirmedEmail = async ( // Note: Renamed from the original to avoid conflict, assuming this is the intended final name for the "mentor" confirmation
   mentorEmail: string,
   mentorName: string,
@@ -1416,12 +1413,13 @@ export const sendMentorBookingConfirmedEmail = async ( // Note: Renamed from the
     const prepInfoCardContent = `<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Preparing for the Session:</h3> ${createStyledList(prepInfo)}`;
     const prepInfoCard = createStyledCard(prepInfoCardContent, theme.palette.info.main + '1A');
 
-    // Calendar Integration
+    // Calendar Integration with proper meeting link handling
     const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
     const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
-    const calendarDescription = `Mentorship Session with ${menteeName}\nTopic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}` : 'Meeting link to be provided via dashboard.'}`;
-    const icsData = createIcsContent(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
+    const calendarDescription = `Mentorship Session with ${menteeName}\\nTopic: ${topic}${meetingLink ? `\\nMeeting Link: ${meetingLink}` : '\\nMeeting link to be provided via dashboard.'}`;
+    const calendarLocation = meetingLink ? meetingLink : 'Online - Meeting link to be provided';
+    const icsData = createIcsContent(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription, calendarLocation);
+    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${menteeName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription.replace(/\\n/g, '\n'), calendarLocation);
     const calendarSection = createCalendarSectionHtml(icsData, googleCalendarUrl);
 
     const contentHtml = `
@@ -1486,7 +1484,7 @@ export const sendMenteeBookingConfirmedEmail = async ( // This is the second ver
   console.log(`Attempting to send mentee booking confirmed (v2) to: ${menteeEmail} with subject: "${subject}"`);
   try {
     const formattedDisplayDate = formatDateForDisplay(scheduledDate);
-    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}`;
+    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings`;
     const preheaderText = `Confirmed: Your session with ${mentorName} on ${formattedDisplayDate} at ${startTime}.`;
 
     const sessionDetails = [
@@ -1513,12 +1511,13 @@ export const sendMenteeBookingConfirmedEmail = async ( // This is the second ver
     const importantInfoCardContent = `<h3 style="font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.h3Size}; color: ${theme.palette.primary.dark}; margin-top: 0; margin-bottom: 15px;">Preparing for Your Session:</h3> ${createStyledList(importantInfo)}`;
     const importantInfoCard = createStyledCard(importantInfoCardContent, theme.palette.info.main + '1A');
 
-    // Calendar Integration
+    // Calendar Integration with proper meeting link handling
     const eventStartDate = new Date(`${scheduledDate}T${startTime}`);
     const eventEndDate = new Date(`${scheduledDate}T${endTime}`);
-    const calendarDescription = `Mentorship Session with ${mentorName}\nTopic: ${topic}\n${meetingLink ? `Meeting Link: ${meetingLink}`: 'Meeting link will be provided via dashboard.'}`;
-    const icsData = createIcsContent(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
-    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription);
+    const calendarDescription = `Mentorship Session with ${mentorName}\\nTopic: ${topic}${meetingLink ? `\\nMeeting Link: ${meetingLink}` : '\\nMeeting link will be provided via dashboard.'}`;
+    const calendarLocation = meetingLink ? meetingLink : 'Online - Meeting link will be provided';
+    const icsData = createIcsContent(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription, calendarLocation);
+    const googleCalendarUrl = createGoogleCalendarLink(`Mentorship: ${mentorName} - ${topic}`, eventStartDate, eventEndDate, calendarDescription.replace(/\\n/g, '\n'), calendarLocation);
     const calendarSection = createCalendarSectionHtml(icsData, googleCalendarUrl);
 
     const contentHtml = `

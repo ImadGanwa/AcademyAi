@@ -12,6 +12,7 @@ import {
   sendMentorBookingConfirmedEmail,
   sendMenteeBookingConfirmedEmail
 } from '../utils/email';
+import { createGoogleMeet } from '../utils/googleMeet';
 
 // Helper function to get the Monday of a week for a given date
 const getMondayOfWeek = (date: Date | string): string => {
@@ -195,7 +196,7 @@ export const bookingController = {
       const availabilityId = availabilitySlot.id || 
         `${dayOfWeek}-${startTime}-${endTime}-${availabilitySlot.weekKey || 'recurring'}`;
       
-      // Create the booking
+      // Create the booking with 'pending' status (default) - this immediately reserves the slot
       const booking = new MentorshipBooking({
         mentorId,
         menteeId,
@@ -203,13 +204,14 @@ export const bookingController = {
         duration,
         topic,
         price,
+        status: 'pending', // Explicitly set to pending to reserve the slot immediately
         mentorAvailabilityId: availabilityId, // Store the availability slot ID
         notes: {
           menteeNotes: message || ''
         }
       });
       
-      // Save to database
+      // Save to database - this immediately makes the slot unavailable to others
       await booking.save();
       
       // Populate mentor details for response
@@ -255,7 +257,7 @@ export const bookingController = {
       
       res.status(201).json({
         success: true,
-        message: 'Booking created successfully',
+        message: 'Booking request submitted successfully. The mentor will review your request.',
         booking: {
           id: populatedBooking?._id,
           mentorId: populatedBooking?.mentorId,
@@ -264,8 +266,9 @@ export const bookingController = {
           startTime,
           endTime,
           topic,
+          status: 'pending', // Status is pending until mentor approves
           meetingLink: populatedBooking?.meetingLink,
-          status: populatedBooking?.status
+          message: 'Your booking request has been sent to the mentor for approval. You will receive an email confirmation once the mentor responds.'
         }
       });
     } catch (error: any) {
@@ -765,7 +768,7 @@ export const bookingController = {
 
       const mentorId = req.user._id;
       const bookingId = req.params.id;
-      const { notes, meetingLink } = req.body;
+      const { notes, meetingLink, status } = req.body;
       
       // Validate booking ID
       if (!mongoose.Types.ObjectId.isValid(bookingId)) {
@@ -780,7 +783,8 @@ export const bookingController = {
       const booking = await MentorshipBooking.findOne({
         _id: bookingId,
         mentorId
-      });
+      }).populate('menteeId', 'fullName email profileImage')
+        .populate('mentorId', 'fullName email').exec();
       
       if (!booking) {
         res.status(404).json({
@@ -805,8 +809,88 @@ export const bookingController = {
         updateFields.meetingLink = meetingLink;
       }
       
-      // Only allow updates to active bookings
-      if (booking.status !== 'scheduled') {
+      // Handle status changes
+      if (status !== undefined) {
+        console.log('Status change requested:', { 
+          currentStatus: booking.status, 
+          newStatus: status,
+          bookingId: booking._id 
+        });
+        
+        // Validate status transition
+        if (booking.status === 'pending' && status === 'scheduled') {
+          updateFields.status = 'scheduled';
+          
+          // Auto-create Google Meet link if booking is being scheduled and doesn't have one
+          if (!booking.meetingLink && !meetingLink) {
+            console.log('Attempting to create Google Meet for booking:', booking._id);
+            
+            try {
+              const mentorData = booking.mentorId as any;
+              const menteeData = booking.menteeId as any;
+              
+              console.log('Creating Google Meet for scheduled booking:', {
+                bookingId: booking._id,
+                topic: booking.topic,
+                scheduledAt: booking.scheduledAt,
+                duration: booking.duration,
+                mentorEmail: mentorData.email,
+                menteeEmail: menteeData.email
+              });
+              
+              const meetDetails = await createGoogleMeet({
+                topic: booking.topic,
+                start: new Date(booking.scheduledAt),
+                durationMins: booking.duration,
+                mentorEmail: mentorData.email,
+                menteeEmail: menteeData.email
+              });
+              
+              updateFields.meetingLink = meetDetails.joinUrl;
+              updateFields.googleEventId = meetDetails.id;
+              
+              console.log('Google Meet created successfully for booking:', {
+                bookingId: booking._id,
+                meetingLink: meetDetails.joinUrl,
+                eventId: meetDetails.id
+              });
+              
+            } catch (googleError: any) {
+              console.error('Failed to create Google Meet for booking:', booking._id, googleError);
+              
+              // Return error if Google Meet creation fails
+              res.status(502).json({
+                success: false,
+                error: 'Failed to create meeting link. Please try again or contact support.',
+                details: googleError.message
+              });
+              return;
+            }
+          } else {
+            console.log('Skipping Google Meet creation:', {
+              existingMeetingLink: !!booking.meetingLink,
+              providedMeetingLink: !!meetingLink
+            });
+          }
+        } else if (status !== booking.status) {
+          // For other status changes, validate if they're allowed
+          const validStatuses = ['pending', 'scheduled', 'completed', 'cancelled', 'no-show'];
+          if (validStatuses.includes(status)) {
+            updateFields.status = status;
+            console.log('Status change approved:', { from: booking.status, to: status });
+          } else {
+            console.log('Invalid status change rejected:', { from: booking.status, to: status });
+            res.status(400).json({
+              success: false,
+              error: `Invalid status: ${status}`
+            });
+            return;
+          }
+        }
+      }
+      
+      // Only allow updates to pending or scheduled bookings
+      if (!['pending', 'scheduled'].includes(booking.status)) {
         res.status(400).json({
           success: false,
           error: `Cannot update a booking with status: ${booking.status}`
@@ -823,7 +907,7 @@ export const bookingController = {
         .populate('mentorId', 'fullName email').exec();
       
       // Send email notifications
-      if (meetingLink || (notes?.sharedNotes)) {
+      if (updateFields.status === 'scheduled' || meetingLink || (notes?.sharedNotes)) {
         try {
           const menteeData = updatedBooking?.menteeId as any;
           const mentorData = updatedBooking?.mentorId as any;
@@ -841,8 +925,8 @@ export const bookingController = {
           const endMinute = endDate.getMinutes().toString().padStart(2, '0');
           const endTime = `${endHour}:${endMinute}`;
 
-          // If meeting link was added, send confirmation emails with calendar integration
-          if (meetingLink) {
+          // If booking was scheduled or meeting link was added, send confirmation emails
+          if (updateFields.status === 'scheduled' || meetingLink) {
             // Send confirmation to mentor with calendar
             await sendMentorBookingConfirmedEmail(
               mentorData.email,
@@ -1263,10 +1347,12 @@ export const bookingController = {
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
       
+      // FIXED: Exclude both 'scheduled' AND 'pending' bookings to prevent double bookings
+      // 'cancelled' bookings are not excluded so slots become available again when mentor rejects
       const existingBookings = await MentorshipBooking.find({
         mentorId,
         scheduledAt: { $gte: startOfDay, $lte: endOfDay },
-        status: 'scheduled'
+        status: { $in: ['scheduled', 'pending'] } // Exclude both pending and scheduled bookings
       }).select('scheduledAt duration');
       
       // Build array of available time slots in 30-minute increments

@@ -976,8 +976,7 @@ export const mentorController = {
       }).select(
         'fullName email profileImage mentorProfile.title mentorProfile.bio mentorProfile.hourlyRate ' +
         'mentorProfile.country mentorProfile.skills mentorProfile.languages mentorProfile.professionalInfo ' +
-        'mentorProfile.availability  mentorProfile.mentorRating ' +
-        'mentorProfile.mentorReviewsCount mentorProfile.menteesCount mentorProfile.sessionsCount'
+        'mentorProfile.mentorRating mentorProfile.mentorReviewsCount mentorProfile.menteesCount mentorProfile.sessionsCount'
       );
       
       if (!mentor) {
@@ -1010,7 +1009,6 @@ export const mentorController = {
         country: mentor.mentorProfile?.country,
         skills: mentor.mentorProfile?.skills,
         languages: mentor.mentorProfile?.languages,
-        availability: mentor.mentorProfile?.availability,
         stats: {
           rating: mentor.mentorProfile?.mentorRating,
           reviewsCount: mentor.mentorProfile?.mentorReviewsCount,
