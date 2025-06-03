@@ -905,6 +905,13 @@
       }
     },
     "booking": {
+      "hero": {
+        "title": "My Mentorship Sessions",
+        "description": "Manage your mentorship sessions, view upcoming appointments, and track your learning journey with expert mentors.",
+        "findMentor": "Find a Mentor",
+        "viewBookings": "View Bookings"
+      },
+      "mentor": "Mentor",
       "availableTimeSlots": "Available Time Slots",
       "noAvailableSlots": "No available time slots for this date.",
       "selectedDateTime": "Selected Date & Time:",
@@ -919,7 +926,39 @@
       "description": "Choose a date and time that works for you. Once confirmed, your mentor will receive the request and you'll both get a calendar invite.",
       "duration": "30 min",
       "platform": "Zoom Conference",
-      "at": "at"
+      "at": "at",
+      "loadingBookings": "Loading your bookings...",
+      "noBookingsTitle": "No Bookings Yet",
+      "noBookingsDescription": "It looks like you haven't scheduled any mentorship sessions. Find a mentor to get started!",
+      "findMentor": "Find a Mentor",
+      "viewDetails": "View Details",
+      "joinSession": "Join Session",
+      "sessionDetails": "Session Details",
+      "sessionWith": "Session with",
+      "unknownMentor": "Unknown Mentor",
+      "topic": "Topic",
+      "noTopic": "No topic specified",
+      "minutes": "min",
+      "dateNotSpecified": "Date not specified",
+      "timeNotSpecified": "Time not specified",
+      "invalidDateFormat": "Invalid date",
+      "invalidTimeFormat": "Invalid time",
+      "sessionNotes": "Session Notes",
+      "joinZoomMeeting": "Join Zoom Meeting",
+      "addToCalendar": "Add to Calendar",
+      "close": "Close",
+      "calendarTitle": "Mentorship: {{topic}} with {{mentorName}}",
+      "calendarDetails": "Topic: {{topic}}\nJoin here: {{meetingLink}}",
+      "status": {
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "no-show": "No Show"
+      },
+      "error": {
+        "unexpectedResponse": "Received an unexpected response from the server.",
+        "fetchFailed": "Failed to load bookings. Please check your connection and try again."
+      }
     },
     "confirmation": {
       "bookingConfirmation": "Booking Confirmation",
