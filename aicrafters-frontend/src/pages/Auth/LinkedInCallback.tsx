@@ -14,6 +14,8 @@ export const LinkedInCallback: React.FC = () => {
 
   useEffect(() => {
     const handleLinkedInCallback = async () => {
+      console.log('LinkedIn callback processing started');
+      
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const state = urlParams.get('state');
@@ -21,12 +23,15 @@ export const LinkedInCallback: React.FC = () => {
       const errorDescription = urlParams.get('error_description');
       const savedState = localStorage.getItem('linkedinState');
 
+      console.log('LinkedIn callback params:', { code: !!code, state, errorParam, errorDescription });
+
       // Check for errors from LinkedIn
       if (errorParam || errorDescription) {
         const errorMessage = `LinkedIn login failed: ${errorDescription || errorParam}`;
         setError(errorMessage);
         setTimeout(() => {
           if (window.opener) {
+            console.log('Sending error message to parent');
             window.opener.postMessage({ type: 'linkedin-auth-error', error: errorMessage }, window.location.origin);
             window.close();
           }
@@ -40,6 +45,7 @@ export const LinkedInCallback: React.FC = () => {
         setError(errorMessage);
         setTimeout(() => {
           if (window.opener) {
+            console.log('Sending error message to parent');
             window.opener.postMessage({ type: 'linkedin-auth-error', error: errorMessage }, window.location.origin);
             window.close();
           }
@@ -53,6 +59,7 @@ export const LinkedInCallback: React.FC = () => {
         setError(errorMessage);
         setTimeout(() => {
           if (window.opener) {
+            console.log('Sending error message to parent');
             window.opener.postMessage({ type: 'linkedin-auth-error', error: errorMessage }, window.location.origin);
             window.close();
           }
@@ -61,8 +68,16 @@ export const LinkedInCallback: React.FC = () => {
       }
 
       try {
+        console.log('Processing LinkedIn authentication with code');
         // Process the LinkedIn authentication
         const response = await authService.linkedinLogin(code);
+        
+        console.log('LinkedIn auth response:', { 
+          hasUser: !!response.user, 
+          hasToken: !!response.token,
+          userRole: response.user?.role,
+          userId: response.user?.id 
+        });
         
         if (response.user && response.token) {
           setSuccess(true);
@@ -70,22 +85,47 @@ export const LinkedInCallback: React.FC = () => {
           // Clear LinkedIn state from localStorage
           localStorage.removeItem('linkedinState');
           
-          // Notify the opener window with complete auth data and close
-          setTimeout(() => {
-            if (window.opener) {
-              window.opener.postMessage({ 
-                type: 'linkedin-auth-success',
+          console.log('Preparing to send success message to parent');
+          
+          // Notify the opener window with complete auth data
+          if (window.opener) {
+            const messageData = { 
+              type: 'linkedin-auth-success',
+              user: response.user,
+              token: response.token,
+              authData: {
                 user: response.user,
-                token: response.token,
-                // Include full response for parent to handle authentication
-                authData: {
-                  user: response.user,
-                  token: response.token
-                }
-              }, window.location.origin);
+                token: response.token
+              }
+            };
+            
+            console.log('Sending success message to parent:', messageData);
+            
+            // Send message multiple times to ensure it's received
+            const sendMessage = () => {
+              try {
+                window.opener.postMessage(messageData, window.location.origin);
+                console.log('Message sent to parent window');
+              } catch (error) {
+                console.error('Error sending message to parent:', error);
+              }
+            };
+            
+            // Send immediately
+            sendMessage();
+            
+            // Send again after a short delay
+            setTimeout(sendMessage, 100);
+            setTimeout(sendMessage, 500);
+            
+            // Close after ensuring messages are sent
+            setTimeout(() => {
+              console.log('Closing popup window');
               window.close();
-            }
-          }, 1500);
+            }, 3000);
+          } else {
+            console.error('No window.opener found');
+          }
         } else {
           throw new Error('Invalid response format - missing user or token');
         }
@@ -101,6 +141,7 @@ export const LinkedInCallback: React.FC = () => {
         
         setTimeout(() => {
           if (window.opener) {
+            console.log('Sending error message to parent');
             window.opener.postMessage({ type: 'linkedin-auth-error', error: errorMessage }, window.location.origin);
             window.close();
           }

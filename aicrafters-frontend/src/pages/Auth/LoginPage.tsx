@@ -155,17 +155,30 @@ export const LoginPage: React.FC = () => {
 
     // Add event listener for messages from popup
     const handleAuthMessage = (event: MessageEvent) => {
+      console.log('LoginPage received message:', event.data);
+      
       // Verify origin for security
-      if (event.origin !== window.location.origin) return;
+      if (event.origin !== window.location.origin) {
+        console.log('Message origin mismatch:', event.origin, 'vs', window.location.origin);
+        return;
+      }
       
       if (event.data?.type === 'linkedin-auth-success') {
+        console.log('Processing LinkedIn auth success in parent window');
+        
         // Set authentication state in parent window
         if (event.data.authData) {
+          console.log('Dispatching credentials to Redux store:', event.data.authData);
+          
           // Dispatch credentials to parent window's Redux store
           dispatch(setCredentials({
             user: event.data.authData.user,
             token: event.data.authData.token
           }));
+          
+          console.log('Credentials dispatched, redirecting user');
+        } else {
+          console.error('No authData found in success message');
         }
         
         toast.success(t('auth.linkedinLoginSuccess'));
@@ -173,6 +186,7 @@ export const LoginPage: React.FC = () => {
       }
       
       if (event.data?.type === 'linkedin-auth-error') {
+        console.log('LinkedIn auth error received:', event.data.error);
         toast.error(event.data.error || t('auth.linkedinLoginFailed'));
       }
     };
@@ -288,6 +302,7 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleLinkedInLogin = () => {
+    console.log('LinkedIn login button clicked');
     initiateLinkedInLogin();
   };
 
