@@ -214,6 +214,9 @@ export const Settings: React.FC = () => {
     if (!profileData.name.trim()) {
       newErrors.name = t('mentor.settings.errors.nameRequired', 'Full name is required') as string;
       isValid = false;
+    } else if (profileData.name.length > 100) {
+      newErrors.name = t('mentor.settings.errors.nameTooLong', 'Full name must be 100 characters or less') as string;
+      isValid = false;
     }
     
     if (!profileData.email.trim()) {
@@ -232,6 +235,9 @@ export const Settings: React.FC = () => {
     if (!profileData.bio.trim()) {
       newErrors.bio = t('mentor.settings.errors.bioRequired', 'Bio is required') as string;
       isValid = false;
+    } else if (profileData.bio.length > 500) {
+      newErrors.bio = t('mentor.settings.errors.bioTooLong', 'Bio must be 500 characters or less') as string;
+      isValid = false;
     }
     
     // Fix error with professionalInfo.experience - add null/undefined check before calling trim
@@ -239,10 +245,16 @@ export const Settings: React.FC = () => {
     if (!experience.trim()) {
       newErrors['professionalInfo.experience'] = t('mentor.settings.errors.experienceRequired', 'Professional experience is required') as string;
       isValid = false;
+    } else if (experience.length > 500) {
+      newErrors['professionalInfo.experience'] = t('mentor.settings.errors.experienceTooLong', 'Professional experience must be 500 characters or less') as string;
+      isValid = false;
     }
     
     if (!profileData.professionalInfo.academicBackground.trim()) {
       newErrors['professionalInfo.academicBackground'] = t('mentor.settings.errors.academicBackgroundRequired', 'Academic background is required') as string;
+      isValid = false;
+    } else if (profileData.professionalInfo.academicBackground.length > 500) {
+      newErrors['professionalInfo.academicBackground'] = t('mentor.settings.errors.academicBackgroundTooLong', 'Academic background must be 500 characters or less') as string;
       isValid = false;
     }
     

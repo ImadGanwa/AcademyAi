@@ -415,7 +415,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label={`${t('mentor.settings.professionalExperience', 'Professional Experience') as string} `}
+            label={
+              <>
+                {`${t('mentor.settings.professionalExperience', 'Professional Experience') as string} `}
+                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(0, 0, 0, 0.6)' }}>
+                  ({profileData.professionalInfo.experience.length}/500)
+                </span>
+              </>
+            }
             name="professionalInfo.experience"
             value={profileData.professionalInfo.experience}
             onChange={handleProfileChange}
@@ -423,6 +430,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             multiline
             rows={4}
             placeholder={t('mentor.settings.experiencePlaceholder', 'Describe your professional experience, achievements, and skills') as string}
+            inputProps={{ maxLength: 500 }}
             required
             error={!!formErrors['professionalInfo.experience']}
             helperText={formErrors['professionalInfo.experience']}
@@ -431,7 +439,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label={`${t('mentor.settings.academicBackground', 'Academic Background') as string} `}
+            label={
+              <>
+                {`${t('mentor.settings.academicBackground', 'Academic Background') as string} `}
+                <span style={{ marginLeft: '8px', fontSize: '12px', color: 'rgba(0, 0, 0, 0.6)' }}>
+                  ({profileData.professionalInfo.academicBackground.length}/500)
+                </span>
+              </>
+            }
             name="professionalInfo.academicBackground"
             value={profileData.professionalInfo.academicBackground}
             onChange={handleProfileChange}
@@ -439,6 +454,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             multiline
             rows={4}
             placeholder={t('mentor.settings.academicBackgroundPlaceholder', 'Describe your academic qualifications and background') as string}
+            inputProps={{ maxLength: 500 }}
             required
             error={!!formErrors['professionalInfo.academicBackground']}
             helperText={formErrors['professionalInfo.academicBackground']}

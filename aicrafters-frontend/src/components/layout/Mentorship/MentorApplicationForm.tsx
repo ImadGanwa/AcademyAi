@@ -163,7 +163,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
     bio: '',
     professionalRole: '',
     academicBackground: '',
-    areasOfInterest: ['Digital Marketing', 'Data Science'],
+    areasOfInterest: [] as string[],
     hasInternationalExperience: false,
     desiredDuration: '1h',
     mentorPreferences: {
@@ -259,6 +259,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       if (!formData.fullName.trim()) {
         newErrors.fullName = t('mentor.applicationForm.errors.fullNameRequired', 'Full name is required') as string;
         isValid = false;
+      } else if (formData.fullName.length > 100) {
+        newErrors.fullName = t('mentor.applicationForm.errors.fullNameTooLong', 'Full name must be 100 characters or less') as string;
+        isValid = false;
       }
       
       if (!formData.email.trim()) {
@@ -282,6 +285,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       if (!formData.bio.trim()) {
         newErrors.bio = t('mentor.applicationForm.errors.bioRequired', 'Bio is required') as string;
         isValid = false;
+      } else if (formData.bio.length > 500) {
+        newErrors.bio = t('mentor.applicationForm.errors.bioTooLong', 'Bio must be 500 characters or less') as string;
+        isValid = false;
       }
     }
     
@@ -294,10 +300,16 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
       if (!formData.experience.trim()) {
         newErrors.experience = t('mentor.applicationForm.errors.experienceRequired', 'Professional experience is required') as string;
         isValid = false;
+      } else if (formData.experience.length > 500) {
+        newErrors.experience = t('mentor.applicationForm.errors.experienceTooLong', 'Professional experience must be 500 characters or less') as string;
+        isValid = false;
       }
       
       if (!formData.academicBackground.trim()) {
         newErrors.academicBackground = t('mentor.applicationForm.errors.academicBackgroundRequired', 'Academic background is required') as string;
+        isValid = false;
+      } else if (formData.academicBackground.length > 500) {
+        newErrors.academicBackground = t('mentor.applicationForm.errors.academicBackgroundTooLong', 'Academic background must be 500 characters or less') as string;
         isValid = false;
       }
       
@@ -391,6 +403,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             <FieldLabel>
               {t('mentor.applicationForm.fullName', 'Full Name') as string}
               <span className="required">*</span>
+              <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.palette.text.secondary }}>
+                ({formData.fullName.length}/100 {t('mentor.applicationForm.characters', 'characters') as string})
+              </span>
             </FieldLabel>
             <TextField 
               fullWidth
@@ -402,6 +417,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               required
               error={!!formErrors.fullName}
               helperText={formErrors.fullName}
+              inputProps={{ maxLength: 100 }}
             />
           </FormField>
           
@@ -593,6 +609,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             <FieldLabel>
               {t('mentor.applicationForm.experience', 'Professional Experience') as string}
               <span className="required">*</span>
+              <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.palette.text.secondary }}>
+                ({formData.experience.length}/500 {t('mentor.applicationForm.characters', 'characters') as string})
+              </span>
             </FieldLabel>
             <TextField 
               fullWidth
@@ -606,6 +625,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               required
               error={!!formErrors.experience}
               helperText={formErrors.experience}
+              inputProps={{ maxLength: 500 }}
             />
           </FormField>
           
@@ -613,6 +633,9 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             <FieldLabel>
               {t('mentor.applicationForm.academicBackground', 'Academic Background') as string}
               <span className="required">*</span>
+              <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.palette.text.secondary }}>
+                ({formData.academicBackground.length}/500 {t('mentor.applicationForm.characters', 'characters') as string})
+              </span>
             </FieldLabel>
             <TextField 
               fullWidth
@@ -626,6 +649,7 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               required
               error={!!formErrors.academicBackground}
               helperText={formErrors.academicBackground}
+              inputProps={{ maxLength: 500 }}
             />
           </FormField>
           
