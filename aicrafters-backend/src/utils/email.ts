@@ -1327,15 +1327,14 @@ export const sendMenteeBookingConfirmationEmail = async (
   console.log(`Attempting to send mentee booking request notification to: ${menteeEmail} with subject: "${subject}"`);
   try {
     const formattedDisplayDate = formatDateForDisplay(scheduledDate);
-    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings/${bookingId}`;
-    const preheaderText = `Your session request with ${mentorName} on ${formattedDisplayDate} at ${startTime} has been sent. Price: $${price.toFixed(2)}.`;
+    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings`;
+    const preheaderText = `Your session request with ${mentorName} on ${formattedDisplayDate} at ${startTime} has been sent.`;
 
     const sessionDetails = [
       `<strong>Mentor:</strong> ${mentorName}`,
       `<strong>Topic:</strong> ${topic}`,
       `<strong>Date:</strong> ${formattedDisplayDate}`,
-      `<strong>Time:</strong> ${startTime} - ${endTime}`,
-      `<strong>Price:</strong> $${price.toFixed(2)}`
+      `<strong>Time:</strong> ${startTime} - ${endTime}`
     ];
 
     const sessionDetailsCardContent = sessionDetails.map(detail => `<p style="margin: 0 0 8px 0; font-family: ${theme.typography.fontFamily}; font-size: ${theme.typography.bodySize}; color: ${theme.palette.text.primary}; line-height: 1.6;">${detail}</p>`).join('');

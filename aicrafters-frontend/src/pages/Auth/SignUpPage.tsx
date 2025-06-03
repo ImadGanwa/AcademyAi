@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -19,6 +19,8 @@ import { Layout } from '../../components/layout/Layout/Layout';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { initiateLinkedInLogin } from '../../utils/auth';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../../store/slices/authSlice';
 
 const Container = styled(Box)`
   display: flex;
@@ -146,6 +148,7 @@ export const SignUpPage: React.FC = () => {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -164,103 +167,21 @@ export const SignUpPage: React.FC = () => {
   }>({});
 
   useEffect(() => {
-    // Handle LinkedIn callback
-    const handleLinkedInCallback = async () => {
-
-      // Only process if this is the LinkedIn callback path
-      if (!window.location.pathname.includes('/auth/linkedin/callback')) {
-        return;
-      }
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-      const state = urlParams.get('state');
-      const error = urlParams.get('error');
-      const error_description = urlParams.get('error_description');
-      const savedState = localStorage.getItem('linkedinState');
-
-
-      if (error || error_description) {
-        toast.error(`LinkedIn login failed: ${error_description || error}`);
-        navigate('/signup');
-        return;
-      }
-
-      if (!code) {
-        toast.error('LinkedIn authentication failed - no code received');
-        navigate('/signup');
-        return;
-      }
-
-      if (state !== savedState) {
-       
-        toast.error('Invalid authentication state');
-        navigate('/signup');
-        return;
-      }
-
-      try {
-        setLoading(true);
-        
-        const response = await authService.linkedinLogin(code);
-        
-       
-
-        if (response.user) {
-          let dashboardPath = '/dashboard/user/learning';
-          
-          if (response.user.role === 'admin') {
-            dashboardPath = '/dashboard/admin';
-          } else if (response.user.role === 'trainer') {
-            dashboardPath = '/dashboard/trainer';
-          } else if (response.user.role === 'mentor') {
-            dashboardPath = '/dashboard/mentor';
-          }
-
-          const lang = location.pathname.split('/')[1] || 'en';
-          const targetPath = `/${lang}${dashboardPath}`;
-          toast.success('LinkedIn login successful');
-          navigate(targetPath);
-          return;
-        }
-      } catch (error: any) {
-        console.error('LinkedIn Authentication Error:', {
-          message: error.message,
-          response: {
-            data: error.response?.data,
-            status: error.response?.status,
-            statusText: error.response?.statusText,
-            headers: error.response?.headers
-          },
-          request: {
-            url: error.config?.url,
-            method: error.config?.method,
-            data: error.config?.data,
-            headers: error.config?.headers
-          }
-        });
-        toast.error('LinkedIn login failed. Please try again.');
-        navigate('/signup');
-        return;
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    handleLinkedInCallback().catch(error => {
-      console.error('Unhandled LinkedIn callback error:', error);
-      toast.error('An unexpected error occurred');
-      navigate('/signup');
-    });
-  }, [location, navigate]);
-
-  useEffect(() => {
     // Add event listener for messages from popup
     const handleAuthMessage = (event: MessageEvent) => {
       // Verify origin for security
       if (event.origin !== window.location.origin) return;
       
       if (event.data?.type === 'linkedin-auth-success') {
+        // Set authentication state in parent window
+        if (event.data.authData) {
+          // Dispatch credentials to parent window's Redux store
+          dispatch(setCredentials({
+            user: event.data.authData.user,
+            token: event.data.authData.token
+          }));
+        }
+        
         toast.success(t('auth.linkedinSignupSuccess', 'Successfully signed up with LinkedIn'));
         
         // Determine dashboard path based on user role
@@ -295,7 +216,7 @@ export const SignUpPage: React.FC = () => {
     return () => {
       window.removeEventListener('message', handleAuthMessage);
     };
-  }, [navigate, location.pathname, t]);
+  }, [navigate, location.pathname, t, dispatch]);
 
   const handleRecaptchaChange = (token: string | null) => {
     setFormData(prev => ({ ...prev, recaptchaToken: token || '' }));

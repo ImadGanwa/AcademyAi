@@ -20,6 +20,7 @@ import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import {useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { initiateLinkedInLogin } from '../../utils/auth';
+import { setCredentials } from '../../store/slices/authSlice';
 // import { LinkedIn } from 'react-linkedin-login-oauth2';
 
 const Container = styled(Box)`
@@ -136,7 +137,7 @@ export const LoginPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useLocalizedNavigate();
   const location = useLocation();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -145,14 +146,8 @@ export const LoginPage: React.FC = () => {
   const [openOrgInfo, setOpenOrgInfo] = useState(false);
 
   useEffect(() => {
-    // Handle LinkedIn OAuth callback
-    const urlParams = new URLSearchParams(location.search);
-    const code = urlParams.get('code');
-    if (code) {
-      handleLinkedInCallback(code);
-    }
-    
     // Check for expired token notification
+    const urlParams = new URLSearchParams(location.search);
     const expired = urlParams.get('expired');
     if (expired === 'true') {
       toast.warning(t('auth.sessionExpired', 'Your session has expired. Please log in again.') as string);
@@ -164,6 +159,15 @@ export const LoginPage: React.FC = () => {
       if (event.origin !== window.location.origin) return;
       
       if (event.data?.type === 'linkedin-auth-success') {
+        // Set authentication state in parent window
+        if (event.data.authData) {
+          // Dispatch credentials to parent window's Redux store
+          dispatch(setCredentials({
+            user: event.data.authData.user,
+            token: event.data.authData.token
+          }));
+        }
+        
         toast.success(t('auth.linkedinLoginSuccess'));
         redirectAfterLogin(event.data.user);
       }
@@ -179,7 +183,7 @@ export const LoginPage: React.FC = () => {
     return () => {
       window.removeEventListener('message', handleAuthMessage);
     };
-  }, [location]);
+  }, [location, dispatch, t]);
 
   const redirectAfterLogin = (user: any) => {
     // Check if there's a mentor booking redirect
@@ -281,23 +285,6 @@ export const LoginPage: React.FC = () => {
   const handleGoogleError = () => {
     console.error('Google login failed');
     toast.error(t('auth.googleLoginFailed'));
-  };
-
-  const handleLinkedInCallback = async (code: string) => {
-    try {
-      setIsLoading(true);
-      
-      const response = await authService.linkedinLogin(code);
-      
-      if (response.user) {
-        toast.success(t('auth.linkedinLoginSuccess'));
-        redirectAfterLogin(response.user);
-      }
-    } catch (error) {
-      toast.error(t('auth.linkedinLoginFailed'));
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleLinkedInLogin = () => {

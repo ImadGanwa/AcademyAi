@@ -64,19 +64,30 @@ export const LinkedInCallback: React.FC = () => {
         // Process the LinkedIn authentication
         const response = await authService.linkedinLogin(code);
         
-        if (response.user) {
+        if (response.user && response.token) {
           setSuccess(true);
           
-          // Notify the opener window and close
+          // Clear LinkedIn state from localStorage
+          localStorage.removeItem('linkedinState');
+          
+          // Notify the opener window with complete auth data and close
           setTimeout(() => {
             if (window.opener) {
               window.opener.postMessage({ 
                 type: 'linkedin-auth-success',
-                user: response.user
+                user: response.user,
+                token: response.token,
+                // Include full response for parent to handle authentication
+                authData: {
+                  user: response.user,
+                  token: response.token
+                }
               }, window.location.origin);
               window.close();
             }
           }, 1500);
+        } else {
+          throw new Error('Invalid response format - missing user or token');
         }
       } catch (error: any) {
         console.error('LinkedIn Authentication Error:', {
