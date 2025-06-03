@@ -34,6 +34,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import VideocamIcon from '@mui/icons-material/Videocam';
+import InfoIcon from '@mui/icons-material/Info';
 import { getMentorBookings, updateBooking, cancelMentorBooking } from '../../../../api/booking';
 import { useTranslation } from 'react-i18next';
 
@@ -248,6 +249,8 @@ interface Mentee {
   status: 'pending' | 'accepted' | 'rejected';
   topic?: string;
   bookingId?: string;
+  originalScheduledAt?: string;
+  originalDuration?: number;
 }
 
 // Utility function to generate a placeholder avatar with the first letter of the name
@@ -262,6 +265,7 @@ export const Mentees: React.FC = () => {
   const [openScheduleDialog, setOpenScheduleDialog] = useState(false);
   const [openRescheduleDialog, setOpenRescheduleDialog] = useState(false);
   const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
+  const [openMeetingDetailsDialog, setOpenMeetingDetailsDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [duration, setDuration] = useState('60');
@@ -279,6 +283,7 @@ export const Mentees: React.FC = () => {
   const [linkCopied, setLinkCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [meetingDetailsData, setMeetingDetailsData] = useState<any>(null);
 
   // Updated state for real mentees/bookings data
   const [allMentees, setAllMentees] = useState<Mentee[]>([]);
@@ -342,7 +347,9 @@ export const Mentees: React.FC = () => {
         sessionTime: `${formattedTime} / ${formattedDate}`,
         status: status,
         topic: booking.topic,
-        bookingId: booking._id
+        bookingId: booking._id,
+        originalScheduledAt: booking.scheduledAt,
+        originalDuration: booking.duration
       };
     };
     
@@ -406,9 +413,8 @@ export const Mentees: React.FC = () => {
     let formattedTime = '';
     if (selectedTime) {
       const [hours, minutes] = selectedTime.split(':');
-      const startTime = new Date();
-      startTime.setHours(parseInt(hours));
-      startTime.setMinutes(parseInt(minutes));
+      // Use the selected date instead of creating a new Date without context
+      const startTime = new Date(selectedDate + 'T' + selectedTime + ':00');
       
       const endTime = new Date(startTime);
       endTime.setMinutes(endTime.getMinutes() + parseInt(duration));
@@ -532,12 +538,23 @@ export const Mentees: React.FC = () => {
     try {
       setSelectedMentee(mentee);
       
-      // Generate a default date and time for scheduling
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-      setSelectedDate(formattedDate);
-      setSelectedTime('10:00');
-      setDuration('30');
+      // Use the actual booking data instead of defaults
+      if (mentee.originalScheduledAt) {
+        const bookingDate = new Date(mentee.originalScheduledAt);
+        const formattedDate = bookingDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const formattedTime = bookingDate.toTimeString().slice(0, 5); // HH:MM format
+        
+        setSelectedDate(formattedDate);
+        setSelectedTime(formattedTime);
+        setDuration((mentee.originalDuration || 30).toString());
+      } else {
+        // Fallback to defaults if original data is not available
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        setSelectedDate(formattedDate);
+        setSelectedTime('10:00');
+        setDuration('30');
+      }
       
       // Open the scheduling dialog to set meeting details
       setOpenScheduleDialog(true);
@@ -585,6 +602,58 @@ export const Mentees: React.FC = () => {
         alert(t('mentorship.mentees.error.updateLinkFailed', 'Failed to update meeting link. Please try again.') as string);
       }
     }
+  };
+
+  const handleViewMeetingDetails = async (mentee: Mentee) => {
+    try {
+      setSelectedMentee(mentee);
+      
+      // Fetch the latest booking details to get meeting link
+      const response = await getMentorBookings('scheduled');
+      if (response.success && response.data.bookings) {
+        const booking = response.data.bookings.find((b: any) => b._id === mentee.bookingId);
+        if (booking) {
+          const scheduledDate = new Date(booking.scheduledAt);
+          const endDate = new Date(scheduledDate.getTime() + (booking.duration * 60000));
+          
+          setMeetingDetailsData({
+            menteeName: booking.menteeId.fullName,
+            menteeEmail: booking.menteeId.email,
+            topic: booking.topic,
+            scheduledDate: scheduledDate.toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric'
+            }),
+            startTime: scheduledDate.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            }),
+            endTime: endDate.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            }),
+            duration: booking.duration,
+            meetingLink: booking.meetingLink || 'Meeting link not available',
+            status: booking.status,
+            notes: booking.notes?.mentorNotes || 'No notes available'
+          });
+          
+          setOpenMeetingDetailsDialog(true);
+        }
+      }
+    } catch (err: any) {
+      console.error('Error fetching meeting details:', err);
+      alert('Failed to load meeting details. Please try again.');
+    }
+  };
+
+  const handleCloseMeetingDetails = () => {
+    setOpenMeetingDetailsDialog(false);
+    setMeetingDetailsData(null);
   };
 
   return (
@@ -661,6 +730,14 @@ export const Mentees: React.FC = () => {
                     {t('common.accept', 'Accept') as string}
                   </AcceptButton>
                 </>
+              )}
+              {mentee.status === 'accepted' && (
+                <MessageButton
+                  onClick={() => handleViewMeetingDetails(mentee)}
+                  startIcon={<InfoIcon />}
+                >
+                  {t('mentorship.mentees.button.viewDetails', 'View Details') as string}
+                </MessageButton>
               )}
               <MessageButton
                 onClick={() => handleMessage(mentee)}
@@ -986,6 +1063,119 @@ export const Mentees: React.FC = () => {
           </ConfirmButton>
         </SessionConfirmedContent>
       </SessionConfirmedDialog>
+
+      {/* Meeting Details Dialog */}
+      <Dialog open={openMeetingDetailsDialog} onClose={handleCloseMeetingDetails} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {t('mentorship.mentees.dialog.meetingDetailsTitle', 'Meeting Details') as string}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseMeetingDetails}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {meetingDetailsData && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle1" sx={{ mb: 3 }}>
+                {t('mentorship.mentees.dialog.meetingDetails', 'Meeting Details') as string}
+              </Typography>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.menteeNameLabel', 'Mentee Name:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.menteeName}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.menteeEmailLabel', 'Mentee Email:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.menteeEmail}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.topicLabel', 'Topic:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.topic}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.scheduledDateLabel', 'Scheduled Date:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.scheduledDate}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.startTimeLabel', 'Start Time:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.startTime}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.endTimeLabel', 'End Time:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.endTime}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.durationLabel', 'Duration:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.duration} minutes</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.meetingLinkLabel', 'Meeting Link:') as string}</SessionDetailLabel>
+                <SessionDetailValue>
+                  {meetingDetailsData.meetingLink !== 'Meeting link not available' ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography 
+                        component="a" 
+                        href={meetingDetailsData.meetingLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        sx={{ 
+                          color: theme.palette.primary.main, 
+                          textDecoration: 'underline',
+                          maxWidth: '200px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {meetingDetailsData.meetingLink}
+                      </Typography>
+                      <Tooltip title={linkCopied ? 'Copied!' : 'Copy Link'} placement="top">
+                        <IconButton 
+                          size="small" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(meetingDetailsData.meetingLink);
+                            setLinkCopied(true);
+                            setTimeout(() => setLinkCopied(false), 2000);
+                          }}
+                        >
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+                  ) : (
+                    meetingDetailsData.meetingLink
+                  )}
+                </SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.statusLabel', 'Status:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.status}</SessionDetailValue>
+              </SessionDetailItem>
+              
+              <SessionDetailItem>
+                <SessionDetailLabel>{t('mentorship.mentees.dialog.notesLabel', 'Notes:') as string}</SessionDetailLabel>
+                <SessionDetailValue>{meetingDetailsData.notes}</SessionDetailValue>
+              </SessionDetailItem>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }; 
