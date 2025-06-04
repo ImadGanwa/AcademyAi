@@ -591,6 +591,8 @@
       "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
       "passwordLength": "Le mot de passe doit comporter entre 8 et 40 caractères",
       "passwordMustContainAtLeastOneNumber": "Le mot de passe doit contenir au moins un chiffre",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Le mot de passe doit contenir des lettres minuscules et majuscules",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Le mot de passe doit contenir au moins un caractère spécial",
       "failedToUpdatePassword": "Échec de la mise à jour du mot de passe",
       "currentPasswordIncorrect": "Le mot de passe actuel est incorrect"
     },

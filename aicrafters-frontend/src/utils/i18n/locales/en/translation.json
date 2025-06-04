@@ -591,6 +591,8 @@
       "passwordsDoNotMatch": "Passwords do not match",
       "passwordLength": "Password must be between 8 and 40 characters",
       "passwordMustContainAtLeastOneNumber": "Password must contain at least one number",
+      "passwordMustContainAtLeastOneSpecialCharacter": "Password must contain at least one special character",
+      "passwordMustContainBothLowercaseAndUppercaseLetters": "Password must contain both lowercase and uppercase letters",
       "failedToUpdatePassword": "Failed to update password",
       "currentPasswordIncorrect": "Current password is incorrect"
     },
