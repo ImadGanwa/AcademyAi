@@ -106,6 +106,6 @@ router.post('/messages/:menteeId', authMiddleware, isMentor, mentorController.se
  * @desc    Get complete mentor profile by ID (includes experience and academic background)
  * @access  Private (requires authentication)
  */
-router.get('/:mentorId', authMiddleware, mentorController.getCompleteMentorProfile);
+router.get('/private/:mentorId', authMiddleware, mentorController.getCompleteMentorProfile);
 
 export default router; 
