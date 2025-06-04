@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Box, Container, Typography } from '@mui/material';
-import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import PersonIcon from '@mui/icons-material/Person';
@@ -34,7 +33,7 @@ const HeroContent = styled(Box)`
   margin: 0 auto;
 `;
 
-const MainTitle = styled(motion.h1)`
+const MainTitle = styled.h1`
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 24px;
@@ -53,7 +52,7 @@ const MainTitle = styled(motion.h1)`
   }
 `;
 
-const SubTitle = styled(motion.p)`
+const SubTitle = styled.p`
   font-size: 1.25rem;
   color: rgba(255, 255, 255, 0.9);
   line-height: 1.6;
@@ -77,7 +76,7 @@ const MentorNameHighlight = styled.span`
   font-weight: 600;
 `;
 
-const IconsContainer = styled(motion.div)`
+const IconsContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 40px;
@@ -188,11 +187,7 @@ export const BookingSessionHero: React.FC<BookingSessionHeroProps> = ({ mentorNa
       
       <HeroContainer maxWidth="lg">
         <HeroContent>
-          <MainTitle
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <MainTitle>
             {mentorName ? (
               <>
                 Book Your Session with{' '}
@@ -203,25 +198,17 @@ export const BookingSessionHero: React.FC<BookingSessionHeroProps> = ({ mentorNa
             )}
           </MainTitle>
 
-          <SubTitle
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          <SubTitle>
             {getDescription()}
           </SubTitle>
 
-          <IconsContainer
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
+          <IconsContainer>
             <IconBox>
               <Box className="icon">
                 <CalendarTodayIcon />
               </Box>
               <IconLabel>
-                {t('mentor.booking.session.selectDate', { defaultValue: 'Select Date & Time' })}
+                {(t('mentor.booking.session.selectDate', { defaultValue: 'Select Date & Time' }) as string)}
               </IconLabel>
             </IconBox>
 
@@ -230,7 +217,7 @@ export const BookingSessionHero: React.FC<BookingSessionHeroProps> = ({ mentorNa
                 <PersonIcon />
               </Box>
               <IconLabel>
-                {t('mentor.booking.session.expertGuidance', { defaultValue: 'Expert Guidance' })}
+                {(t('mentor.booking.session.expertGuidance', { defaultValue: 'Expert Guidance' }) as string)}
               </IconLabel>
             </IconBox>
           </IconsContainer>
