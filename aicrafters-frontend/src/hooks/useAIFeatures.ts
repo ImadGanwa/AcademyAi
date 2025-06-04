@@ -29,6 +29,9 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
 
+  // Track the current course to detect course changes
+  const currentCourseId = useRef<string>(courseId);
+
   // Transcript state
   const [transcript, setTranscript] = useState<string>('');
   const [transcriptLoading, setTranscriptLoading] = useState(false);
@@ -68,6 +71,21 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
 
   const MAX_RETRY_ATTEMPTS = 3; // Maximum number of retry attempts
 
+  // Handle course changes - clear chat state when course changes
+  useEffect(() => {
+    if (currentCourseId.current !== courseId) {
+      console.log(`Course changed from ${currentCourseId.current} to ${courseId} - clearing chat state`);
+      
+      // Clear chat state for course switch
+      setMessages([]);
+      setThreadId(undefined);
+      setChatError(null);
+      
+      // Update the current course reference
+      currentCourseId.current = courseId;
+    }
+  }, [courseId]);
+
   // Check if we have a cached mind map for this video when video URL changes
   useEffect(() => {
     const cacheKey = `${courseId}:${videoUrl}`;
@@ -87,7 +105,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     }
   }, [courseId, videoUrl]);
 
-  // Reset transcript and summaries state when video URL changes
+  // Reset transcript and summaries state when video URL changes (but not chat for same course)
   useEffect(() => {
     // Don't clear chat history or mind map, only other features
     setTranscript('');
@@ -101,7 +119,7 @@ export const useAIFeatures = ({ courseId, videoUrl }: UseAIFeaturesProps) => {
     setTranscriptError(null);
     setSummariesError(null);
     setMindMapError(null);
-    setChatError(null);
+    // Note: Don't clear chatError here as it should persist within the same course
     
     // Reset retry tracking
     setHasFailedTranscriptFetch(false);

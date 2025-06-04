@@ -7,8 +7,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Store conversation threads by user
-const threadsByUser = new Map<string, string>();
+// Store conversation threads by user and course combination
+const threadsByUserAndCourse = new Map<string, string>();
 
 interface ChatResponse {
   response: string;
@@ -29,24 +29,53 @@ function isTextContent(content: any): content is TextContentBlock {
 }
 
 /**
- * Get or create a conversation thread for a user
+ * Generate a unique key for thread identification
  */
-async function getOrCreateThreadForUser(userId: string, context?: string): Promise<string> {
-  if (!threadsByUser.has(userId)) {
+function generateThreadKey(userId: string, courseId: string): string {
+  return `${userId}:${courseId}`;
+}
+
+/**
+ * Get or create a conversation thread for a user and course combination
+ */
+async function getOrCreateThreadForUserAndCourse(
+  userId: string, 
+  courseId: string, 
+  context?: string
+): Promise<string> {
+  const threadKey = generateThreadKey(userId, courseId);
+  
+  if (!threadsByUserAndCourse.has(threadKey)) {
     const thread = await openai.beta.threads.create();
-    threadsByUser.set(userId, thread.id);
+    threadsByUserAndCourse.set(threadKey, thread.id);
     
-    // Add context as a user message if provided
+    // Add initial context as a user message if provided
     if (context) {
       await openai.beta.threads.messages.create(thread.id, {
         role: "user",
-        content: context
+        content: `Context for this course conversation:\n${context}`
       });
     }
     
     return thread.id;
   }
-  return threadsByUser.get(userId)!;
+  
+  return threadsByUserAndCourse.get(threadKey)!;
+}
+
+/**
+ * Add video context to an existing thread when switching videos within the same course
+ */
+async function addVideoContextToThread(
+  threadId: string, 
+  videoContext: string
+): Promise<void> {
+  if (videoContext.trim()) {
+    await openai.beta.threads.messages.create(threadId, {
+      role: "user", 
+      content: `New video context (video changed within course):\n${videoContext}`
+    });
+  }
 }
 
 /**
@@ -62,7 +91,7 @@ async function buildContext(courseId: mongoose.Types.ObjectId, videoUrl: string)
     return "No transcription data available for this video.";
   }
 
-  let context = "Context about the video:\n";
+  let context = "Context about the current video:\n";
 
   // Add video transcription if available
   if (transcriptionData.transcription) {
@@ -88,6 +117,11 @@ async function buildContext(courseId: mongoose.Types.ObjectId, videoUrl: string)
 }
 
 /**
+ * Track the last video URL for each thread to detect video changes
+ */
+const lastVideoByThread = new Map<string, string>();
+
+/**
  * Chat with the trainer coach
  */
 export async function chatWithTrainer(
@@ -101,11 +135,25 @@ export async function chatWithTrainer(
     // Convert courseId to ObjectId
     const courseObjectId = new mongoose.Types.ObjectId(courseId);
     
-    // Build context
-    const context = await buildContext(courseObjectId, videoUrl);
+    // Build context for current video
+    const currentVideoContext = await buildContext(courseObjectId, videoUrl);
     
-    // Get or create a thread for this user
-    const actualThreadId = threadId || await getOrCreateThreadForUser(userId, context);
+    // Get or create a thread for this user and course combination
+    const actualThreadId = threadId || await getOrCreateThreadForUserAndCourse(
+      userId, 
+      courseId, 
+      currentVideoContext
+    );
+    
+    // Check if we've switched videos within the same course
+    const lastVideoUrl = lastVideoByThread.get(actualThreadId);
+    if (lastVideoUrl && lastVideoUrl !== videoUrl) {
+      // Video changed within the same course - add new video context
+      await addVideoContextToThread(actualThreadId, currentVideoContext);
+    }
+    
+    // Update the last video URL for this thread
+    lastVideoByThread.set(actualThreadId, videoUrl);
     
     // Add the user message to the thread
     await openai.beta.threads.messages.create(actualThreadId, {
@@ -149,4 +197,24 @@ export async function chatWithTrainer(
     console.error("Error in chatWithTrainer:", error);
     throw new Error(`Failed to chat with trainer: ${error.message}`);
   }
+}
+
+/**
+ * Clear thread data for a specific user and course (useful for testing or manual cleanup)
+ */
+export function clearThreadForUserAndCourse(userId: string, courseId: string): void {
+  const threadKey = generateThreadKey(userId, courseId);
+  const threadId = threadsByUserAndCourse.get(threadKey);
+  
+  if (threadId) {
+    threadsByUserAndCourse.delete(threadKey);
+    lastVideoByThread.delete(threadId);
+  }
+}
+
+/**
+ * Get all active threads (useful for monitoring)
+ */
+export function getActiveThreadsCount(): number {
+  return threadsByUserAndCourse.size;
 } 
