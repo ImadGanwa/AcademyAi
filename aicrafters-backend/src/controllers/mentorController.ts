@@ -1042,7 +1042,7 @@ export const mentorController = {
 
   /**
    * Get complete mentor profile by ID (includes experience and academic background)
-   * @route GET /api/mentor/:mentorId
+   * @route GET /api/mentor/private/:mentorId
    */
   getCompleteMentorProfile: async (req: Request, res: Response): Promise<void> => {
     try {

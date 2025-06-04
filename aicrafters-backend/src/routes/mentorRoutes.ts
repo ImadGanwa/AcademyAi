@@ -46,13 +46,6 @@ router.get('/public/mentors', mentorController.getPublicMentorList);
 router.get('/public/:mentorId', mentorController.getPublicMentorProfile);
 
 /**
- * @route   GET /api/mentor/:mentorId
- * @desc    Get complete mentor profile by ID (includes experience and academic background)
- * @access  Private (requires authentication)
- */
-router.get('/:mentorId', authMiddleware, mentorController.getCompleteMentorProfile);
-
-/**
  * @route   POST /api/mentor/apply
  * @desc    Apply to become a mentor
  * @access  Public
@@ -107,5 +100,12 @@ router.get('/messages/:menteeId', authMiddleware, isMentor, mentorController.get
  * @access  Private (requires mentor authentication)
  */
 router.post('/messages/:menteeId', authMiddleware, isMentor, mentorController.sendMenteeMessage);
+
+/**
+ * @route   GET /api/mentor/private/:mentorId
+ * @desc    Get complete mentor profile by ID (includes experience and academic background)
+ * @access  Private (requires authentication)
+ */
+router.get('/:mentorId', authMiddleware, mentorController.getCompleteMentorProfile);
 
 export default router; 

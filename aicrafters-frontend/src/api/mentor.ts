@@ -85,7 +85,7 @@ export const getPublicMentorProfile = async (mentorId: string) => {
 export const getCompleteMentorProfile = async (mentorId: string) => {
   try {
     console.log('getCompleteMentorProfile API call for mentorId:', mentorId);
-    const response = await axiosInstance.get(`/api/mentor/${mentorId}`);
+    const response = await axiosInstance.get(`/api/mentor/private/${mentorId}`);
     console.log('getCompleteMentorProfile API response:', response.data);
     return response.data;
   } catch (error: any) {
