@@ -19,7 +19,7 @@ import { resetRefreshCount } from '../../../hooks/useAIMentorFeatures';
 const fadeIn = keyframes` from { opacity: 0; } to { opacity: 1; }`;
 const slideUp = keyframes` from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; }`;
 
-// Floating button wrapper
+// Floating button wrapper with mobile responsiveness
 const FloatingButtonWrapper = styled(Box)<{ isVisible: boolean }>`
   position: fixed;
   bottom: 24px;
@@ -32,6 +32,12 @@ const FloatingButtonWrapper = styled(Box)<{ isVisible: boolean }>`
   
   &:hover {
     transform: ${props => props.isVisible ? 'translateY(-2px)' : 'translateY(20px)'};
+  }
+
+  /* Mobile responsiveness - keep button on right side */
+  @media (max-width: 768px) {
+    right: 16px;
+    bottom: 20px;
   }
 `;
 
@@ -93,6 +99,11 @@ const ExpandButtonContainer = styled(Box)`
   top: 8px;
   right: 48px; 
   z-index: 10;
+
+  /* Hide expand button on mobile */
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ExpandButton = styled(IconButton)`
@@ -148,6 +159,34 @@ const UniversalChatWrapper = styled(Box)<{ isOpen: boolean; isExpanded: boolean 
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
           }
         `)}
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    /* On mobile, ignore expand state and use full screen approach */
+    width: 95vw !important;
+    height: 85vh !important;
+    max-width: 500px;
+    max-height: 700px;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    border-radius: 16px;
+    
+    ${props =>
+      props.isOpen &&
+      css`
+        animation: ${fadeIn} 0.3s forwards;
+      `}
+  }
+
+  /* Very small mobile screens */
+  @media (max-width: 480px) {
+    width: 98vw !important;
+    height: 90vh !important;
+    border-radius: 12px;
+  }
 `;
 
 interface MentorChatInterfaceProps {

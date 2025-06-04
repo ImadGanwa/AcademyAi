@@ -115,6 +115,17 @@ const ChatBody = styled(Box)`
   &::-webkit-scrollbar-thumb:hover {
     background: #888;
   }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    padding: 12px;
+    gap: 12px;
+    
+    /* Hide scrollbar on mobile for cleaner look */
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+  }
 `;
 
 const ChatInputContainer = styled(Box)`
@@ -125,6 +136,13 @@ const ChatInputContainer = styled(Box)`
   border-top: 1px solid #e0e0e0;
   flex-shrink: 0;
   box-shadow: 0 -1px 2px rgba(0,0,0,0.03);
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    padding: 12px;
+    background-color: #ffffff;
+    border-top: 2px solid #f0f0f0;
+  }
 `;
 
 const StyledTextField = styled(TextField)`
@@ -152,6 +170,14 @@ const StyledTextField = styled(TextField)`
   
   .MuiInputBase-input {
     padding: 12px 16px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .MuiInputBase-input {
+      padding: 10px 14px;
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
   }
 `;
 
@@ -186,6 +212,14 @@ const MessageBubble = styled(Box)<{ isUser: boolean }>`
       ? 'polygon(0 0, 0% 100%, 100% 100%)' 
       : 'polygon(100% 0, 0% 100%, 100% 100%)'};
     display: ${props => props.isUser ? 'none' : 'none'}; /* Disabled for now, enable if desired */
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    max-width: 90%;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 `;
 
@@ -223,6 +257,18 @@ const SuggestionButton = styled(Button)`
   }
   
   animation: ${css`${fadeIn} 0.4s ease forwards`};
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    margin: 3px;
+    font-size: 0.8rem;
+    
+    /* Reduce hover effects on mobile */
+    &:hover {
+      transform: none;
+    }
+  }
 `;
 
 const WelcomeContainer = styled(Box)`
@@ -313,6 +359,18 @@ const SendButton = styled(IconButton)`
   &:disabled {
     background: #e0e0e0;
     color: #9e9e9e;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    margin-left: 6px;
+    
+    /* Reduce hover effects on mobile */
+    &:hover {
+      transform: translateY(-1px);
+    }
   }
 `;
 

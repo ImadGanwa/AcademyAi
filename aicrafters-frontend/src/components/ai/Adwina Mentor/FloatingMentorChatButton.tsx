@@ -67,6 +67,22 @@ const StyledIconButton = styled(IconButton)<{ $pulsing: boolean }>`
   &:hover img {
     transform: scale(1.1);
   }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    width: 56px;
+    height: 56px;
+    
+    img {
+      width: 28px;
+      height: 28px;
+    }
+    
+    /* Reduce hover effects on mobile */
+    &:hover {
+      transform: scale(1.05) translateY(-1px);
+    }
+  }
 `;
 
 interface FloatingMentorChatButtonProps {
@@ -82,6 +98,9 @@ const FloatingMentorChatButton: React.FC<FloatingMentorChatButtonProps> = ({ onC
       placement="left"
       TransitionComponent={Zoom}
       arrow
+      // Hide tooltip on mobile/touch devices
+      disableHoverListener={window.innerWidth <= 768}
+      disableTouchListener={true}
     >
       <StyledIconButton
         onClick={onClick}

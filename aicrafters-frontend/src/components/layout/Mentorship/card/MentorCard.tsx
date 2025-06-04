@@ -30,6 +30,13 @@ export interface MentorStats {
   sessionsCount: number;
 }
 
+export interface MentorProfessionalInfo {
+  role?: string;
+  linkedIn?: string;
+  experience?: string;
+  academicBackground?: string;
+}
+
 export interface Mentor {
   id: string;
   fullName: string; // Changed from name to fullName to match API
@@ -40,6 +47,7 @@ export interface Mentor {
   country?: string; // Add country field from database
   skills: MentorSkill[];
   languages: MentorLanguage[];
+  professionalInfo?: MentorProfessionalInfo; // Added professional info
   stats?: MentorStats; // Added from API response
   isVerified?: boolean; // Made optional as it might not be in API
   countryFlag?: string; // Keep for backward compatibility but will be deprecated

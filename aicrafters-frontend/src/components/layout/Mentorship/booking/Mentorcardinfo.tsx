@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import styled from 'styled-components';
 import { VerifiedUser as VerifiedIcon } from '@mui/icons-material';
 import { Mentor } from '../card/MentorCard';
@@ -168,6 +168,56 @@ const VerifiedBadge = styled(VerifiedIcon)`
   font-size: 18px; /* Adjusted size */
 `;
 
+// See More/Less button
+const SeeMoreButton = styled(Button)`
+  && {
+    color: ${props => props.theme.palette.primary.main};
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 0;
+    text-transform: none;
+    justify-content: flex-start;
+    min-width: auto;
+    
+    &:hover {
+      background: none;
+      text-decoration: underline;
+      color: ${props => props.theme.palette.primary.dark};
+    }
+  }
+`;
+
+// Collapsible text component
+interface CollapsibleTextProps {
+  text: string;
+  maxLength?: number;
+}
+
+const CollapsibleText: React.FC<CollapsibleTextProps> = ({ text, maxLength = 300 }) => {
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const { t } = useTranslation();
+
+  if (text.length <= maxLength) {
+    return <AboutText>{text}</AboutText>;
+  }
+
+  const truncatedText = text.substring(0, maxLength) + '...';
+
+  return (
+    <Box>
+      <AboutText>
+        {isExpanded ? text : truncatedText}
+      </AboutText>
+      <SeeMoreButton onClick={() => setIsExpanded(!isExpanded)}>
+        {isExpanded 
+          ? t('mentorship.seeLess', { defaultValue: 'See less' })
+          : t('mentorship.seeMore', { defaultValue: 'See more' })
+        }
+      </SeeMoreButton>
+    </Box>
+  );
+};
+
 // --- PROPS INTERFACE ---
 interface MentorHeaderInfoProps {
   mentor: Mentor;
@@ -209,6 +259,20 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
           <>
             <SectionTitle>{t('mentorship.aboutMe', { defaultValue: 'About Me' }) as string}</SectionTitle>
             <AboutText>{t(`bios.${mentor.id}`, { defaultValue: mentor.bio }) as string}</AboutText>
+          </>
+        )}
+
+        {mentor.professionalInfo?.experience && (
+          <>
+            <SectionTitle>{t('mentorship.experience', { defaultValue: 'Experience' }) as string}</SectionTitle>
+            <CollapsibleText text={mentor.professionalInfo.experience} />
+          </>
+        )}
+
+        {mentor.professionalInfo?.academicBackground && (
+          <>
+            <SectionTitle>{t('mentorship.academicBackground', { defaultValue: 'Academic Background' }) as string}</SectionTitle>
+            <CollapsibleText text={mentor.professionalInfo.academicBackground} />
           </>
         )}
         

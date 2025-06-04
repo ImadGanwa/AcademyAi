@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { IconButton, Tooltip } from '@mui/material';
-import ChatIcon from '@mui/icons-material/Chat';
+import AdwinaImage from '../../assets/images/adwina.png';
 
 const StyledIconButton = styled(IconButton)`
   background-color: ${props => props.theme.palette.primary.main} !important;
@@ -32,7 +32,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ onClick }) => {
         size="large"
         aria-label="Adwina"
       >
-        <ChatIcon fontSize="medium" />
+        <img src={AdwinaImage} alt="Adwina" style={{ width: '100%', height: '100%' }} />
       </StyledIconButton>
     </Tooltip>
   );

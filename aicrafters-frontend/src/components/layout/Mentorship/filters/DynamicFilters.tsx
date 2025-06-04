@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Box, FormControl, TextField, Autocomplete } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 import { KeyboardArrowDown as ArrowDownIcon } from '@mui/icons-material';
@@ -47,7 +47,7 @@ const FiltersRow = styled(Box)`
   }
 `;
 
-const FilterSelect = styled(FormControl)`
+const FilterContainer = styled(Box)`
   flex: 1;
   min-width: 200px;
   max-width: 300px;
@@ -56,186 +56,146 @@ const FilterSelect = styled(FormControl)`
     max-width: 100%;
     min-width: 100%;
   }
-  
-  .MuiOutlinedInput-root {
-    background: #ffffff;
-    border-radius: 16px;
-    height: 56px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
+`;
 
-    .MuiSelect-select {
-      padding: 16px 20px;
-      padding-right: 48px !important;
-      font-size: 1rem;
-      color: #2c3e50;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-    }
-
-    .MuiOutlinedInput-notchedOutline {
-      border: 2px solid #e8ecef;
-      transition: border-color 0.3s ease;
-    }
-
-    .MuiSelect-icon {
-      right: 16px;
-      color: #6c757d;
-      font-size: 24px;
-      transition: all 0.3s ease;
-    }
-
-    &:hover {
-      .MuiOutlinedInput-notchedOutline {
-        border-color: ${props => props.theme.palette.primary.main};
-      }
-      
-      .MuiSelect-icon {
-        color: ${props => props.theme.palette.primary.main};
-        transform: rotate(180deg);
-      }
-    }
-
-    &.Mui-focused {
-      border-color: ${props => props.theme.palette.primary.main};
-      
-      .MuiOutlinedInput-notchedOutline {
-        border-color: ${props => props.theme.palette.primary.main};
-        border-width: 2px;
-      }
-      
-      .MuiSelect-icon {
-        color: ${props => props.theme.palette.primary.main};
-        transform: rotate(180deg);
-      }
-    }
-    
-    @media (max-width: 768px) {
-      height: 52px;
-      border-radius: 12px;
-      
-      .MuiSelect-select {
-        padding: 14px 18px;
-        padding-right: 44px !important;
-        font-size: 0.95rem;
-      }
-      
-      .MuiSelect-icon {
-        right: 14px;
-        font-size: 22px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      height: 48px;
-      
-      .MuiSelect-select {
-        padding: 12px 16px;
-        padding-right: 40px !important;
-        font-size: 0.9rem;
-      }
-      
-      .MuiSelect-icon {
-        right: 12px;
-        font-size: 20px;
-      }
-    }
-  }
-
-  .MuiInputLabel-root {
-    color: #6c757d;
-    font-size: 1rem;
-    font-weight: 500;
-    transform: translate(20px, 18px) scale(1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &.Mui-focused {
-      color: ${props => props.theme.palette.primary.main};
-      transform: translate(20px, -9px) scale(0.85);
-    }
-
-    &.MuiInputLabel-shrink {
-      transform: translate(20px, -9px) scale(0.85);
+const StyledAutocomplete = styled(Autocomplete<FilterOption, false, false, false>)`
+  && {
+    .MuiOutlinedInput-root {
       background: #ffffff;
-      padding: 0 8px;
-      border-radius: 4px;
-    }
-    
-    @media (max-width: 768px) {
-      font-size: 0.95rem;
-      transform: translate(18px, 16px) scale(1);
-      
-      &.Mui-focused, &.MuiInputLabel-shrink {
-        transform: translate(18px, -9px) scale(0.85);
-      }
-    }
-    
-    @media (max-width: 480px) {
-      font-size: 0.9rem;
-      transform: translate(16px, 14px) scale(1);
-      
-      &.Mui-focused, &.MuiInputLabel-shrink {
-        transform: translate(16px, -9px) scale(0.85);
-      }
-    }
-  }
+      border-radius: 16px;
+      height: 56px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid transparent;
+      padding-right: 48px !important;
 
-  .MuiSelect-select:focus {
-    background: transparent;
-  }
-`;
+      .MuiAutocomplete-input {
+        padding: 16px 20px !important;
+        font-size: 1rem;
+        color: #2c3e50;
+        font-weight: 500;
+      }
 
-const StyledMenuItem = styled(MenuItem)`
-  && {
-    padding: 12px 20px;
-    font-size: 0.95rem;
-    color: ${props => props.theme.palette.primary.main};
-    transition: all 0.2s ease;
-    border-radius: 8px;
-    margin: 2px 8px;
-    
-    &:hover {
-      background: ${props => props.theme.palette.primary.main}15;
-      color: ${props => props.theme.palette.primary.main};
-      transform: translateX(4px);
-    }
-    
-    &.Mui-selected {
-      background: ${props => props.theme.palette.primary.main};
-      color: white;
-      font-weight: 600;
-      
+      .MuiOutlinedInput-notchedOutline {
+        border: 2px solid #e8ecef;
+        transition: border-color 0.3s ease;
+      }
+
+      .MuiAutocomplete-endAdornment {
+        right: 16px;
+        
+        .MuiAutocomplete-popupIndicator {
+          color: #6c757d;
+          transition: all 0.3s ease;
+          
+          .MuiSvgIcon-root {
+            font-size: 24px;
+          }
+        }
+      }
+
       &:hover {
-        background: ${props => props.theme.palette.primary.dark};
-        transform: translateX(4px);
+        .MuiOutlinedInput-notchedOutline {
+          border-color: ${props => props.theme.palette.primary.main};
+        }
+        
+        .MuiAutocomplete-popupIndicator {
+          color: ${props => props.theme.palette.primary.main};
+          transform: rotate(180deg);
+        }
       }
-    }
-    
-    @media (max-width: 768px) {
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      margin: 1px 6px;
-    }
-    
-    @media (max-width: 480px) {
-      padding: 8px 16px;
-      font-size: 0.85rem;
-      margin: 1px 4px;
-    }
-  }
-`;
 
-const StyledSelect = styled(Select<string>)`
-  && {
-    .MuiSelect-select {
-      &:focus {
-        background: transparent;
+      &.Mui-focused {
+        border-color: ${props => props.theme.palette.primary.main};
+        
+        .MuiOutlinedInput-notchedOutline {
+          border-color: ${props => props.theme.palette.primary.main};
+          border-width: 2px;
+        }
+        
+        .MuiAutocomplete-popupIndicator {
+          color: ${props => props.theme.palette.primary.main};
+          transform: rotate(180deg);
+        }
+      }
+      
+      @media (max-width: 768px) {
+        height: 52px;
+        border-radius: 12px;
+        padding-right: 44px !important;
+        
+        .MuiAutocomplete-input {
+          padding: 14px 18px !important;
+          font-size: 0.95rem;
+        }
+        
+        .MuiAutocomplete-endAdornment {
+          right: 14px;
+          
+          .MuiSvgIcon-root {
+            font-size: 22px;
+          }
+        }
+      }
+      
+      @media (max-width: 480px) {
+        height: 48px;
+        padding-right: 40px !important;
+        
+        .MuiAutocomplete-input {
+          padding: 12px 16px !important;
+          font-size: 0.9rem;
+        }
+        
+        .MuiAutocomplete-endAdornment {
+          right: 12px;
+          
+          .MuiSvgIcon-root {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+
+    .MuiInputLabel-root {
+      color: #6c757d;
+      font-size: 1rem;
+      font-weight: 500;
+      transform: translate(20px, 18px) scale(1);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &.Mui-focused {
+        color: ${props => props.theme.palette.primary.main};
+        transform: translate(20px, -9px) scale(0.85);
+      }
+
+      &.MuiInputLabel-shrink {
+        transform: translate(20px, -9px) scale(0.85);
+        background: #ffffff;
+        padding: 0 8px;
+        border-radius: 4px;
+      }
+      
+      @media (max-width: 768px) {
+        font-size: 0.95rem;
+        transform: translate(18px, 16px) scale(1);
+        
+        &.Mui-focused, &.MuiInputLabel-shrink {
+          transform: translate(18px, -9px) scale(0.85);
+        }
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 0.9rem;
+        transform: translate(16px, 14px) scale(1);
+        
+        &.Mui-focused, &.MuiInputLabel-shrink {
+          transform: translate(16px, -9px) scale(0.85);
+        }
       }
     }
   }
-  
+
   .MuiPaper-root {
     border-radius: 16px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
@@ -248,11 +208,49 @@ const StyledSelect = styled(Select<string>)`
     }
   }
   
-  .MuiList-root {
+  .MuiAutocomplete-listbox {
     padding: 8px;
     
     @media (max-width: 768px) {
       padding: 6px;
+    }
+    
+    .MuiAutocomplete-option {
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      color: ${props => props.theme.palette.primary.main};
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      margin: 2px 8px;
+      
+      &:hover {
+        background: ${props => props.theme.palette.primary.main}15;
+        color: ${props => props.theme.palette.primary.main};
+        transform: translateX(4px);
+      }
+      
+      &[aria-selected="true"] {
+        background: ${props => props.theme.palette.primary.main};
+        color: white;
+        font-weight: 600;
+        
+        &:hover {
+          background: ${props => props.theme.palette.primary.dark};
+          transform: translateX(4px);
+        }
+      }
+      
+      @media (max-width: 768px) {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+        margin: 1px 6px;
+      }
+      
+      @media (max-width: 480px) {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        margin: 1px 4px;
+      }
     }
   }
 `;
@@ -296,6 +294,7 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
           label: mentor?.title || catValue
         };
       });
+      
       setCategories(categoryOptions);
       
       // Extract and deduplicate skills
@@ -319,6 +318,7 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
           label: skill?.name || skillValue
         };
       });
+      
       setSkills(skillOptions);
       
       // Extract and deduplicate countries
@@ -348,6 +348,7 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
           label: countryName  // Display full country name to user
         };
       });
+      
       setCountries(countryOptions);
       
       // Extract and deduplicate languages
@@ -371,103 +372,121 @@ export const DynamicFilters: React.FC<DynamicFiltersProps> = ({
           label: language?.name || langValue
         };
       });
+      
       setLanguages(languageOptions);
     }
   }, [mentors]);
 
-  const handleCategoryChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value as string;
-    console.log('DynamicFilters - Category selected:', value);
-    onCategoryChange(value);
+  const handleCategoryChange = (event: React.SyntheticEvent, value: FilterOption | null) => {
+    const selectedValue = value?.value || '';
+    console.log('DynamicFilters - Category selected:', selectedValue);
+    onCategoryChange(selectedValue);
   };
   
-  const handleSkillChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value as string;
-    console.log('DynamicFilters - Skill selected:', value);
-    onSkillChange(value);
+  const handleSkillChange = (event: React.SyntheticEvent, value: FilterOption | null) => {
+    const selectedValue = value?.value || '';
+    console.log('DynamicFilters - Skill selected:', selectedValue);
+    onSkillChange(selectedValue);
   };
   
-  const handleCountryChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value as string;
-    console.log('DynamicFilters - Country selected:', value);
-    onCountryChange(value);
+  const handleCountryChange = (event: React.SyntheticEvent, value: FilterOption | null) => {
+    const selectedValue = value?.value || '';
+    console.log('DynamicFilters - Country selected:', selectedValue);
+    onCountryChange(selectedValue);
   };
   
-  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value as string;
-    console.log('DynamicFilters - Language selected:', value);
-    onLanguageChange(value);
+  const handleLanguageChange = (event: React.SyntheticEvent, value: FilterOption | null) => {
+    const selectedValue = value?.value || '';
+    console.log('DynamicFilters - Language selected:', selectedValue);
+    onLanguageChange(selectedValue);
+  };
+
+  // Helper function to find current value object
+  const findOptionByValue = (options: FilterOption[], value: string): FilterOption | null => {
+    return options.find(option => option.value === value) || null;
   };
 
   return (
     <FiltersRow>
-      <FilterSelect variant="outlined" fullWidth>
-        <InputLabel>{t('mentor.professionalRoleLabel', { defaultValue: 'Professional Role' }) as string}</InputLabel>
-        <StyledSelect
-          value={category}
+      <FilterContainer>
+        <StyledAutocomplete
+          options={categories}
+          value={findOptionByValue(categories, category)}
           onChange={handleCategoryChange}
-          label={t('mentor.professionalRoleLabel', { defaultValue: 'Professional Role' }) as string}
-          IconComponent={ArrowDownIcon}
-        >
-          <StyledMenuItem value="">{t('mentor.allProfessionalRoles', { defaultValue: 'All Professional Roles' }) as string}</StyledMenuItem>
-          {categories.map((cat) => (
-            <StyledMenuItem key={cat.value} value={cat.value}>
-              {t(`mentor.categories.${cat.value}`, { defaultValue: cat.label }) as string}
-            </StyledMenuItem>
-          ))}
-        </StyledSelect>
-      </FilterSelect>
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          popupIcon={<ArrowDownIcon />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t('mentor.professionalRoleLabel', { defaultValue: 'Professional Role' }) as string}
+              placeholder={t('mentor.professionalRoleLabel', { defaultValue: 'Professional Role' }) as string}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+      </FilterContainer>
       
-      <FilterSelect variant="outlined" fullWidth>
-        <InputLabel>{t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}</InputLabel>
-        <StyledSelect
-          value={skill}
+      <FilterContainer>
+        <StyledAutocomplete
+          options={skills}
+          value={findOptionByValue(skills, skill)}
           onChange={handleSkillChange}
-          label={t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}
-          IconComponent={ArrowDownIcon}
-        >
-          <StyledMenuItem value="">{t('mentor.allSkills', { defaultValue: 'All Skills' }) as string}</StyledMenuItem>
-          {skills.map((sk) => (
-            <StyledMenuItem key={sk.value} value={sk.value}>
-              {t(`mentor.skills.${sk.value}`, { defaultValue: sk.label }) as string}
-            </StyledMenuItem>
-          ))}
-        </StyledSelect>
-      </FilterSelect>
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          popupIcon={<ArrowDownIcon />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}
+              placeholder={t('mentor.skillLabel', { defaultValue: 'Skill' }) as string}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+      </FilterContainer>
       
-      <FilterSelect variant="outlined" fullWidth>
-        <InputLabel>{t('mentor.countryLabel', { defaultValue: 'Country' }) as string}</InputLabel>
-        <StyledSelect
-          value={country}
+      <FilterContainer>
+        <StyledAutocomplete
+          options={countries}
+          value={findOptionByValue(countries, country)}
           onChange={handleCountryChange}
-          label={t('mentor.countryLabel', { defaultValue: 'Country' }) as string}
-          IconComponent={ArrowDownIcon}
-        >
-          <StyledMenuItem value="">{t('mentor.allCountries', { defaultValue: 'All Countries' }) as string}</StyledMenuItem>
-          {countries.map((countryItem) => (
-            <StyledMenuItem key={countryItem.value} value={countryItem.value}>
-              {t(`mentor.countries.${countryItem.value}`, { defaultValue: countryItem.label }) as string}
-            </StyledMenuItem>
-          ))}
-        </StyledSelect>
-      </FilterSelect>
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          popupIcon={<ArrowDownIcon />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t('mentor.countryLabel', { defaultValue: 'Country' }) as string}
+              placeholder={t('mentor.countryLabel', { defaultValue: 'Country' }) as string}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+      </FilterContainer>
       
-      <FilterSelect variant="outlined" fullWidth>
-        <InputLabel>{t('mentor.languageLabel', { defaultValue: 'Language' }) as string}</InputLabel>
-        <StyledSelect
-          value={language}
+      <FilterContainer>
+        <StyledAutocomplete
+          options={languages}
+          value={findOptionByValue(languages, language)}
           onChange={handleLanguageChange}
-          label={t('mentor.languageLabel', { defaultValue: 'Language' }) as string}
-          IconComponent={ArrowDownIcon}
-        >
-          <StyledMenuItem value="">{t('mentor.allLanguages', { defaultValue: 'All Languages' }) as string}</StyledMenuItem>
-          {languages.map((lang) => (
-            <StyledMenuItem key={lang.value} value={lang.value}>
-              {t(`mentor.languages.${lang.value}`, { defaultValue: lang.label }) as string}
-            </StyledMenuItem>
-          ))}
-        </StyledSelect>
-      </FilterSelect>
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          popupIcon={<ArrowDownIcon />}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t('mentor.languageLabel', { defaultValue: 'Language' }) as string}
+              placeholder={t('mentor.languageLabel', { defaultValue: 'Language' }) as string}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+      </FilterContainer>
     </FiltersRow>
   );
 }; 

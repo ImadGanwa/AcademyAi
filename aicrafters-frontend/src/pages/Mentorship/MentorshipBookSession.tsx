@@ -13,9 +13,10 @@ import { MentorInfoCard } from '../../components/layout/Mentorship/booking/Mento
 import { BookingCalendar } from '../../components/layout/Mentorship/booking/BookingCalendar';
 import { MentorHeaderInfo } from '../../components/layout/Mentorship/booking/Mentorcardinfo';
 import BookingConfirmationPopup from '../../components/layout/Mentorship/booking/BookingConfirmationPopup';
+import { BookingSessionHero } from '../../components/layout/Mentorship/booking/BookingSessionHero';
 
 // Import API services
-import { getPublicMentorProfile } from '../../api/mentor';
+import { getCompleteMentorProfile } from '../../api/mentor';
 import { getMentorAvailableSlots, createBooking } from '../../api/booking';
 
 
@@ -103,7 +104,7 @@ const MentorshipBookSession: React.FC = () => {
       setError(null);
       
       try {
-        const response = await getPublicMentorProfile(mentorId);
+        const response = await getCompleteMentorProfile(mentorId);
         if (response && response.success && response.data) {
           setMentor(response.data);
         } else {
@@ -361,8 +362,8 @@ const MentorshipBookSession: React.FC = () => {
   if (loading) {
     return (
       <Layout title={t('mentorship.bookSessionTitle') as string}>
+        <BookingSessionHero />
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
           <LoadingContainer>
             <CircularProgress size={60} />
             <Typography variant="h6" sx={{ mt: 3 }}>{t('mentorship.loadingMentorProfile') as string}</Typography>
@@ -375,8 +376,8 @@ const MentorshipBookSession: React.FC = () => {
   if (error || !mentor) {
     return (
       <Layout title={t('mentorship.bookSessionTitle') as string}>
+        <BookingSessionHero />
         <PageContainer maxWidth="lg">
-          <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
           <Alert severity="error" sx={{ mb: 3 }}>
             {error || t('mentorship.failedToLoadMentor') as string}
           </Alert>
@@ -390,9 +391,8 @@ const MentorshipBookSession: React.FC = () => {
   
   return (
     <Layout title={t('mentorship.bookSessionTitle') as string}>
+      <BookingSessionHero mentorName={mentor?.fullName} />
       <PageContainer maxWidth="lg">
-        <PageTitle variant="h2">{t('mentorship.bookSessionTitle') as string}</PageTitle>
-        
         {/* Header with Mentor's basic info */}
         <MentorHeaderInfo mentor={mentor} />
         

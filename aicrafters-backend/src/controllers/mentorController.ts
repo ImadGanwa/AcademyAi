@@ -1041,6 +1041,101 @@ export const mentorController = {
   },
 
   /**
+   * Get complete mentor profile by ID (includes experience and academic background)
+   * @route GET /api/mentor/:mentorId
+   */
+  getCompleteMentorProfile: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const mentorId = req.params.mentorId;
+      
+      // Validate mentor ID
+      if (!mongoose.Types.ObjectId.isValid(mentorId)) {
+        res.status(400).json({ 
+          success: false, 
+          error: 'Invalid mentor ID format'
+        });
+        return;
+      }
+      
+      // Get complete mentor profile including professional info
+      const mentor = await User.findOne({
+        _id: mentorId,
+        role: 'mentor',
+        'mentorProfile.isVerified': true
+      }).select(
+        'fullName email profileImage mentorProfile.title mentorProfile.bio mentorProfile.hourlyRate ' +
+        'mentorProfile.country mentorProfile.skills mentorProfile.languages mentorProfile.professionalInfo ' +
+        'mentorProfile.mentorRating mentorProfile.mentorReviewsCount mentorProfile.menteesCount mentorProfile.sessionsCount'
+      );
+      
+      if (!mentor) {
+        res.status(404).json({
+          success: false,
+          error: 'Mentor not found or not verified'
+        });
+        return;
+      }
+      
+      // Get mentor reviews
+      const reviews = await MentorshipBooking.find({
+        mentorId,
+        status: 'completed',
+        'feedback.rating': { $exists: true, $ne: null }
+      })
+        .select('feedback.rating feedback.comment feedback.submittedAt menteeId')
+        .populate('menteeId', 'fullName profileImage')
+        .sort({ 'feedback.submittedAt': -1 })
+        .limit(10);
+      
+      // Transform mentor data for complete view including professional info
+      const completeMentorProfile = {
+        id: mentor._id,
+        fullName: mentor.fullName,
+        profileImage: mentor.profileImage,
+        title: mentor.mentorProfile?.title,
+        bio: mentor.mentorProfile?.bio,
+        hourlyRate: mentor.mentorProfile?.hourlyRate,
+        country: mentor.mentorProfile?.country,
+        skills: mentor.mentorProfile?.skills,
+        languages: mentor.mentorProfile?.languages,
+        professionalInfo: {
+          role: mentor.mentorProfile?.professionalInfo?.role,
+          linkedIn: mentor.mentorProfile?.professionalInfo?.linkedIn,
+          experience: mentor.mentorProfile?.professionalInfo?.experience,
+          academicBackground: mentor.mentorProfile?.professionalInfo?.academicBackground
+        },
+        stats: {
+          rating: mentor.mentorProfile?.mentorRating,
+          reviewsCount: mentor.mentorProfile?.mentorReviewsCount,
+          menteesCount: mentor.mentorProfile?.menteesCount,
+          sessionsCount: mentor.mentorProfile?.sessionsCount
+        },
+        reviews: reviews.map(review => ({
+          rating: review.feedback.rating,
+          comment: review.feedback.comment,
+          date: review.feedback.submittedAt,
+          mentee: {
+            id: review.menteeId._id,
+            fullName: (review.menteeId as any).fullName,
+            profileImage: (review.menteeId as any).profileImage
+          }
+        }))
+      };
+      
+      res.status(200).json({
+        success: true,
+        data: completeMentorProfile
+      });
+    } catch (error: any) {
+      console.error('Error fetching complete mentor profile:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'An error occurred while fetching complete mentor profile'
+      });
+    }
+  },
+
+  /**
    * Chat with the Adwina Mentor AI assistant
    * @route GET /api/mentor/chat
    */

@@ -81,6 +81,20 @@ export const getPublicMentorProfile = async (mentorId: string) => {
   }
 };
 
+// Get complete mentor profile by ID (includes experience and academic background)
+export const getCompleteMentorProfile = async (mentorId: string) => {
+  try {
+    console.log('getCompleteMentorProfile API call for mentorId:', mentorId);
+    const response = await axiosInstance.get(`/api/mentor/${mentorId}`);
+    console.log('getCompleteMentorProfile API response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(`Error fetching complete mentor profile for ID ${mentorId}:`, error);
+    console.error('Error details:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
 // Apply to become a mentor
 export const applyToBecomeMentor = async (applicationData: MentorApplicationData) => {
   try {
