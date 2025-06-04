@@ -1306,7 +1306,7 @@ export const sendMenteeBookingConfirmationEmail = async (
   console.log(`Attempting to send mentee booking request notification to: ${menteeEmail} with subject: "${subject}"`);
   try {
     const formattedDisplayDate = formatDateForDisplay(scheduledDate);
-    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/bookings`;
+    const bookingDetailsLink = `${FRONTEND_URL}/en/dashboard/user/booking`;
     const preheaderText = `Your session request with ${mentorName} on ${formattedDisplayDate} at ${startTime} has been sent.`;
 
     const sessionDetails = [

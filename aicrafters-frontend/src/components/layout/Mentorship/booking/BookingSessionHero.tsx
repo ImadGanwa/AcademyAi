@@ -160,26 +160,26 @@ const BackgroundDecoration = styled.div`
 export const BookingSessionHero: React.FC<BookingSessionHeroProps> = ({ mentorName }) => {
   const { t } = useTranslation();
 
-  const getTitle = () => {
+  const getTitle = (): string => {
     return mentorName 
-      ? t('mentor.booking.session.titleWithName', { 
+      ? (t('mentor.booking.session.titleWithName', { 
           defaultValue: 'Book Your Session',
           mentorName 
-        })
-      : t('mentor.booking.session.title', { 
+        }) as string)
+      : (t('mentor.booking.session.title', { 
           defaultValue: 'Book Mentorship Session' 
-        });
+        }) as string);
   };
 
-  const getDescription = () => {
+  const getDescription = (): string => {
     return mentorName 
-      ? t('mentor.booking.session.descriptionWithName', { 
+      ? (t('mentor.booking.session.descriptionWithName', { 
           defaultValue: `Schedule your personalized mentorship session with {{mentorName}}. Choose your preferred time and get expert guidance tailored to your goals.`,
           mentorName 
-        })
-      : t('mentor.booking.session.description', { 
+        }) as string)
+      : (t('mentor.booking.session.description', { 
           defaultValue: 'Choose your preferred date and time to schedule a personalized mentorship session. Get expert guidance to accelerate your learning journey.' 
-        });
+        }) as string);
   };
 
   return (
