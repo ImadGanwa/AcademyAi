@@ -210,8 +210,8 @@ const CollapsibleText: React.FC<CollapsibleTextProps> = ({ text, maxLength = 300
       </AboutText>
       <SeeMoreButton onClick={() => setIsExpanded(!isExpanded)}>
         {isExpanded 
-          ? t('mentorship.seeLess', { defaultValue: 'See less' })
-          : t('mentorship.seeMore', { defaultValue: 'See more' })
+          ? (t('mentorship.seeLess', { defaultValue: 'See less' }) as string)
+          : (t('mentorship.seeMore', { defaultValue: 'See more' }) as string)
         }
       </SeeMoreButton>
     </Box>
