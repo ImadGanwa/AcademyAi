@@ -537,13 +537,13 @@ export const LearningCard: React.FC<LearningCardProps> = ({
                   </Typography>
                 </ProgressInfo>
                 <ActionsSection>
-                  <ShareButton 
+                  {/* <ShareButton 
                     className="share-button" 
                     onClick={onShare}
                     >
                     {t('user.learning.share')}
                     <ShareIcon />
-                  </ShareButton>
+                  </ShareButton> */}
                 </ActionsSection>
               </ProgressSection>
             </>
