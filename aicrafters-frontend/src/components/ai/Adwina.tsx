@@ -7,7 +7,7 @@ import { useAIFeatures } from '../../hooks/useAIFeatures';
 
 const AIChatContainer = styled(Box)`
   height: 100%;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -18,8 +18,11 @@ const AIChatContainer = styled(Box)`
   position: relative;
   
   @media (max-width: 1200px) {
-    max-width: 520px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
+    border-radius: 12px;
+    box-shadow: none;
+    border: none;
   }
 `;
 

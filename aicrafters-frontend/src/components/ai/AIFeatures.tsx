@@ -44,28 +44,49 @@ const TabContainer = styled(Box)`
   position: relative;
   
   @media (max-width: 768px) {
-    justify-content: center;
+    justify-content: space-between;
+    padding-right: 50px; /* Add space for collapse button */
   }
 `;
 
 const CollapseIndicator = styled.div<{ expanded: boolean }>`
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  padding: 4px;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  &:active {
+    background-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-50%) scale(0.95);
+  }
   
   svg {
     transition: transform 0.3s ease;
     transform: ${props => props.expanded ? 'rotate(180deg)' : 'rotate(0deg)'};
     width: 20px;
     height: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    right: 8px;
+    padding: 6px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
   }
 `;
 
@@ -83,6 +104,10 @@ const StyledTabs = styled(Tabs)`
     &.Mui-selected {
       color: white;
     }
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
   }
   
   .MuiTabs-indicator {
@@ -92,11 +117,17 @@ const StyledTabs = styled(Tabs)`
   @media (max-width: 768px) {
     .MuiTab-root {
       min-height: 56px;
-      padding: 6px 12px;
+      padding: 6px 8px; /* Reduced padding to give more space */
+      min-width: 60px;
       
       .MuiSvgIcon-root {
         margin: 0;
       }
+    }
+    
+    /* Ensure tabs don't overflow */
+    .MuiTabs-flexContainer {
+      justify-content: space-around;
     }
   }
 `;
@@ -132,7 +163,7 @@ interface AIFeaturesProps {
 
 export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -167,6 +198,9 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
   
   // Handle tab change and fetch data if needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    // Stop event propagation to prevent conflicts
+    event.stopPropagation();
+    
     // If on mobile and not expanded, expand first
     if (isMobile && !expanded) {
       setExpanded(true);
@@ -186,7 +220,11 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
     }
   };
   
-  const toggleExpanded = () => {
+  const toggleExpanded = (event?: React.MouseEvent) => {
+    // Stop event propagation to prevent conflicts
+    if (event) {
+      event.stopPropagation();
+    }
     setExpanded(!expanded);
   };
   
@@ -235,8 +273,12 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
           variant={isMobile ? "scrollable" : "fullWidth"}
           scrollButtons="auto"
           allowScrollButtonsMobile
-          onClick={(e) => expanded && e.stopPropagation()}
-          centered={isMobile}
+          onClick={(e) => {
+            if (expanded) {
+              e.stopPropagation();
+            }
+          }}
+          centered={!isMobile}
         >
           <Tab 
             icon={<TextSnippetOutlinedIcon fontSize={isMobile ? "medium" : "small"} />} 
@@ -260,7 +302,7 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
             size="small" 
             onClick={(e) => {
               e.stopPropagation();
-              toggleExpanded();
+              toggleExpanded(e);
             }}
             sx={{ 
               color: 'white', 
@@ -279,7 +321,7 @@ export const AIFeatures: React.FC<AIFeaturesProps> = ({ courseId, videoUrl }) =>
             expanded={expanded}
             onClick={(e) => {
               e.stopPropagation();
-              toggleExpanded();
+              toggleExpanded(e);
             }}
           >
             {expanded ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}

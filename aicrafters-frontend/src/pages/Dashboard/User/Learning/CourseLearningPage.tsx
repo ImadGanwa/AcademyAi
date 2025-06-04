@@ -93,16 +93,29 @@ const AdwinaPanel = styled.div<{ isVisible: boolean }>`
   margin-right: ${props => props.isVisible ? '10px' : '0'};
   
   @media (max-width: 1200px) {
-    width: ${props => props.isVisible ? '100%' : '0'};
-    max-width: 100%;
-    height: ${props => props.isVisible ? '500px' : '0'};
-    position: relative;
-    top: 0;
-    margin: ${props => props.isVisible ? '24px auto 0' : '0'};
-    padding: 0;
-    display: flex;
-    justify-content: center;
+    position: fixed;
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: ${props => props.isVisible ? '90vw' : '0'};
+    max-width: ${props => props.isVisible ? '500px' : '0'};
+    height: ${props => props.isVisible ? '82vh' : '0'};
+    max-height: ${props => props.isVisible ? '600px' : '0'};
+    z-index: 1000;
+    margin: 0;
+    border-radius: 12px;
+    box-shadow: ${props => props.isVisible ? '0 10px 30px rgba(0, 0, 0, 0.3)' : 'none'};
+    overflow: ${props => props.isVisible ? 'visible' : 'hidden'};
+    opacity: ${props => props.isVisible ? '1' : '0'};
+    visibility: ${props => props.isVisible ? 'visible' : 'hidden'};
     transition: all 0.3s ease;
+  }
+  
+  @media (max-width: 480px) {
+    width: ${props => props.isVisible ? '95vw' : '0'};
+    height: ${props => props.isVisible ? '85vh' : '0'};
+    max-height: ${props => props.isVisible ? '650px' : '0'};
+    top: 54%;
   }
 `;
 
@@ -117,7 +130,26 @@ const AdwinaContent = styled.div<{ isVisible: boolean }>`
   
   @media (max-width: 1200px) {
     width: 100%;
-    max-width: 520px;
+    max-width: 500px;
+    border-radius: 12px;
+  }
+`;
+
+// Add backdrop overlay for mobile
+const MobileBackdrop = styled.div<{ isVisible: boolean }>`
+  display: none;
+  
+  @media (max-width: 1200px) {
+    display: ${props => props.isVisible ? 'block' : 'none'};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: ${props => props.isVisible ? '1' : '0'};
+    transition: opacity 0.3s ease;
   }
 `;
 
@@ -635,17 +667,24 @@ export const CourseLearningPage: React.FC = () => {
           
           {/* Adwina Panel - only render if the current lesson has video content */}
           {hasVideoContent && (
-            <AdwinaPanel isVisible={isChatOpen}>
-              <AdwinaContent isVisible={isChatOpen}>
-                <Adwina 
-                  courseId={courseId || ''}
-                  videoUrl={
-                    (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
-                  }
-                  onClose={handleToggleChat}
-                />
-              </AdwinaContent>
-            </AdwinaPanel>
+            <>
+              {/* Mobile backdrop overlay */}
+              <MobileBackdrop 
+                isVisible={isChatOpen} 
+                onClick={handleToggleChat}
+              />
+              <AdwinaPanel isVisible={isChatOpen}>
+                <AdwinaContent isVisible={isChatOpen}>
+                  <Adwina 
+                    courseId={courseId || ''}
+                    videoUrl={
+                      (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
+                    }
+                    onClose={handleToggleChat}
+                  />
+                </AdwinaContent>
+              </AdwinaPanel>
+            </>
           )}
         </PageLayout>
         
