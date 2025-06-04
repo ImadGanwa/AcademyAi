@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Course } from '../models/Course';
 import { User, IUser } from '../models/User';
 import mongoose, { Document, Types } from 'mongoose';
-import { chatWithTrainer } from '../services/trainerService';
+import { chatWithTrainer, getSystemStats, preloadPopularContent, invalidateContextCache } from '../services/trainerService';
 
 interface UserCourse {
   courseId: Types.ObjectId;
@@ -163,6 +163,106 @@ export const trainerController = {
       res.status(500).json({ 
         success: false,
         error: error.message || 'An error occurred while chatting with the trainer'
+      });
+    }
+  },
+
+  /**
+   * Get system statistics for monitoring
+   * @route GET /api/trainer/stats
+   */
+  getStats: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const stats = await getSystemStats();
+      
+      res.status(200).json({
+        success: true,
+        data: {
+          ...stats,
+          timestamp: new Date().toISOString(),
+          uptime: process.uptime(),
+          memory: process.memoryUsage()
+        }
+      });
+    } catch (error: any) {
+      console.error('Error getting system stats:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to get system statistics'
+      });
+    }
+  },
+
+  /**
+   * Health check endpoint
+   * @route GET /api/trainer/health
+   */
+  healthCheck: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const stats = await getSystemStats();
+      const isHealthy = stats.health.redis;
+      
+      res.status(isHealthy ? 200 : 503).json({
+        success: isHealthy,
+        data: {
+          status: isHealthy ? 'healthy' : 'unhealthy',
+          redis: stats.health.redis,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error: any) {
+      console.error('Error in health check:', error);
+      res.status(503).json({
+        success: false,
+        error: 'Health check failed'
+      });
+    }
+  },
+
+  /**
+   * Preload popular content for better performance
+   * @route POST /api/trainer/preload
+   */
+  preloadContent: async (req: Request, res: Response): Promise<void> => {
+    try {
+      await preloadPopularContent();
+      
+      res.status(200).json({
+        success: true,
+        message: 'Content preloading started'
+      });
+    } catch (error: any) {
+      console.error('Error preloading content:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to preload content'
+      });
+    }
+  },
+
+  /**
+   * Invalidate cache for a course or specific video
+   * @route DELETE /api/trainer/cache/:courseId
+   * @route DELETE /api/trainer/cache/:courseId/:videoUrl
+   */
+  invalidateCache: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { courseId } = req.params;
+      const { videoUrl } = req.query;
+      
+      await invalidateContextCache(courseId, videoUrl as string | undefined);
+      
+      res.status(200).json({
+        success: true,
+        message: videoUrl 
+          ? `Cache invalidated for course ${courseId}, video ${videoUrl}`
+          : `Cache invalidated for entire course ${courseId}`
+      });
+    } catch (error: any) {
+      console.error('Error invalidating cache:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || 'Failed to invalidate cache'
       });
     }
   }

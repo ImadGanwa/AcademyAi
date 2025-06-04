@@ -9,7 +9,6 @@ interface MentorMessage {
 
 interface UseAIMentorFeaturesProps {
   mentorId?: string;
-  userId?: string;
 }
 
 // Helper functions for message persistence
@@ -95,7 +94,7 @@ export const resetRefreshCount = () => {
   }
 };
 
-export const useAIMentorFeatures = ({ mentorId, userId }: UseAIMentorFeaturesProps) => {
+export const useAIMentorFeatures = ({ mentorId }: UseAIMentorFeaturesProps) => {
   const savedState = loadFromStorage();
   
   const [messages, setMessages] = useState<MentorMessage[]>(savedState?.messages || []);
@@ -104,48 +103,21 @@ export const useAIMentorFeatures = ({ mentorId, userId }: UseAIMentorFeaturesPro
   const [chatError, setChatError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('🚀 useAIMentorFeatures mounted/userId changed');
+    console.log('🚀 useAIMentorFeatures mounted/mentorId changed');
     
     const wasClearedByRefreshLogic = checkAndHandleRefresh();
     
-    // If user ID changes, it's a new context, clear messages and reset refresh count.
-    // This takes precedence over the refresh check for the *previous* user's session.
-    const savedUserId = localStorage.getItem('current_user_id');
-    if (userId && savedUserId && savedUserId !== userId) {
-      console.log('👤 User changed, clearing messages and resetting refresh count.');
-      setMessages([]);
-      setThreadId(undefined);
-      setChatError(null);
-      localStorage.removeItem(STORAGE_KEY);
-      resetRefreshCount(); // Reset for the new user session
-      localStorage.setItem('current_user_id', userId);
-    } else if (userId && !savedUserId) {
-      // First time setting user ID, treat as a new session, ensure refresh count is reset or fresh.
-      localStorage.setItem('current_user_id', userId);
-      // If wasClearedByRefreshLogic happened, it's fine. If not, an explicit resetRefreshCount might be
-      // considered if a "new user" implies starting the refresh count from 0 irrespective of previous anonymous state.
-      // However, current logic: new user logs in, checkAndHandleRefresh runs, if it clears, it clears.
-      // If it doesn't, count is 1. If they refresh, count is 2, clears. This seems consistent.
-    } else if (wasClearedByRefreshLogic) {
-      // If user ID didn't change but refresh logic cleared messages
+    // When mentor context changes, we might want to maintain separate thread contexts
+    // but for now, we'll use a simpler approach where the backend handles user context
+    if (wasClearedByRefreshLogic) {
+      // If refresh logic cleared messages
       console.log('🧹 Messages were cleared by refresh logic, resetting UI state.');
       setMessages([]);
       setThreadId(undefined);
       setChatError(null);
-    } else if (userId && !localStorage.getItem('current_user_id')) {
-        localStorage.setItem('current_user_id', userId);
     }
 
-    // If no user ID initially, and then one is provided, ensure refresh count is reset.
-    // This effect runs when userId changes.
-    // If previous userId was undefined/null and now we have one.
-    if (userId && !savedUserId) { // Switched from no user to a user
-        // resetRefreshCount(); // Start fresh for this new user.
-        // checkAndHandleRefresh() would have already run. Let its count stand unless explicit reset desired.
-        // For now, let's keep it simple: userId change clears and resets. Initial load handles its own refresh logic.
-    }
-
-  }, [userId]);
+  }, [mentorId]);
   
   useEffect(() => {
     // Save messages to localStorage whenever they change, if there are messages.
@@ -182,7 +154,6 @@ export const useAIMentorFeatures = ({ mentorId, userId }: UseAIMentorFeaturesPro
       
       const response = await mentorAiService.chat({
         mentorId,
-        userId,
         message: content,
         threadId,
       });
@@ -206,7 +177,7 @@ export const useAIMentorFeatures = ({ mentorId, userId }: UseAIMentorFeaturesPro
     } finally {
       setChatLoading(false);
     }
-  }, [mentorId, userId, threadId]); // `messages` removed from deps as we use functional updates for setMessages
+  }, [mentorId, threadId]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);

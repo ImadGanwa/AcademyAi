@@ -8,7 +8,13 @@ import { mentorService } from '../services/mentorService';
 import { notificationService } from '../services/notificationService';
 import { processNamedItems } from '../utils/mentorUtils';
 import { uploadToCloudinary } from '../utils/fileUpload';
-import { chatWithMentor } from '../services/mentorAiService';
+import { 
+  chatWithMentor, 
+  getMentorSystemStats, 
+  preloadPopularMentorContent, 
+  invalidateMentorSearchCache,
+  clearMentorThreadForUser 
+} from '../services/mentorAiService';
 
 export const mentorController = {
   /**
@@ -1136,41 +1142,153 @@ export const mentorController = {
   },
 
   /**
-   * Chat with the Adwina Mentor AI assistant
-   * @route GET /api/mentor/chat
+   * Chat with AI Mentor
+   * @route POST /api/mentor/ai/chat
    */
-  mentorChat: async (req: Request, res: Response): Promise<void> => {
+  mentorAiChat: async (req: Request, res: Response): Promise<void> => {
     try {
-      const { mentorId, userId, message, threadId } = req.query;
-      const currentUserId = req.user?.id || 'anonymous';
-
-      // Validate required parameters
-      if (!message) {
-        res.status(400).json({ 
-          success: false,
-          error: 'Missing required parameter: message is required'
-        });
+      if (!req.user) {
+        res.status(401).json({ success: false, error: 'User not authenticated' });
         return;
       }
 
-      // Chat with the mentor AI
-      const response = await chatWithMentor(
-        currentUserId,
-        message as string,
-        threadId as string | undefined,
-        mentorId as string | undefined
-      );
+      const userId = req.user._id.toString();
+      const { message, threadId, mentorId } = req.body;
 
-      // Return the response
+      if (!message || message.trim() === '') {
+        res.status(400).json({ success: false, error: 'Message is required' });
+        return;
+      }
+
+      const response = await chatWithMentor(userId, message, threadId, mentorId);
+
       res.status(200).json({
         success: true,
         data: response
       });
     } catch (error: any) {
-      console.error('Error in mentor chat controller:', error);
+      console.error('Error in mentor AI chat:', error);
       res.status(500).json({ 
-        success: false,
-        error: error.message || 'An error occurred while chatting with the mentor'
+        success: false, 
+        error: error.message || 'An error occurred while chatting with mentor AI'
+      });
+    }
+  },
+
+  /**
+   * Get mentor AI system statistics (for monitoring)
+   * @route GET /api/mentor/ai/stats
+   */
+  getMentorAiStats: async (req: Request, res: Response): Promise<void> => {
+    try {
+      const stats = await getMentorSystemStats();
+      
+      res.status(200).json({
+        success: true,
+        data: stats,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      console.error('Error getting mentor AI stats:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'An error occurred while getting mentor AI stats'
+      });
+    }
+  },
+
+  /**
+   * Preload popular mentor content (for performance optimization)
+   * @route POST /api/mentor/ai/preload
+   */
+  preloadMentorContent: async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, error: 'User not authenticated' });
+        return;
+      }
+
+      await preloadPopularMentorContent();
+      
+      res.status(200).json({
+        success: true,
+        message: 'Popular mentor content preloaded successfully'
+      });
+    } catch (error: any) {
+      console.error('Error preloading mentor content:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'An error occurred while preloading mentor content'
+      });
+    }
+  },
+
+  /**
+   * Clear mentor search cache
+   * @route DELETE /api/mentor/ai/cache
+   */
+  clearMentorCache: async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, error: 'User not authenticated' });
+        return;
+      }
+
+      const { pattern } = req.query;
+      
+      await invalidateMentorSearchCache(pattern as string);
+      
+      res.status(200).json({
+        success: true,
+        message: pattern 
+          ? `Mentor search cache cleared for pattern: ${pattern}`
+          : 'All mentor search cache cleared successfully'
+      });
+    } catch (error: any) {
+      console.error('Error clearing mentor cache:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'An error occurred while clearing mentor cache'
+      });
+    }
+  },
+
+  /**
+   * Clear mentor thread for user (for testing and troubleshooting)
+   * @route DELETE /api/mentor/ai/threads/:userId
+   */
+  clearMentorThread: async (req: Request, res: Response): Promise<void> => {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, error: 'User not authenticated' });
+        return;
+      }
+
+      const { userId } = req.params;
+      const { mentorId } = req.query;
+      
+      // Allow users to clear their own threads or admin to clear any
+      if (req.user._id.toString() !== userId && req.user.role !== 'admin') {
+        res.status(403).json({ 
+          success: false, 
+          error: 'You can only clear your own mentor threads' 
+        });
+        return;
+      }
+      
+      await clearMentorThreadForUser(userId, mentorId as string);
+      
+      res.status(200).json({
+        success: true,
+        message: mentorId 
+          ? `Mentor thread cleared for user ${userId} with mentor ${mentorId}`
+          : `General mentor thread cleared for user ${userId}`
+      });
+    } catch (error: any) {
+      console.error('Error clearing mentor thread:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'An error occurred while clearing mentor thread'
       });
     }
   },

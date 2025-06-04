@@ -26,10 +26,10 @@ const router = express.Router();
 
 /**
  * @route   GET /api/mentor/chat
- * @desc    Chat with the Adwina Mentor AI assistant
+ * @desc    Chat with the Adwina Mentor AI assistant (deprecated - use POST /ai/chat)
  * @access  Private (requires authentication)
  */
-router.get('/chat', authMiddleware, mentorController.mentorChat);
+router.get('/chat', authMiddleware, mentorController.mentorAiChat);
 
 /**
  * @route   GET /api/mentor/public/mentors
@@ -107,5 +107,41 @@ router.post('/messages/:menteeId', authMiddleware, isMentor, mentorController.se
  * @access  Private (requires authentication)
  */
 router.get('/private/:mentorId', authMiddleware, mentorController.getCompleteMentorProfile);
+
+// Mentor AI Service Routes
+/**
+ * @route   POST /api/mentor/ai/chat
+ * @desc    Chat with AI Mentor
+ * @access  Private (requires authentication)
+ */
+router.post('/ai/chat', authMiddleware, mentorController.mentorAiChat);
+
+/**
+ * @route   GET /api/mentor/ai/stats
+ * @desc    Get mentor AI system statistics
+ * @access  Private (requires authentication)
+ */
+router.get('/ai/stats', authMiddleware, mentorController.getMentorAiStats);
+
+/**
+ * @route   POST /api/mentor/ai/preload
+ * @desc    Preload popular mentor content for performance
+ * @access  Private (requires authentication)
+ */
+router.post('/ai/preload', authMiddleware, mentorController.preloadMentorContent);
+
+/**
+ * @route   DELETE /api/mentor/ai/cache
+ * @desc    Clear mentor search cache
+ * @access  Private (requires authentication)
+ */
+router.delete('/ai/cache', authMiddleware, mentorController.clearMentorCache);
+
+/**
+ * @route   DELETE /api/mentor/ai/threads/:userId
+ * @desc    Clear mentor thread for user
+ * @access  Private (requires authentication - own threads or admin)
+ */
+router.delete('/ai/threads/:userId', authMiddleware, mentorController.clearMentorThread);
 
 export default router; 

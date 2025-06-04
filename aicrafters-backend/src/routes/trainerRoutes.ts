@@ -1,6 +1,6 @@
 import express from 'express';
 import { trainerController } from '../controllers/trainerController';
-import { authMiddleware } from '../middleware/authMiddleware';
+import { authMiddleware } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -17,5 +17,11 @@ router.get('/chat', authMiddleware, trainerController.chat);
  * @access  Private (requires trainer authentication)
  */
 router.get('/users', authMiddleware, trainerController.getUsers);
+
+// Monitoring and management endpoints
+router.get('/stats', authMiddleware, trainerController.getStats);
+router.get('/health', trainerController.healthCheck); // No auth for health checks
+router.post('/preload', authMiddleware, trainerController.preloadContent);
+router.delete('/cache/:courseId', authMiddleware, trainerController.invalidateCache);
 
 export default router; 

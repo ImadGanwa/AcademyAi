@@ -217,4 +217,38 @@ export function clearThreadForUserAndCourse(userId: string, courseId: string): v
  */
 export function getActiveThreadsCount(): number {
   return threadsByUserAndCourse.size;
+}
+
+/**
+ * Get system statistics for monitoring (basic version)
+ */
+export function getSystemStats(): {
+  activeThreads: number;
+  lastVideoTracking: number;
+  health: { redis: boolean };
+} {
+  return {
+    activeThreads: threadsByUserAndCourse.size,
+    lastVideoTracking: lastVideoByThread.size,
+    health: { redis: true }
+  };
+}
+
+/**
+ * Preload popular content (placeholder for future implementation)
+ */
+export async function preloadPopularContent(): Promise<void> {
+  // This is a placeholder function to match the mentor service interface
+  // In the future, this could preload commonly accessed course contexts
+  console.log('Preloading popular trainer content...');
+}
+
+/**
+ * Invalidate context cache (placeholder for future implementation)
+ */
+export async function invalidateContextCache(courseId: string, videoUrl?: string): Promise<void> {
+  // This is a placeholder function to match the mentor service interface
+  // In the future, this could invalidate cached course contexts
+  console.log('Invalidating trainer context cache...', 
+    videoUrl ? `Course: ${courseId}, Video: ${videoUrl}` : `Course: ${courseId}`);
 } 
