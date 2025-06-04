@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import styled from 'styled-components';
-import { VerifiedUser as VerifiedIcon } from '@mui/icons-material';
+import { VerifiedUser as VerifiedIcon, LinkedIn as LinkedInIcon } from '@mui/icons-material';
 import { Mentor } from '../card/MentorCard';
 import { useTranslation } from 'react-i18next';
 import { getCountryFlag, getLanguageFlag, getCountryName } from '../../../../utils/countryUtils';
@@ -168,6 +168,45 @@ const VerifiedBadge = styled(VerifiedIcon)`
   font-size: 18px; /* Adjusted size */
 `;
 
+// LinkedIn section container
+const LinkedInSection = styled(Box)`
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 16px;
+`;
+
+// LinkedIn link styling
+const LinkedInLink = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0077b5; /* LinkedIn blue */
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid #0077b5;
+  border-radius: 24px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #0077b5;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 119, 181, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+// LinkedIn icon styling
+const LinkedInIconStyled = styled(LinkedInIcon)`
+  font-size: 18px;
+`;
+
 // See More/Less button
 const SeeMoreButton = styled(Button)`
   && {
@@ -193,7 +232,7 @@ interface CollapsibleTextProps {
   maxLength?: number;
 }
 
-const CollapsibleText: React.FC<CollapsibleTextProps> = ({ text, maxLength = 300 }) => {
+const CollapsibleText: React.FC<CollapsibleTextProps> = ({ text, maxLength = 550 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const { t } = useTranslation();
 
@@ -254,6 +293,22 @@ export const MentorHeaderInfo: React.FC<MentorHeaderInfoProps> = ({ mentor }) =>
           </MentorName>
           <MentorTitle>{t(`titles.${mentor.title}`, { defaultValue: mentor.title }) as string}</MentorTitle>
         </MentorNameSection>
+
+        {mentor.professionalInfo?.linkedIn && (
+          <LinkedInSection>
+            <LinkedInLink 
+              href={mentor.professionalInfo.linkedIn.startsWith('http') 
+                ? mentor.professionalInfo.linkedIn 
+                : `https://linkedin.com/in/${mentor.professionalInfo.linkedIn}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t('mentorship.viewLinkedInProfile', { defaultValue: 'View LinkedIn Profile' }) as string}
+            >
+              <LinkedInIconStyled />
+              {t('mentorship.linkedInProfile', { defaultValue: 'LinkedIn Profile' }) as string}
+            </LinkedInLink>
+          </LinkedInSection>
+        )}
 
         {mentor.bio && (
           <>

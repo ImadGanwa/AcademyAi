@@ -94,13 +94,13 @@ const AdwinaPanel = styled.div<{ isVisible: boolean }>`
   
   @media (max-width: 1200px) {
     position: fixed;
-    top: 56%;
+    top: 58%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: ${props => props.isVisible ? '90vw' : '0'};
     max-width: ${props => props.isVisible ? '500px' : '0'};
-    height: ${props => props.isVisible ? '82vh' : '0'};
-    max-height: ${props => props.isVisible ? '600px' : '0'};
+    height: ${props => props.isVisible ? '78vh' : '0'};
+    max-height: ${props => props.isVisible ? '550px' : '0'};
     z-index: 1000;
     margin: 0;
     border-radius: 12px;
@@ -109,13 +109,15 @@ const AdwinaPanel = styled.div<{ isVisible: boolean }>`
     opacity: ${props => props.isVisible ? '1' : '0'};
     visibility: ${props => props.isVisible ? 'visible' : 'hidden'};
     transition: all 0.3s ease;
+    /* Prevent clicks from bubbling to backdrop */
+    pointer-events: ${props => props.isVisible ? 'auto' : 'none'};
   }
   
   @media (max-width: 480px) {
     width: ${props => props.isVisible ? '95vw' : '0'};
-    height: ${props => props.isVisible ? '85vh' : '0'};
-    max-height: ${props => props.isVisible ? '650px' : '0'};
-    top: 54%;
+    height: ${props => props.isVisible ? '82vh' : '0'};
+    max-height: ${props => props.isVisible ? '600px' : '0'};
+    top: 56%;
   }
 `;
 
@@ -150,6 +152,11 @@ const MobileBackdrop = styled.div<{ isVisible: boolean }>`
     z-index: 999;
     opacity: ${props => props.isVisible ? '1' : '0'};
     transition: opacity 0.3s ease;
+    cursor: pointer;
+    /* Ensure backdrop is always clickable */
+    pointer-events: auto;
+    /* Prevent scrolling on body when popup is open */
+    touch-action: none;
   }
 `;
 
@@ -207,13 +214,55 @@ export const CourseLearningPage: React.FC = () => {
     localStorage.setItem('AdwinaChatOpen', isChatOpen.toString());
   }, [isChatOpen]);
 
+  // Prevent body scroll when chat is open on mobile
+  useEffect(() => {
+    if (window.innerWidth <= 1200) {
+      if (isChatOpen) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+      } else {
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isChatOpen]);
+
+  // Add escape key listener for closing chat
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isChatOpen) {
+        setIsChatOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isChatOpen]);
+
   // Debug courseProgress
   useEffect(() => {
     console.log('Debug - courseProgress changed to:', courseProgress);
   }, [courseProgress]);
 
-  // Toggle chat visibility
-  const handleToggleChat = () => {
+  // Toggle chat visibility with improved reliability
+  const handleToggleChat = (event?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent event bubbling
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     setIsChatOpen(prevState => !prevState);
   };
 
@@ -672,15 +721,28 @@ export const CourseLearningPage: React.FC = () => {
               <MobileBackdrop 
                 isVisible={isChatOpen} 
                 onClick={handleToggleChat}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  handleToggleChat(e);
+                }}
+                role="button"
+                aria-label="Close Adwina chat"
+                tabIndex={isChatOpen ? 0 : -1}
               />
-              <AdwinaPanel isVisible={isChatOpen}>
+              <AdwinaPanel 
+                isVisible={isChatOpen}
+                onClick={(e) => {
+                  // Prevent backdrop click when clicking inside the panel
+                  e.stopPropagation();
+                }}
+              >
                 <AdwinaContent isVisible={isChatOpen}>
                   <Adwina 
                     courseId={courseId || ''}
                     videoUrl={
                       (currentLesson.content.contentItems.find(item => item.type === 'video')?.content || '')
                     }
-                    onClose={handleToggleChat}
+                    onClose={() => handleToggleChat()}
                   />
                 </AdwinaContent>
               </AdwinaPanel>
@@ -691,7 +753,7 @@ export const CourseLearningPage: React.FC = () => {
         {/* Floating chat button - only show when chat is closed and lesson has video */}
         {hasVideoContent && !isChatOpen && (
           <FloatingButtonContainer>
-            <FloatingChatButton onClick={handleToggleChat} />
+            <FloatingChatButton onClick={() => handleToggleChat()} />
           </FloatingButtonContainer>
         )}
         
