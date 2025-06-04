@@ -54,7 +54,7 @@ const AdwinaMentor: React.FC<AdwinaMentorProps> = ({ mentorId, userId, onClose }
     chatLoading,
     chatError,
     sendMessage,
-  } = useAIMentorFeatures({ mentorId, userId });
+  } = useAIMentorFeatures({ mentorId});
 
   return (
     <AIMentorChatWrapper>
