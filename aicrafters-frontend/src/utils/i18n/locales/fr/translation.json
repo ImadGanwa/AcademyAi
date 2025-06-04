@@ -905,6 +905,13 @@
       }
     },
     "booking": {
+      "hero": {
+        "title": "Mes Sessions de Mentorat",
+        "description": "Gérez vos sessions de mentorat, consultez vos rendez-vous à venir et suivez votre parcours d'apprentissage avec des mentors experts.",
+        "findMentor": "Trouver un Mentor",
+        "viewBookings": "Voir les Réservations"
+      },
+      "mentor": "Mentor",
       "availableTimeSlots": "Créneaux horaires disponibles",
       "noAvailableSlots": "Aucun créneau horaire disponible pour cette date.",
       "selectedDateTime": "Date & Heure sélectionnées :",
@@ -919,7 +926,40 @@
       "description": "Choisissez une date et une heure qui vous conviennent. Une fois confirmé, votre mentor recevra la demande et vous recevrez tous les deux une invitation calendrier.",
       "duration": "30 min",
       "platform": "Conférence Zoom",
-      "at": "à"
+      "at": "à",
+      "loadingBookings": "Chargement de vos réservations...",
+      "noBookingsTitle": "Aucune Réservation",
+      "noBookingsDescription": "Il semble que vous n'ayez pas encore planifié de sessions de mentorat. Trouvez un mentor pour commencer !",
+      "findMentor": "Trouver un Mentor",
+      "viewDetails": "Voir les Détails",
+      "joinSession": "Rejoindre la Session",
+      "sessionDetails": "Détails de la Session",
+      "sessionWith": "Session avec ",
+      "unknownMentor": "Mentor Inconnu",
+      "topic": "Sujet",
+      "noTopic": "Aucun sujet spécifié",
+      "minutes": "min",
+      "dateNotSpecified": "Date non spécifiée",
+      "timeNotSpecified": "Heure non spécifiée",
+      "invalidDateFormat": "Date invalide",
+      "invalidTimeFormat": "Heure invalide",
+      "sessionNotes": "Notes de Session",
+      "joinZoomMeeting": "Rejoindre la Réunion Zoom",
+      "addToCalendar": "Ajouter au Calendrier",
+      "close": "Fermer",
+      "calendarTitle": "Mentorat : {{topic}} avec {{mentorName}}",
+      "calendarDetails": "Sujet : {{topic}}\nRejoindre ici : {{meetingLink}}",
+      "status": {
+        "scheduled": "Planifié",
+        "pending": "En attente",
+        "completed": "Terminé",
+        "cancelled": "Annulé",
+        "no-show": "Absent"
+      },
+      "error": {
+        "unexpectedResponse": "Réponse inattendue du serveur.",
+        "fetchFailed": "Échec du chargement des réservations. Veuillez vérifier votre connexion et réessayer."
+      }
     },
     "confirmation": {
       "bookingConfirmation": "Confirmation de réservation",

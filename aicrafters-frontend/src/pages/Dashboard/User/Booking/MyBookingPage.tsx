@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Typography, Box, Card, CardContent, Chip, Button, Dialog, Grid, CircularProgress, Paper,
-  Avatar, Container, Stack,  Alert
+  Typography, Box, Button, Dialog, CircularProgress,
+  Avatar, Container, Stack, Alert, Divider
 } from '@mui/material';
+import IconButton from '@mui/material/IconButton';
 import styled, { ThemeProvider } from 'styled-components';
+import { motion, AnimatePresence } from 'framer-motion';
+import CloseIcon from '@mui/icons-material/Close';
 
 // Icons
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -12,213 +15,388 @@ import TimerIcon from '@mui/icons-material/Timer';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import AddIcon from '@mui/icons-material/Add';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
-// Original Imports from your script
-import { Layout } from '../../../../components/layout/Layout/Layout'; // Assuming this path is correct
+// Components
+import { Layout } from '../../../../components/layout/Layout/Layout';
+import { BookingHero } from '../../../../components/layout/Booking/BookingHero';
 import { useTranslation } from 'react-i18next';
 import { getUserBookings } from '../../../../api/booking'; 
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../../../../assets/styles/theme';
 
-
 // Styled components
 const PageWrapper = styled.div`
-  width: 100%;
-  padding-top: ${({ theme }) => theme.spacing(3)};
-  padding-bottom: ${({ theme }) => theme.spacing(5)};
-  background-color: #f7f9fc;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  background-color: #f5f5f5;
 `;
 
-const PageTitle = styled(Typography)`
-  margin-bottom: ${({ theme }) => theme.spacing(3.5)};
-  text-align: center;
-  color: #1a1a2c; // From original script's Title
-  @media (min-width: ${theme.breakpoints.values.sm}px) {
-    text-align: left;
+const ContentSection = styled.section`
+  padding-bottom: 50px;
+  position: relative;
+  margin-top: 50px;
+
+  @media (max-width: 768px) {
+    padding-bottom: 100px;
+    margin-top: 16px;
   }
 `;
 
-const BookingCardStyled = styled(Card)<{ $status?: string }>`
-  margin-bottom: ${({ theme }) => theme.spacing(2.5)};
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
-  border: 1px solid ${({ theme }) => theme.palette.grey[300]};
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  background-color: white;
+const ContentWrapper = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 24px;
 
-  ${({ $status, theme }) =>
-    $status === 'scheduled' && `border-left: 4px solid ${theme.palette.info.main};`}
-  ${({ $status, theme }) =>
-    $status === 'completed' && `border-left: 4px solid ${theme.palette.success.main};`}
-  ${({ $status, theme }) =>
-    $status === 'cancelled' && `border-left: 4px solid ${theme.palette.error.main};`}
-   ${({ $status, theme }) =>
-    $status === 'no-show' && `border-left: 4px solid ${theme.palette.warning.main};`}
+  @media (max-width: 768px) {
+    padding: 0;
+  }
+`;
 
+const BookingSection = styled.div`
+  /* Removed card styling - now just a container */
+  /* background: white; */
+  /* border-radius: 12px; */
+  /* padding: 24px; */
+  /* margin-bottom: 16px; */
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+
+  @media (max-width: 768px) {
+    /* background: transparent; */
+    /* padding: 0; */
+    /* box-shadow: none; */
+    /* border-radius: 0; */
+    /* margin-bottom: 0; */
+  }
+`;
+
+const BookingCard = styled(motion.div)<{ $status?: string }>`
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #E8ECEF;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  @media (max-width: 768px) {
+    border-radius: 16px;
+    margin-bottom: 16px;
+    border: none;
   }
 `;
 
 const CardHeader = styled(Box)`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: ${({ theme }) => theme.spacing(1.5)};
+  padding: 24px;
+  border-bottom: 1px solid #E8ECEF;
+  background-color: #FAFBFC;
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+    background-color: white;
+  }
 `;
 
 const MentorInfo = styled(Box)`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(1.5)};
+  gap: 12px;
+  margin-bottom: 12px;
+`;
+
+const MentorAvatar = styled(Avatar)`
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #6D4794 0%, #D710C1 100%);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+`;
+
+const MentorDetails = styled(Box)`
+  flex: 1;
 `;
 
 const MentorName = styled(Typography)`
   font-weight: 600;
   color: ${({ theme }) => theme.palette.text.primary};
+  font-size: 1.1rem;
+  margin-bottom: 2px;
 `;
 
-const BookingTopic = styled(Typography)`
-  color: ${({ theme }) => theme.palette.text.secondary};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 2.4em; // Approx 2 lines
-`;
-
-const InfoRow = styled(Stack)`
+const MentorTitle = styled(Typography)`
   color: ${({ theme }) => theme.palette.text.secondary};
   font-size: 0.875rem;
-  
-  & svg {
-    color: ${({ theme }) => theme.palette.primary.main};
-    font-size: 1.05rem; // Slightly smaller than before for refinement
-  }
 `;
 
-const StatusChip = styled(Chip)<{ $status: string }>`
-  font-weight: 500;
-  font-size: 0.75rem; // Smaller chip text
-  height: 26px;
-  border-radius: ${({ theme }) => theme.shape.borderRadius * 0.6}px;
+const StatusChip = styled.div<{ $status: string }>`
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 
   background-color: ${props => {
     switch (props.$status) {
-      case 'scheduled': return props.theme.palette.info.light;
-      case 'completed': return props.theme.palette.success.light;
-      case 'cancelled': return props.theme.palette.error.light;
-      case 'no-show': return props.theme.palette.warning.light; // Using warning theme color
-      default: return props.theme.palette.info.light;
+      case 'scheduled': 
+      case 'pending': return '#FEF3C7';
+      case 'completed': return '#D1FAE5';
+      case 'cancelled': return '#FEE2E2';
+      case 'no-show': return '#FED7AA';
+      default: return '#FEF3C7';
     }
   }};
   color: ${props => {
     switch (props.$status) {
-      case 'scheduled': return props.theme.palette.info.contrastText;
-      case 'completed': return props.theme.palette.success.contrastText;
-      case 'cancelled': return props.theme.palette.error.contrastText;
-      case 'no-show': return props.theme.palette.warning.contrastText; // Using warning theme color
-      default: return props.theme.palette.info.contrastText;
+      case 'scheduled':
+      case 'pending': return '#92400E';
+      case 'completed': return '#065F46';
+      case 'cancelled': return '#991B1B';
+      case 'no-show': return '#9A3412';
+      default: return '#92400E';
     }
   }};
 `;
 
-const ActionButton = styled(Button)`
-  border-radius: ${({ theme }) => theme.shape.borderRadius * 0.8}px;
-`;
+const StyledIconWrapper = styled(Box)`
+  display: none;
 
-const PrimaryActionButton = styled(ActionButton)`
-  background-color: ${({ theme }) => theme.palette.primary.main};
-  color: white;
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.primary.dark};
-  }
-`;
-
-const SecondaryActionButton = styled(ActionButton)`
-    border: 1px solid ${({ theme }) => theme.palette.grey[400]};
-    color: ${({ theme }) => theme.palette.text.primary};
-    &:hover {
-        background-color: ${({ theme }) => theme.palette.grey[100]};
-        border-color: ${({ theme }) => theme.palette.grey[500]};
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${({ theme }) => theme.palette.primary.main};
+    border-radius: 8px;
+    padding: 8px;
+    min-width: 40px;
+    height: 40px;
+    svg {
+      fill: white;
+      color: white;
+      font-size: 20px;
     }
-`;
-
-const ZoomButton = styled(PrimaryActionButton)`
-  background-color: ${({ theme }) => theme.palette.secondary.main}; // Using secondary (pink) from theme
-  &:hover {
-    background-color: ${({ theme }) => theme.palette.secondary.dark};
   }
 `;
 
-const NoBookingsContainer = styled(Paper)`
+const CardContent = styled(Box)`
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+`;
+
+const BookingTopic = styled(Typography)`
+  color: ${({ theme }) => theme.palette.text.primary};
+  margin-bottom: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 500;
+`;
+
+const BookingDetails = styled(Box)`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+`;
+
+const DetailItem = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: ${({ theme }) => theme.palette.text.secondary};
+  font-size: 0.875rem;
+  font-weight: 500;
+  
+  & > svg:not(.mobile-icon-wrapper svg) {
+    color: ${({ theme }) => theme.palette.primary.main};
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    background: #F8F9FA;
+    border: 1px solid #E8ECEF;
+    border-radius: 12px;
+    padding: 16px;
+    gap: 12px;
+
+    & > svg:not(.mobile-icon-wrapper svg) {
+      display: none;
+    }
+  }
+`;
+
+const ActionButtons = styled(Box)`
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+  }
+`;
+
+const ActionButton = styled(Button)`
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 10px 20px;
+  text-transform: none;
+  transition: all 0.2s ease;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+const PrimaryButton = styled(ActionButton)`
+  background: linear-gradient(135deg, #6D4794 0%, #D710C1 100%);
+  color: white;
+  
+  &:hover {
+    background: linear-gradient(135deg, #5a3a7a 0%, #b0009c 100%);
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: scale(0.98) translateY(0px);
+    background: linear-gradient(135deg, #50306f 0%, #a0008c 100%);
+  }
+`;
+
+const SecondaryButton = styled(ActionButton)`
+  border: 2px solid #e5e7eb;
+  color: ${({ theme }) => theme.palette.text.primary};
+  background: white;
+  
+  &:hover {
+    background: #f9fafb;
+    border-color: ${({ theme }) => theme.palette.primary.main};
+    color: ${({ theme }) => theme.palette.primary.main};
+    transform: translateY(-1px);
+  }
+  &:active {
+    transform: scale(0.98) translateY(0px);
+    background: #f0f0f0;
+    border-color: ${({ theme }) => theme.palette.primary.dark};
+  }
+`;
+
+const NoBookingsContainer = styled(motion.div)`
+  background: white;
+  border-radius: 12px;
+  padding: 60px 32px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: ${({ theme }) => theme.spacing(5)} ${({ theme }) => theme.spacing(3)};
-  margin: ${({ theme }) => theme.spacing(5)} auto;
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  background-color: white;
-  border: 1px dashed ${({ theme }) => theme.palette.grey[400]};
-  text-align: center;
-  max-width: 500px;
+
+  @media (max-width: 768px) {
+    border-radius: 16px;
+    margin: 0 16px;
+    padding: 40px 24px;
+  }
 `;
 
-const IllustrationContainer = styled(Box)`
-  margin-bottom: ${({ theme }) => theme.spacing(3)};
-  color: ${({ theme }) => theme.palette.primary.light};
+const IllustrationContainer = styled(motion.div)`
+  margin-bottom: 24px;
+  color: #6D4794;
+  opacity: 0.7;
   
   svg {
-    font-size: 4.5rem;
-    opacity: 0.7;
+    font-size: 4rem;
   }
 `;
 
-const LoadingContainer = styled(Box)`
+const LoadingContainer = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
+  min-height: 400px;
   width: 100%;
 `;
 
 const ConfirmationDialog = styled(Dialog)`
   .MuiDialog-paper {
-    border-radius: ${({ theme }) => theme.shape.borderRadius * 1.2}px;
-    padding: ${({ theme }) => theme.spacing(0.5)}; // Small padding around content box
+    border-radius: 16px;
+    padding: 0;
+    max-width: 600px;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
   }
+`;
+
+const DialogHeader = styled(Box)`
+  background-color: ${({ theme }) => theme.palette.primary.main};
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const DialogTitleStyled = styled(Typography)`
   font-weight: 600;
-  color: ${({ theme }) => theme.palette.text.primary};
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
-  text-align: center;
+  font-size: 1.25rem;
 `;
 
-const DialogInfoContainer = styled(Paper)`
-  border: 1px solid ${({ theme }) => theme.palette.grey[200]};
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
-  padding: ${({ theme }) => theme.spacing(2.5)};
-  background-color: ${({ theme }) => theme.palette.grey[50]};
-  margin: ${({ theme }) => theme.spacing(2.5)} 0;
+const DialogContentStyled = styled(Box)`
+  padding: 24px;
 `;
 
-const SessionHeader = styled(Typography)`
-  font-weight: 600;
-  color: ${({ theme }) => theme.palette.text.primary};
-  margin-bottom: ${({ theme }) => theme.spacing(1)};
-`;
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  }
+};
 
 const MyBookingPage: React.FC = () => {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -227,7 +405,7 @@ const MyBookingPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('translation');
   const navigate = useNavigate();
   const currentLanguage = i18n.language;
 
@@ -240,74 +418,80 @@ const MyBookingPage: React.FC = () => {
         if (response && response.data && response.data.bookings) {
           setBookings(response.data.bookings);
         } else {
-          // This case implies an unexpected API response structure
           console.error("Unexpected API response structure:", response);
-          setError(t('booking.error.unexpectedResponse', "Received an unexpected response from the server.") as string);
+          setError("Received an unexpected response from the server.");
           setBookings([]);
         }
       } catch (err: any) {
         console.error("Error fetching bookings:", err);
-        setError(t('booking.error.fetchFailed', "Failed to load bookings. Please check your connection and try again.") as string);
-        setBookings([]); // Clear bookings on error
+        setError("Failed to load bookings. Please check your connection and try again.");
+        setBookings([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchBookings();
-  }, [t]); // Added `t` to dependency array as it's used in error messages
+  }, []);
 
-  const handleOpenDetails = (booking: any) => {
+  const handleOpenDetails = useCallback((booking: any) => {
     setSelectedBooking(booking);
     setOpenDialog(true);
-  };
+  }, []);
 
-  const handleCloseDialog = () => setOpenDialog(false);
+  const handleCloseDialog = useCallback(() => setOpenDialog(false), []);
 
-  const handleZoomLink = (bookingToOpen?: any) => {
+  const handleZoomLink = useCallback((bookingToOpen?: any) => {
     const booking = bookingToOpen || selectedBooking;
     if (booking && booking.meetingLink) {
       window.open(booking.meetingLink, '_blank', 'noopener,noreferrer');
     }
-  };
+  }, [selectedBooking]);
 
-  const handleAddToCalendar = () => {
+  const handleAddToCalendar = useCallback(() => {
     if (!selectedBooking) return;
-    const mentorName = selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('booking.unknownMentor', 'your mentor') as string;
+    const mentorName = selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('mentor.booking.unknownMentor', 'your mentor') as string;
     const startDateTime = `${selectedBooking.date}T${selectedBooking.startTime}:00`;
     const endDateTime = `${selectedBooking.date}T${selectedBooking.endTime}:00`;
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t('booking.calendarTitle', `Mentorship: ${selectedBooking.topic} with ${mentorName}`, { topic: selectedBooking.topic, mentorName }))}&details=${encodeURIComponent(t('booking.calendarDetails', `Topic: ${selectedBooking.topic}\nJoin here: ${selectedBooking.meetingLink || 'Online'}`, { topic: selectedBooking.topic, meetingLink: selectedBooking.meetingLink || 'Online' }))}&location=${encodeURIComponent(selectedBooking.meetingLink || 'Online Meeting')}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}`;
+    const calendarTitle = t('mentor.booking.calendarTitle', 'Mentorship: {{topic}} with {{mentorName}}', { 
+      topic: selectedBooking.topic, 
+      mentorName 
+    }) as string;
+    const calendarDetails = t('mentor.booking.calendarDetails', 'Topic: {{topic}}\nJoin here: {{meetingLink}}', { 
+      topic: selectedBooking.topic, 
+      meetingLink: selectedBooking.meetingLink || 'Online' 
+    }) as string;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(calendarTitle)}&details=${encodeURIComponent(calendarDetails)}&location=${encodeURIComponent(selectedBooking.meetingLink || 'Online Meeting')}&dates=${startDateTime.replace(/[-:]/g, '')}/${endDateTime.replace(/[-:]/g, '')}`;
     window.open(googleCalendarUrl, '_blank', 'noopener,noreferrer');
-  };
+  }, [selectedBooking, t]);
 
-  const handleFindMentor = () => navigate(`/${currentLanguage}/mentorship`);
+  const handleFindMentor = useCallback(() => navigate(`/${currentLanguage}/mentorship`), [navigate, currentLanguage]);
 
-  const formatDate = (dateString: string | undefined): string => {
-    if (!dateString) return t('booking.dateNotSpecified', 'Date not specified') as string;
+  const formatDate = useCallback((dateString: string | undefined): string => {
+    if (!dateString) return t('mentor.booking.dateNotSpecified', 'Date not specified') as string;
     try {
       return new Date(dateString).toLocaleDateString(
         currentLanguage === 'fr' ? 'fr-FR' : 'en-US', 
         { day: 'numeric', month: 'long', year: 'numeric' }
       );
-    } catch { return t('booking.invalidDateFormat', 'Invalid date') as string; }
-  };
+    } catch { return t('mentor.booking.invalidDateFormat', 'Invalid date') as string; }
+  }, [currentLanguage, t]);
 
-  const formatTime = (timeString: string | undefined, scheduledAt?: string): string => {
+  const formatTime = useCallback((timeString: string | undefined, scheduledAt?: string): string => {
     if (!timeString && scheduledAt) {
       try {
         const date = new Date(scheduledAt);
         if (!isNaN(date.getTime())) timeString = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-      } catch {} // Silently ignore if scheduledAt is invalid
+      } catch {}
     }
-    if (!timeString) return t('booking.timeNotSpecified', 'Time not specified') as string;
+    if (!timeString) return t('mentor.booking.timeNotSpecified', 'Time not specified') as string;
     
     const locale = currentLanguage === 'fr' ? 'fr-FR' : 'en-US';
     try {
-        const date = new Date(`1970-01-01T${timeString}`); // Create a dummy date with the time
+        const date = new Date(`1970-01-01T${timeString}`);
         if (isNaN(date.getTime())) throw new Error("Invalid time for Date constructor");
         return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: 'numeric', hour12: locale !== 'fr-FR' }).format(date);
     } catch {
-        // Fallback for simpler display if Intl fails or timeString is problematic
         const parts = timeString.split(':');
         if (parts.length === 2) {
             const hourInt = parseInt(parts[0]);
@@ -317,25 +501,49 @@ const MyBookingPage: React.FC = () => {
                  return `${hourInt % 12 || 12}:${minute}${hourInt >= 12 ? ' PM' : ' AM'}`;
             }
         }
-        return t('booking.invalidTimeFormat', 'Invalid time') as string;
+        return t('mentor.booking.invalidTimeFormat', 'Invalid time') as string;
     }
-  };
+  }, [currentLanguage, t]);
 
-  const getStatusLabel = (status: string): string => t(`booking.status.${status}`, status.charAt(0).toUpperCase() + status.slice(1)) as string;
+  const getStatusLabel = useCallback((status: string): string => t(`mentor.booking.status.${status}`, status.charAt(0).toUpperCase() + status.slice(1)) as string, [t]);
+
+  // Translate error messages after component mounts
+  const translatedError = useMemo(() => {
+    if (!error) return null;
+    if (error.includes('unexpected response')) {
+      return t('mentor.booking.error.unexpectedResponse', "Received an unexpected response from the server.") as string;
+    }
+    if (error.includes('Failed to load')) {
+      return t('mentor.booking.error.fetchFailed', "Failed to load bookings. Please check your connection and try again.") as string;
+    }
+    return error;
+  }, [error, t]);
 
   if (loading) {
     return (
       <Layout>
         <ThemeProvider theme={theme}>
           <PageWrapper>
-            <Container maxWidth="md">
-              <LoadingContainer>
-                <CircularProgress size={50} thickness={3.5} />
-                <Typography variant="h6" sx={{ mt: 3, color: 'text.secondary' }}>
-                  {t('booking.loadingBookings', 'Loading your bookings...') as string}
-                </Typography>
-              </LoadingContainer>
-            </Container>
+            <BookingHero />
+            <ContentSection>
+              <Container maxWidth="lg">
+                <LoadingContainer
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
+                    <CircularProgress size={60} thickness={4} />
+                  </motion.div>
+                  <Typography variant="h6" sx={{ mt: 3, color: 'text.secondary', fontWeight: 500 }}>
+                    {t('mentor.booking.loadingBookings', 'Loading your bookings...') as string}
+                  </Typography>
+                </LoadingContainer>
+              </Container>
+            </ContentSection>
           </PageWrapper>
         </ThemeProvider>
       </Layout>
@@ -343,195 +551,239 @@ const MyBookingPage: React.FC = () => {
   }
 
   return (
-    <Layout> {/* Your main Layout component */}
+    <Layout>
       <ThemeProvider theme={theme}>
         <PageWrapper>
-          <Container maxWidth="md">
-            <PageTitle variant="h2">
-              {t('booking.myBookings', 'My Bookings') as string}
-            </PageTitle>
+          <BookingHero />
+          <ContentSection id="bookings-section">
+            <ContentWrapper>
+              <AnimatePresence>
+                {translatedError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Alert severity="error" sx={{ mb: 4, borderRadius: 2 }}>
+                      {translatedError}
+                    </Alert>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {error}
-              </Alert>
-            )}
-
-            {!loading && !error && bookings.length === 0 ? (
-              <NoBookingsContainer elevation={0}>
-                <IllustrationContainer>
-                  <EventBusyIcon />
-                </IllustrationContainer>
-                <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
-                  {t('booking.noBookingsTitle', 'No Bookings Yet') as string}
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: '400px' }}>
-                  {t('booking.noBookingsDescription', "It looks like you haven't scheduled any mentorship sessions. Find a mentor to get started!") as string}
-                </Typography>
-                <PrimaryActionButton
-                  variant="contained"
-                  startIcon={<PersonSearchIcon />}
-                  onClick={handleFindMentor}
-                  size="large"
+              {!loading && !translatedError && bookings.length === 0 ? (
+                <NoBookingsContainer
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  {t('booking.findMentor', 'Find a Mentor') as string}
-                </PrimaryActionButton>
-              </NoBookingsContainer>
-            ) : (
-              <Grid container spacing={0}> {/* Cards have their own margin-bottom */}
-                {bookings.map(booking => (
-                  <Grid item xs={12} key={booking._id}>
-                    <BookingCardStyled $status={booking.status}>
-                      <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}> {/* Slightly reduced padding */}
+                  <IllustrationContainer
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                  >
+                    <EventBusyIcon />
+                  </IllustrationContainer>
+                  <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 700, color: 'text.primary', mb: 2 }}>
+                    {t('mentor.booking.noBookingsTitle', 'No Bookings Yet') as string}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: '400px', lineHeight: 1.6 }}>
+                    {t('mentor.booking.noBookingsDescription', "It looks like you haven't scheduled any mentorship sessions. Find a mentor to get started!") as string}
+                  </Typography>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <PrimaryButton
+                      variant="contained"
+                      startIcon={<PersonSearchIcon />}
+                      onClick={handleFindMentor}
+                      size="large"
+                    >
+                      {t('mentor.booking.findMentor', 'Find a Mentor') as string}
+                    </PrimaryButton>
+                  </motion.div>
+                </NoBookingsContainer>
+              ) : (
+                <BookingSection> {/* Now just a simple container, no card styling */}
+                  <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    {bookings.map((booking, index) => (
+                      <BookingCard
+                        key={booking._id}
+                        variants={cardVariants}
+                        $status={booking.status}
+                      >
                         <CardHeader>
                           <MentorInfo>
-                            <Avatar sx={{ bgcolor: 'primary.light', color: 'primary.dark', width: 44, height: 44 }}>
-                              <AccountCircleIcon sx={{ fontSize: '1.8rem' }}/>
-                            </Avatar>
-                            <Box>
+                            <MentorAvatar 
+                              src={booking.mentorId?.profileImage} 
+                              alt={booking.mentorId?.fullName || booking.mentorName}
+                            >
+                              {!booking.mentorId?.profileImage && (booking.mentorId?.fullName?.[0] || booking.mentorName?.[0] || 'M')}
+                            </MentorAvatar>
+                            <MentorDetails>
                               <MentorName variant="h6">
-                                {booking.mentorId?.fullName || booking.mentorName || t('booking.unknownMentor', 'Unknown Mentor') as string}
+                                {booking.mentorId?.fullName || booking.mentorName || t('mentor.booking.unknownMentor', 'Unknown Mentor') as string}
                               </MentorName>
-                              {/* Optional: Mentor title if available */}
-                              {/* <Typography variant="caption" color="text.secondary">Mentor</Typography> */}
-                            </Box>
+                              <MentorTitle variant="caption">
+                                {t('mentor.booking.mentor', 'Mentor') as string}
+                              </MentorTitle>
+                            </MentorDetails>
                           </MentorInfo>
-                          <StatusChip
-                            label={getStatusLabel(booking.status)}
-                            $status={booking.status}
-                          />
+                          <StatusChip $status={booking.status}>
+                            {getStatusLabel(booking.status)}
+                          </StatusChip>
                         </CardHeader>
 
-                        <BookingTopic variant="subtitle1" sx={{ mt: 0.5, mb: 2.5}}>
-                          {booking.topic || t('booking.noTopic', 'No topic specified') as string}
-                        </BookingTopic>
+                        <CardContent>
+                          <BookingTopic variant="subtitle1">
+                            {booking.topic || t('mentor.booking.noTopic', 'No topic specified') as string}
+                          </BookingTopic>
 
-                        <Grid container spacing={1.5} sx={{ mb: 2.5 }}>
-                          <Grid item xs={12} sm={4}>
-                            <InfoRow direction="row" spacing={1} alignItems="center">
-                              <CalendarMonthIcon />
+                          <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
+
+                          <BookingDetails>
+                            <DetailItem>
+                              <CalendarMonthIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                              <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper">
+                                <CalendarMonthIcon />
+                              </StyledIconWrapper>
                               <span>{formatDate(booking.date || booking.scheduledAt)}</span>
-                            </InfoRow>
-                          </Grid>
-                          <Grid item xs={6} sm={4}>
-                            <InfoRow direction="row" spacing={1} alignItems="center">
-                              <ScheduleIcon />
+                            </DetailItem>
+                            <DetailItem>
+                              <ScheduleIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                              <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper">
+                                <ScheduleIcon />
+                              </StyledIconWrapper>
                               <span>{formatTime(booking.startTime, booking.scheduledAt)}</span>
-                            </InfoRow>
-                          </Grid>
-                          <Grid item xs={6} sm={4}>
-                            <InfoRow direction="row" spacing={1} alignItems="center">
-                              <TimerIcon />
-                              <span>{booking.duration || 30} {t('booking.minutes', 'min') as string}</span>
-                            </InfoRow>
-                          </Grid>
-                        </Grid>
+                            </DetailItem>
+                            <DetailItem>
+                              <TimerIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                              <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper">
+                                <TimerIcon />
+                              </StyledIconWrapper>
+                              <span>{booking.duration || 30} {t('mentor.booking.minutes', 'min') as string}</span>
+                            </DetailItem>
+                          </BookingDetails>
 
-                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="flex-end">
-                          <SecondaryActionButton
-                            variant="outlined"
-                            startIcon={<InfoOutlinedIcon />}
-                            onClick={() => handleOpenDetails(booking)}
-                            sx={{ width: { xs: '100%', sm: 'auto' } }}
-                          >
-                            {t('booking.viewDetails', 'View Details') as string}
-                          </SecondaryActionButton>
-                          {booking.status === 'scheduled' && (
-                            <ZoomButton
-                              variant="contained"
-                              startIcon={<VideocamIcon />}
-                              onClick={() => handleZoomLink(booking)}
-                              sx={{ width: { xs: '100%', sm: 'auto' } }}
+                          <Divider sx={{ my: 2, display: { xs: 'none', md: 'block' } }} />
+
+                          <ActionButtons>
+                            <SecondaryButton
+                              variant="outlined"
+                              startIcon={<InfoOutlinedIcon />}
+                              onClick={() => handleOpenDetails(booking)}
                             >
-                              {t('booking.joinSession', 'Join Session') as string}
-                            </ZoomButton>
-                          )}
-                        </Stack>
-                      </CardContent>
-                    </BookingCardStyled>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </Container>
+                              {t('mentor.booking.viewDetails', 'View Details') as string}
+                            </SecondaryButton>
+                            {booking.status === 'scheduled' && (
+                              <PrimaryButton
+                                variant="contained"
+                                startIcon={<VideocamIcon />}
+                                onClick={() => handleZoomLink(booking)}
+                              >
+                                {t('mentor.booking.joinSession', 'Join Session') as string}
+                              </PrimaryButton>
+                            )}
+                          </ActionButtons>
+                        </CardContent>
+                      </BookingCard>
+                    ))}
+                  </motion.div>
+                </BookingSection>
+              )}
+            </ContentWrapper>
+          </ContentSection>
 
           <ConfirmationDialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-            <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              <DialogTitleStyled variant="h3">
-                {t('booking.sessionDetails', 'Session Details') as string}
+            <DialogHeader>
+              <DialogTitleStyled>
+                {t('mentor.booking.sessionDetails', 'Session Details') as string}
               </DialogTitleStyled>
+              <IconButton aria-label="close" onClick={handleCloseDialog} sx={{ color: 'white' }}>
+                <CloseIcon />
+              </IconButton>
+            </DialogHeader>
 
+            <DialogContentStyled>
               {selectedBooking && (
                 <>
-                  <DialogInfoContainer elevation={0}>
-                    <SessionHeader variant="h4"> {}
-                      {t('booking.sessionWith', 'Session with')}{' '}
-                      {selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('booking.unknownMentor', 'Unknown Mentor') as string}
-                    </SessionHeader>
-                    <Stack spacing={1.5} sx={{mt: 1.5}}>
-                      <InfoRow direction="row" spacing={1.5} alignItems="center">
-                        <CalendarMonthIcon />
-                        <Typography variant="body1">{formatDate(selectedBooking.date || selectedBooking.scheduledAt)}</Typography>
-                      </InfoRow>
-                      <InfoRow direction="row" spacing={1.5} alignItems="center">
-                        <ScheduleIcon />
-                        <Typography variant="body1">{formatTime(selectedBooking.startTime, selectedBooking.scheduledAt)}</Typography>
-                      </InfoRow>
-                      <InfoRow direction="row" spacing={1.5} alignItems="center">
-                        <TimerIcon />
-                        <Typography variant="body1">{selectedBooking.duration} {t('booking.minutes', 'min') as string}</Typography>
-                      </InfoRow>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" component="h3" fontWeight={600} color="text.primary" marginBottom={2}>
+                      {t('mentor.booking.sessionWith', 'Session with ')}
+                      {selectedBooking.mentorId?.fullName || selectedBooking.mentorName || t('mentor.booking.unknownMentor', 'Unknown Mentor') as string}
+                    </Typography>
+                    
+                    <Stack spacing={1.5} sx={{ mb: 2 }}>
+                      <DetailItem>
+                        <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper"><CalendarMonthIcon /></StyledIconWrapper>
+                        <CalendarMonthIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                        <span>{formatDate(selectedBooking.date || selectedBooking.scheduledAt)}</span>
+                      </DetailItem>
+                      <DetailItem>
+                        <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper"><ScheduleIcon /></StyledIconWrapper>
+                        <ScheduleIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                        <span>{formatTime(selectedBooking.startTime, selectedBooking.scheduledAt)}</span>
+                      </DetailItem>
+                      <DetailItem>
+                        <StyledIconWrapper sx={{ display: { xs: 'flex', sm: 'none' } }} className="mobile-icon-wrapper"><TimerIcon /></StyledIconWrapper>
+                        <TimerIcon sx={{ display: { xs: 'none', sm: 'flex' } }} />
+                        <span>{selectedBooking.duration} {t('mentor.booking.minutes', 'min') as string}</span>
+                      </DetailItem>
                     </Stack>
 
-                    <Typography variant="subtitle1" fontWeight={600} mt={2.5} mb={0.5}>
-                      {t('booking.topic', 'Topic')}:
+                    <Divider sx={{ mt: 2, mb: 2 }} />
+
+                    <Typography variant="h6" component="h4" fontWeight={600} color="text.primary" marginBottom={1}>
+                      {t('mentor.booking.topic', 'Topic')}:
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary" sx={{ mb: selectedBooking.notes?.sharedNotes ? 2 : 0 }}>
                       {selectedBooking.topic}
                     </Typography>
 
                     {selectedBooking.notes?.sharedNotes && (
                       <>
-                        <Typography variant="subtitle1" fontWeight={600} mt={2.5} mb={0.5}>
-                          {t('booking.sessionNotes', 'Session Notes')}:
+                        <Typography variant="h6" component="h4" fontWeight={600} color="text.primary" marginTop={2} marginBottom={1}>
+                          {t('mentor.booking.sessionNotes', 'Session Notes')}:
                         </Typography>
                         <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
                           {selectedBooking.notes.sharedNotes}
                         </Typography>
+                        <Divider sx={{ my: 2 }} />
                       </>
                     )}
-                  </DialogInfoContainer>
+                  </Box>
 
                   {selectedBooking.status === 'scheduled' && (
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 3 }}>
-                      <PrimaryActionButton // Switched to PrimaryActionButton for consistency, ZoomButton used on card
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ marginTop: 3, marginBottom: 1 }}>
+                      <PrimaryButton
                         variant="contained"
                         startIcon={<VideocamIcon />}
                         onClick={handleZoomLink}
                         fullWidth
                         size="large"
                       >
-                        {t('booking.joinZoomMeeting', 'Join Zoom Meeting') as string}
-                      </PrimaryActionButton>
-                      <SecondaryActionButton
+                        {t('mentor.booking.joinZoomMeeting', 'Join Zoom Meeting') as string}
+                      </PrimaryButton>
+                      <SecondaryButton
                         variant="outlined"
                         startIcon={<AddIcon />}
                         onClick={handleAddToCalendar}
                         fullWidth
                         size="large"
                       >
-                        {t('booking.addToCalendar', 'Add to Calendar') as string}
-                      </SecondaryActionButton>
+                        {t('mentor.booking.addToCalendar', 'Add to Calendar') as string}
+                      </SecondaryButton>
                     </Stack>
                   )}
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: selectedBooking.status === 'scheduled' ? 3 : 2.5 }}>
-                    <Button onClick={handleCloseDialog} color="inherit" sx={{ fontWeight: 500, color: 'text.secondary' }}>
-                      {t('booking.close', 'Close') as string}
-                    </Button>
-                  </Box>
                 </>
               )}
-            </Box>
+            </DialogContentStyled>
           </ConfirmationDialog>
         </PageWrapper>
       </ThemeProvider>

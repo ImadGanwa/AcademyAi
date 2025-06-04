@@ -676,7 +676,7 @@ export const Navbar: React.FC = () => {
 
     return (
       <UserDropdown ref={dropdownRef} $isOpen={isUserMenuOpen}>
-        <DropdownItem to={`/${currentLanguage}/dashboard/user/learning`} onClick={handleDropdownItemClick} style={{fontWeight: 'bold'}}>
+        <DropdownItem to={`/${currentLanguage}/dashboard/user/learning`} onClick={handleDropdownItemClick}>
           {t('user.navbar.myLearning')}
         </DropdownItem>
         <DropdownItem to={`/${currentLanguage}/dashboard/user/booking`} onClick={handleDropdownItemClick}>
