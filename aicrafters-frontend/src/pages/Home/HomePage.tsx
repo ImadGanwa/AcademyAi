@@ -158,7 +158,9 @@ export const HomePage: React.FC = () => {
       <Hero />
       
       
-      <AdwinCourseSection />
+      {/* <AdwinCourseSection /> */}
+      <CoursesSection onCourseClick={handleCourseClick} />
+
       
       <TracePlusSection maxWidth="lg" ref={tracePlusSectionRef} id="traceSection">
         <SectionHeader>
@@ -210,7 +212,6 @@ export const HomePage: React.FC = () => {
         </ImagesGrid>
       </TracePlusSection>
       
-      <CoursesSection onCourseClick={handleCourseClick} />
     </Layout>
   );
 }; 

@@ -28,7 +28,7 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({ children, allowRedirec
       dashboardPath = `/${currentLang}/dashboard/trainer`;
       break;
     default:
-      dashboardPath = `/${currentLang}/dashboard/user/learning`;
+      dashboardPath = `/${currentLang}`;
   }
     
   return <Navigate to={dashboardPath} replace />;

@@ -124,7 +124,7 @@ export const AppRoutes: React.FC = () => {
       case 'mentor':
         return `/${lang}/dashboard/mentor/mentees`;
       default:
-        return `/${lang}/dashboard/user/learning`;
+        return `/${lang}/`;
     }
   };
 

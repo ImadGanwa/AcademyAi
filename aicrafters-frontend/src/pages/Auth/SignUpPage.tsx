@@ -197,7 +197,7 @@ export const SignUpPage: React.FC = () => {
             dashboardPath = '/dashboard/mentor';
             break;
           default:
-            dashboardPath = '/dashboard/user/learning';
+            dashboardPath = '/';
         }
 
         // Get the current language from the URL
@@ -322,7 +322,7 @@ export const SignUpPage: React.FC = () => {
             dashboardPath = '/dashboard/mentor';
             break;
           default:
-            dashboardPath = '/dashboard/user/learning';
+            dashboardPath = '';
         }
 
         // Get the current language from the URL
