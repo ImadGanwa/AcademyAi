@@ -388,7 +388,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
 
   const handleShare = () => {
     // Create the sharing text with proper formatting
-    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: ${config.FRONTEND_URL}/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #ADWIN`;
+    const shareText = `I just completed ${courseTitle}!\n\n${courseSubtitle}\n\nCheck out my achievement: https://app.adwin.global/en/courses/${courseId}\n\n${categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')} #ADWIN`;
     
     // Use LinkedIn's feed sharing URL
     const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(shareText)}`;
@@ -439,7 +439,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
               {courseSubtitle}
             </Typography>
             <ShareLink>
-              Check out my achievement: <span>{config.FRONTEND_URL}/en/courses/{courseId}</span>
+              Check out my achievement: <span>https://app.adwin.global/en/courses/{courseId}</span>
             </ShareLink>
             <ShareTags>
               #ADWIN {categories.map(category => `#${category.toLowerCase().replace(/\s+/g, '')}`).join(' ')}
