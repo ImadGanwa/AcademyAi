@@ -393,10 +393,10 @@
   },
   "home": {
     "hero": {
-      "titleStart": "The",
-      "titleHighlight": "Unlocking",
-      "titleEnd": "the potential of African and African Descendant Women",
-      "description": "The 1st Global Platform of Solidarity, Technology, and Innovation for Change",
+      "titleStart": "Win",
+      "titleHighlight": "Skills",
+      "titleEnd": "- AI Enhanced Learning Hub",
+      "description": "Unlocking the potential of African and African Descendant Women",
       "emailPlaceholder": "example@gmail.com",
       "subscribeButton": "Subscribe",
       "emailRequired": "Email is required",
@@ -1291,8 +1291,11 @@
   },
   "mentorship": {
     "pageTitle": "Mentorship - Find Your AI Mentor",
-    "heroTitle": "Unlock Your AI Potential with Personalized Mentorship",
-    "heroSubtitle": "Connect with industry experts, enhance your skills, and accelerate your AI career.",
+          "heroTitle": {
+        "highlight": "Win",
+        "main": "Confidence - Find your ideal mentor"
+      },
+      "heroDescription": "Explore trusted experts ready to support your personal and professional growth.",
     "searchPlaceholder": "Search by skill, name, or industry...",
     "filterByCategory": "Filter by Category",
     "filterByExperience": "Filter by Experience",

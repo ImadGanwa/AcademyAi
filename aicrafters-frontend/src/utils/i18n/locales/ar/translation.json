@@ -343,10 +343,10 @@
   },
   "home": {
     "hero": {
-      "titleStart": "عصر",
-      "titleHighlight": "تحرير",
-      "titleEnd": "الجهود المشتركة لتحقيق التغيير",
-      "description": "المنصة العالمية الأولى للتعاون والتكنولوجيا والابتكار للتغيير",
+      "titleStart": "Win",
+      "titleHighlight": "Skills",
+      "titleEnd": "منصة التعلم المعززة بالذكاء الاصطناعي",
+      "description": "أول منصة عالمية تحرر إمكانات النساء الأفريقيات والمنحدرات من أصل أفريقي",
       "emailPlaceholder": "example@gmail.com",
       "subscribeButton": "اشترك",
       "emailRequired": "البريد الإلكتروني مطلوب",
@@ -1140,5 +1140,12 @@
       "description": "احصل على محتوى البث المتميز، والموارد التعليمية، والدورات المتخصصة التي تنظمها مؤسستك عبر نظام +Trace.",
       "button": "+Trace استكشف"
     }
+  },
+  "mentorship": {
+    "heroTitle": {
+      "highlight": "Win",
+      "main": "Confidence - اعثر على المرشد المثالي"
+    },
+    "heroDescription": "استكشف خبراء موثوقين مستعدين لدعم نموك الشخصي والمهني."
   }
 }

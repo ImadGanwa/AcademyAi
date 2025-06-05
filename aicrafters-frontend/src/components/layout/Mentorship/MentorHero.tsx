@@ -2,61 +2,53 @@ import React from 'react';
 import { Box, Typography, Container } from '@mui/material';
 import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
-
-const HeroWrapper = styled.div`
-  background-color: ${props => props.theme.palette.background.default};
-  width: 100%;
-`;
+import WinConfidenceImage from '../../../assets/images/win-confidence.png';
 
 const HeroSection = styled.section`
   width: 100%;
-  padding: 80px 0 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  position: relative;
+  background-color: ${props => props.theme.palette.background.default};
+  padding: 60px 0;
 
   @media (max-width: 768px) {
-    padding: 60px 0 100px;
+    padding: 30px 0 40px;
   }
 `;
 
 const HeroContainer = styled(Container)`
   display: flex !important;
-  flex-direction: column !important;
+  justify-content: space-between !important;
   align-items: center !important;
-  text-align: center !important;
-  max-width: 1200px !important;
+  gap: 60px !important;
+
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    gap: 32px !important;
+    text-align: center !important;
+  }
 `;
 
-const TitleWrapper = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0px;
-  gap: 6px;
-  width: 642px;
-  max-width: 100%;
-  margin-bottom: 19px;
-  
+const ContentWrapper = styled(Box)`
+  flex: 1;
+  max-width: 600px;
+
   @media (max-width: 768px) {
-    width: 100%;
-    padding: 0 20px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 `;
 
 const Title = styled(Typography)`
-  font-size: 4.5rem !important;
-  font-weight: 500 !important;
+  font-size: 2.5rem !important;
+  font-weight: bold !important;
   line-height: 1.2 !important;
+  margin-bottom: 24px !important;
   color: #ffffff !important;
-  text-align: center;
-  letter-spacing: -0.02em;
 
   @media (max-width: 768px) {
-    font-size: 2.8rem !important;
+    font-size: 2rem !important;
+    margin-bottom: 16px !important;
   }
 `;
 
@@ -65,18 +57,41 @@ const Highlight = styled.span`
 `;
 
 const Description = styled(Typography)`
-  font-size: 1.5rem !important;
+  font-size: 1.1rem !important;
   color: #ffffff !important;
+  margin-bottom: 40px !important;
   line-height: 1.4 !important;
-  max-width: 800px;
-  text-align: center;
-  margin: 0 auto;
-  opacity: 0.9;
-  font-weight: 300;
+  padding-right: 20px;
 
   @media (max-width: 768px) {
-    font-size: 1.2rem !important;
-    padding: 0 20px;
+    padding-right: 0;
+    font-size: 1rem !important;
+    margin-bottom: 30px !important;
+    max-width: 90%;
+  }
+`;
+
+const StyledImage = styled.img`
+  width: 320px;
+  height: auto;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const MobileImageWrapper = styled(Box)`
+  display: none;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    
+    img {
+      width: 220px;
+      height: auto;
+    }
   }
 `;
 
@@ -84,21 +99,22 @@ export const MentorHero: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <HeroWrapper>
-      <HeroSection>
-        <HeroContainer maxWidth="lg">
-          <TitleWrapper>
-            <Title variant="h1">
-              {t('mentor.heroTitle.firstPart', 'Find Your') as string}{' '}
-              <Highlight>{t('mentor.heroTitle.highlight', 'Ideal') as string}</Highlight>{' '}
-              {t('mentor.heroTitle.lastPart', 'Mentor') as string}
-            </Title>
-          </TitleWrapper>
+    <HeroSection>
+      <HeroContainer maxWidth="lg">
+        <ContentWrapper>
+          <MobileImageWrapper>
+            <img src={WinConfidenceImage} alt="Win Confidence" />
+          </MobileImageWrapper>
+          <Title variant="h1">
+            <Highlight>{t('mentorship.heroTitle.highlight', 'Win') as string}</Highlight>
+            {t('mentorship.heroTitle.main', 'Confidence - Find your ideal mentor') as string}
+          </Title>
           <Description>
-            {t('mentor.heroDescription', 'Explore trusted experts ready to support your personal and professional growth.') as string}
+            {t('mentorship.heroDescription', 'Explore trusted experts ready to support your personal and professional growth.') as string}
           </Description>
-        </HeroContainer>
-      </HeroSection>
-    </HeroWrapper>
+        </ContentWrapper>
+        <StyledImage src={WinConfidenceImage} alt="Win Confidence" />
+      </HeroContainer>
+    </HeroSection>
   );
 }; 

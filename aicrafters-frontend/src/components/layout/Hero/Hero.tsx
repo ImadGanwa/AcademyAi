@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 // import { Input } from '../../common/Input/Input';
 import { Button } from '../../common/Button/Button';
-import { ReactComponent as HeroLogo } from '../../../assets/images/hero-logo.svg';
+import WinSkillsLogo from '../../../assets/images/winskills.png';
 // import { ReactComponent as EmailIcon } from '../../../assets/icons/email.svg';
 import axios from 'axios';
 import config from '../../../config';
@@ -129,7 +129,7 @@ const InputWrapper = styled(Box)`
   }
 `;
 
-const StyledLogo = styled(HeroLogo)`
+const StyledLogo = styled.img`
   width: 320px;
   height: auto;
 
@@ -146,7 +146,7 @@ const MobileLogoWrapper = styled(Box)`
     display: flex;
     justify-content: center;
     
-    svg {
+    img {
       width: 220px;
       height: auto;
     }
@@ -224,10 +224,10 @@ export const Hero: React.FC = () => {
       <HeroContainer maxWidth="lg">
         <ContentWrapper>
           <MobileLogoWrapper>
-            <HeroLogo />
+            <img src={WinSkillsLogo} alt="WinSkills" />
           </MobileLogoWrapper>
           <Title variant="h1">
-            <Highlight>{t('home.hero.titleHighlight')}</Highlight>{' '}
+          <Highlight>{t('home.hero.titleStart')}</Highlight>{t('home.hero.titleHighlight')}{' '}
             {t('home.hero.titleEnd')}
           </Title>
           <Description>
@@ -249,7 +249,7 @@ export const Hero: React.FC = () => {
             </a>
           </InputWrapper> */}
         </ContentWrapper>
-        <StyledLogo />
+        <StyledLogo src={WinSkillsLogo} alt="WinSkills" />
       </HeroContainer>
       <Snackbar
         open={snackbar.open}

@@ -393,10 +393,10 @@
   },
   "home": {
     "hero": {
-      "titleStart": "Le",
-      "titleHighlight": "Déverrouillage",
-      "titleEnd": "du potentiel des femmes africaines et afro-descendantes",
-      "description": "La 1ère plateforme mondiale de solidarité, de technologie et d'innovation pour le changement",
+      "titleStart": "Win",
+      "titleHighlight": "Skills",
+      "titleEnd": "Plateforme d'Apprentissage IA Améliorée",
+      "description": "La première plateforme mondiale libérant le potentiel des femmes africaines et d'ascendance africaine",
       "emailPlaceholder": "exemple@gmail.com",
       "subscribeButton": "S'abonner",
       "emailRequired": "L'e-mail est requis",
@@ -1291,8 +1291,11 @@
   },
   "mentorship": {
     "pageTitle": "Mentorat - Trouvez votre Mentor IA",
-    "heroTitle": "Libérez votre potentiel IA avec un mentorat personnalisé",
-    "heroSubtitle": "Connectez-vous avec des experts de l'industrie, améliorez vos compétences et accélérez votre carrière en IA.",
+          "heroTitle": {
+        "highlight": "Win",
+        "main": "Confidence - Trouvez votre mentor idéal"
+      },
+      "heroDescription": "Explorez des experts de confiance prêts à soutenir votre croissance personnelle et professionnelle.",
     "searchPlaceholder": "Rechercher par compétence, nom ou secteur...",
     "filterByCategory": "Filtrer par catégorie",
     "filterByExperience": "Filtrer par expérience",
