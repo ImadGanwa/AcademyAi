@@ -233,7 +233,7 @@ export const Hero: React.FC = () => {
           <Description>
             {t('home.hero.description')}
           </Description>
-          <InputWrapper>
+          {/* <InputWrapper>
             <a 
               href="https://adwin.global/join-adwin/" 
               target="_blank" 
@@ -247,7 +247,7 @@ export const Hero: React.FC = () => {
                 {loading ? t('common.loading') : t('home.hero.connectToday')}
               </StyledButton>
             </a>
-          </InputWrapper>
+          </InputWrapper> */}
         </ContentWrapper>
         <StyledLogo />
       </HeroContainer>
