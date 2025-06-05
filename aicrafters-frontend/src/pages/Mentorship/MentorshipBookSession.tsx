@@ -121,9 +121,17 @@ const MentorshipBookSession: React.FC = () => {
     fetchMentorProfile();
   }, [mentorId, t]);
   
-  // Fetch available time slots when date is selected
+  // Commented out - Fetch available time slots when date is selected (now returns empty array)
   useEffect(() => {
-    const fetchAvailableTimeSlots = async () => {
+    // Since getMentorAvailableSlots now returns empty array, no need to fetch
+    if (!selectedDate || !mentorId) return;
+    
+    setLoadingTimeSlots(true);
+    // Directly set empty array since backend call is commented out
+    setAvailableTimeSlots([]);
+    setLoadingTimeSlots(false);
+    
+    /* const fetchAvailableTimeSlots = async () => {
       if (!selectedDate || !mentorId) return;
       
       setLoadingTimeSlots(true);
@@ -174,7 +182,7 @@ const MentorshipBookSession: React.FC = () => {
       }
     };
     
-    fetchAvailableTimeSlots();
+    fetchAvailableTimeSlots(); */
   }, [selectedDate, mentorId, t]);
   
   // Handler for booking submission
@@ -248,11 +256,11 @@ const MentorshipBookSession: React.FC = () => {
           topic
         });
         
-        // IMMEDIATE SLOT RESERVATION: Clear the selected time and refresh available slots
+        // IMMEDIATE SLOT RESERVATION: Clear the selected time 
         setSelectedTime(null);
         
-        // Refresh available slots to reflect the newly reserved slot
-        try {
+        // Commented out - Refresh available slots logic (now returns empty array)
+        /* try {
           const slotsResponse = await getMentorAvailableSlots(mentorId, formattedDate);
           if (slotsResponse && slotsResponse.success && slotsResponse.data && Array.isArray(slotsResponse.data.availableSlots)) {
             // Format slots for display based on locale
@@ -272,50 +280,50 @@ const MentorshipBookSession: React.FC = () => {
           }
         } catch (refreshError) {
           console.error('Error refreshing available slots:', refreshError);
-        }
+        } */
         
         // Show confirmation popup
         setShowConfirmationPopup(true);
-      } else {
-        // Handle specific error cases with more helpful messages
-        if (response.error?.includes('time slot is already booked')) {
-          setBookingError(`The selected time slot (${selectedTime}) is no longer available. Please choose a different time.`);
-          // Clear the selected time and refresh slots
-          setSelectedTime(null);
-          // Refresh available slots
-          try {
-            const slotsResponse = await getMentorAvailableSlots(mentorId, formattedDate);
-            if (slotsResponse && slotsResponse.success && slotsResponse.data) {
-              const formattedSlots = slotsResponse.data.availableSlots.map((slot: string) => {
-                const [hours, minutes] = slot.split(':');
-                const hour = parseInt(hours, 10);
-                
-                if (currentLang === 'fr') {
-                  return `${hours}:${minutes}`;
-                } else {
-                  const ampm = hour >= 12 ? 'PM' : 'AM';
-                  const hour12 = hour % 12 || 12;
-                  return `${hour12}:${minutes} ${ampm}`;
-                }
-              });
-              setAvailableTimeSlots(formattedSlots);
-            }
-          } catch (refreshError) {
-            console.error('Error refreshing available slots after conflict:', refreshError);
+              } else {
+          // Handle specific error cases with more helpful messages
+          if (response.error?.includes('time slot is already booked')) {
+            setBookingError(`The selected time slot (${selectedTime}) is no longer available. Please choose a different time.`);
+            // Clear the selected time
+            setSelectedTime(null);
+            // Commented out - Refresh available slots logic (now returns empty array)
+            /* try {
+              const slotsResponse = await getMentorAvailableSlots(mentorId, formattedDate);
+              if (slotsResponse && slotsResponse.success && slotsResponse.data) {
+                const formattedSlots = slotsResponse.data.availableSlots.map((slot: string) => {
+                  const [hours, minutes] = slot.split(':');
+                  const hour = parseInt(hours, 10);
+                  
+                  if (currentLang === 'fr') {
+                    return `${hours}:${minutes}`;
+                  } else {
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const hour12 = hour % 12 || 12;
+                    return `${hour12}:${minutes} ${ampm}`;
+                  }
+                });
+                setAvailableTimeSlots(formattedSlots);
+              }
+            } catch (refreshError) {
+              console.error('Error refreshing available slots after conflict:', refreshError);
+            } */
+          } else {
+            setBookingError(response.error || 'Failed to create booking');
           }
-        } else {
-          setBookingError(response.error || 'Failed to create booking');
         }
-      }
     } catch (err: any) {
       console.error('Error creating booking:', err);
       // Handle specific API error responses
       if (err.response?.data?.error?.includes('time slot is already booked')) {
         setBookingError(`The selected time slot (${selectedTime}) is no longer available. Please choose a different time.`);
-        // Clear the selected time and refresh slots
+        // Clear the selected time
         setSelectedTime(null);
-        // Refresh available slots
-        try {
+        // Commented out - Refresh available slots logic (now returns empty array)
+        /* try {
           const slotsResponse = await getMentorAvailableSlots(mentorId, formattedDate);
           if (slotsResponse && slotsResponse.success && slotsResponse.data) {
             const formattedSlots = slotsResponse.data.availableSlots.map((slot: string) => {
@@ -334,7 +342,7 @@ const MentorshipBookSession: React.FC = () => {
           }
         } catch (refreshError) {
           console.error('Error refreshing available slots after API error:', refreshError);
-        }
+        } */
       } else {
         setBookingError(err.response?.data?.error || 'An error occurred while booking the session');
       }
