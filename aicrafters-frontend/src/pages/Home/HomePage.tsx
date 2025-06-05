@@ -157,6 +157,9 @@ export const HomePage: React.FC = () => {
     <Layout title="Home">
       <Hero />
       
+      
+      <AdwinCourseSection />
+      
       <TracePlusSection maxWidth="lg" ref={tracePlusSectionRef} id="traceSection">
         <SectionHeader>
           <Title variant="h2">{t('home.tracePlus.title', 'Free Access to Trace+')}</Title>
@@ -206,8 +209,6 @@ export const HomePage: React.FC = () => {
           </ImageItem>
         </ImagesGrid>
       </TracePlusSection>
-      
-      <AdwinCourseSection />
       
       <CoursesSection onCourseClick={handleCourseClick} />
     </Layout>
