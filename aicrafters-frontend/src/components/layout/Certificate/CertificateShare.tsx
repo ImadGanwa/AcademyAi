@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Container, Typography, useTheme, Dialog, IconButton, Avatar } from '@mui/material';
+import { Container, Typography, useTheme, Dialog, IconButton, Avatar, CircularProgress } from '@mui/material';
 import { Button } from '../../common/Button/Button';
 import { ReactComponent as LinkedInIcon } from '../../../assets/icons/linkedin.svg';
 import { ReactComponent as ArrowDownIcon } from '../../../assets/icons/ArrowDown.svg';
@@ -35,6 +35,12 @@ const ShareHeader = styled.div`
   background-color: #FAFBFC;
   border-bottom: 1px solid ${props => props.theme.palette.divider};
   border-radius: 12px 12px 0 0;
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 `;
 
 const ShareWith = styled.div`
@@ -71,6 +77,11 @@ const UserSection = styled.div`
   margin: 12px 24px;
   align-items: center;
 
+  @media (max-width: 768px) {
+    margin: 12px 16px;
+    gap: 12px;
+  }
+
   p{
     color: ${props => props.theme.palette.text.secondary};
     font-size: 0.875rem;
@@ -90,12 +101,21 @@ const ShareContent = styled.div`
   border-radius: 8px;
   padding: 24px;
   margin: 16px 24px 4px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin: 16px 16px 4px;
+  }
 `;
 
 const CertificateImage = styled.img`
   width: auto;
   height: 90px;
   border-radius: 8px;
+
+  @media (max-width: 768px) {
+    height: 70px;
+  }
 `;
 
 const Tip = styled(Typography)`
@@ -103,6 +123,11 @@ const Tip = styled(Typography)`
     color: ${props => props.theme.palette.text.secondary};
     font-size: 0.8rem;
     margin: 2px 24px;
+
+    @media (max-width: 768px) {
+      margin: 2px 16px;
+      font-size: 0.75rem;
+    }
   }
 `;
 
@@ -115,6 +140,7 @@ const ButtonsContainer = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 12px;
+    margin: 16px;
 
     button {
       width: 100%;
@@ -124,6 +150,10 @@ const ButtonsContainer = styled.div`
 
 const ShareText = styled.div`
   margin-bottom: 16px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 12px;
+  }
 `;
 
 const ShareCourse = styled.p`
@@ -131,6 +161,10 @@ const ShareCourse = styled.p`
   margin-top: 0;
   font-weight: 500;
   color: ${props => props.theme.palette.text.title};
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const ShareLink = styled.p`
@@ -138,6 +172,10 @@ const ShareLink = styled.p`
   color: ${props => props.theme.palette.text.title};
   font-weight: 500;
   word-break: break-all;
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 
   span{
     color: ${props => props.theme.palette.text.secondary};
@@ -148,6 +186,10 @@ const ShareTags = styled.p`
   font-size: 0.8rem;
   font-weight: 500;
   color: ${props => props.theme.palette.text.title};
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const CertificateContent = styled.div`
@@ -159,6 +201,18 @@ const CertificateContent = styled.div`
   border: 1px solid ${props => props.theme.palette.divider};
   padding: 6px;
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  @media (max-width: 480px) {
+    align-items: center;
+    text-align: center;
+  }
 `;
 
 const CertificateTitle = styled.p`
@@ -167,11 +221,19 @@ const CertificateTitle = styled.p`
   color: ${props => props.theme.palette.text.title};
   margin: 0;
 
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+
   span{
     font-size: 0.9rem;
     font-weight: normal;
     color: ${props => props.theme.palette.text.secondary};
     display: block;
+
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+    }
   }
 `;
 
@@ -180,14 +242,23 @@ const ButtonWithIcon = styled(Button)`
     display: flex;
     align-items: center;
     gap: 8px;
-    color: ${props => props.theme.palette.text.title};
+    color: #ffffff;
     border-color: ${props => props.theme.palette.text.title};
     background-color: ${props => props.theme.palette.secondary.main};
-    color: black;
+
+    &:disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
 
     svg {
       width: 16px;
       height: 16px;
+    }
+
+    .MuiCircularProgress-root {
+      width: 16px !important;
+      height: 16px !important;
     }
 
     @media (max-width: 768px) {
@@ -206,6 +277,12 @@ const StyledDialog = styled(Dialog)`
     background: #f8f9fa;
     padding: 0;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+    @media (max-width: 768px) {
+      max-width: 98vw;
+      max-height: 98vh;
+      border-radius: 8px;
+    }
   }
 `;
 
@@ -219,6 +296,13 @@ const DialogImage = styled.img`
   margin: 20px;
   max-width: calc(100% - 40px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: 768px) {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+    border-radius: 8px;
+    max-height: 85vh;
+  }
 `;
 
 const CloseButton = styled(IconButton)`
@@ -231,6 +315,13 @@ const CloseButton = styled(IconButton)`
   width: 48px;
   height: 48px;
   transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+  }
   
   &:hover {
     background-color: rgba(0, 0, 0, 0.9);
@@ -240,6 +331,11 @@ const CloseButton = styled(IconButton)`
   svg {
     width: 24px;
     height: 24px;
+
+    @media (max-width: 768px) {
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
 
@@ -264,6 +360,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
   const [certificateImage, setCertificateImage] = useState<string | null>(null);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
   const [showRating, setShowRating] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
@@ -349,6 +446,7 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
   };
 
   const handleDownloadClick = async () => {
+    setIsDownloading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/certificates/${courseId}`, {
         headers: {
@@ -371,6 +469,8 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading certificate:', error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -459,9 +559,20 @@ export const CertificateShare: React.FC<CertificateShareProps> = ({
         </ShareContent>
 
         <ButtonsContainer>
-          <ButtonWithIcon variant="outlined" onClick={handleDownloadClick}>
-            <DownloadIcon />
-            {t('user.certificate.downloadPDF')}
+          <ButtonWithIcon 
+            variant="outlined" 
+            onClick={handleDownloadClick}
+            disabled={isDownloading}
+          >
+            {/* {isDownloading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) 
+            // : 
+            // (
+            //   <DownloadIcon color="white" />
+            // )
+            } */}
+            {isDownloading ? 'Downloading...' : t('user.certificate.downloadPDF')}
           </ButtonWithIcon>
           <Button variant="contained" onClick={handleShare}>
             {t('user.certificate.shareButton')}
