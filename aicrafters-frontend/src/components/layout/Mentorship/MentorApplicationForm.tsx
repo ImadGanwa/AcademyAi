@@ -32,7 +32,7 @@ const StepIndicator = styled.div<{ currentStep: number }>`
   &::before {
     content: '';
     display: block;
-    width: ${props => `${(props.currentStep / 3) * 100}%`};
+    width: ${props => `${(props.currentStep / 2) * 100}%`};
     height: 100%;
     background-color: ${props => props.theme.palette.primary.main};
     transition: width 0.3s ease;
@@ -325,7 +325,12 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
   
   const handleNext = () => {
     if (validateForm(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 3));
+      if (currentStep === 1) {
+        setCurrentStep(prev => Math.min(prev + 1, 2));
+      } else if (currentStep === 2) {
+        // Submit the form when on step 2
+        handleSubmit();
+      }
     }
   };
   
@@ -714,19 +719,22 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
             <BackButton 
               startIcon={<ArrowBackIcon />}
               onClick={handleBack}
+              disabled={submitting}
             >
               {t('mentor.applicationForm.previous', 'Previous') as string}
             </BackButton>
-            <NextButton 
-              endIcon={<ArrowForwardIcon />}
+            <SubmitButton 
+              endIcon={submitting ? <CircularProgress size={20} color="inherit" /> : undefined} 
               onClick={handleNext}
+              disabled={submitting}
             >
-              {t('mentor.applicationForm.next', 'Next') as string}
-            </NextButton>
+              {submitting ? t('mentor.applicationForm.submitting', 'Submitting...') as string : t('mentor.applicationForm.submitApplication', 'Submit Application') as string}
+            </SubmitButton>
           </ButtonContainer>
         </form>
       )}
       
+      {/* Step 3 - Commented out for now
       {currentStep === 3 && (
         <form>
           <FormField>
@@ -822,13 +830,14 @@ const MentorApplicationForm: React.FC<MentorApplicationFormProps> = ({ onSubmitS
               {submitting ? t('mentor.applicationForm.submitting', 'Submitting...') as string : t('mentor.applicationForm.submitApplication', 'Submit Application') as string}
             </SubmitButton>
           </ButtonContainer>
-          
-          {error && (
-            <Box mt={2}>
-              <Alert severity="error">{error}</Alert>
-            </Box>
-          )}
         </form>
+      )}
+      */}
+      
+      {error && (
+        <Box mt={2}>
+          <Alert severity="error">{error}</Alert>
+        </Box>
       )}
     </FormSection>
   );
