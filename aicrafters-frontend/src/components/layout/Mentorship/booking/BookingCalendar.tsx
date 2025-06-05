@@ -416,7 +416,8 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
         <TimeSlotSection>
           <TimeSlotTitle>{t('mentorship.booking.availableTimeSlots', 'Available Time Slots') as string}</TimeSlotTitle>
           
-          {loadingTimeSlots ? (
+          {/* Commented out current implementation - directly showing no available slots */}
+          {/* {loadingTimeSlots ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <CircularProgress size={30} />
             </Box>
@@ -438,7 +439,14 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
                 {t('mentorship.booking.noAvailableSlots', 'No available time slots for this date.') as string}
               </Typography>
             </Box>
-          )}
+          )} */}
+          
+          {/* Directly showing no available slots message */}
+          <Box sx={{ textAlign: 'center', py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('mentorship.booking.noAvailableSlots', 'No available time slots for this date.') as string}
+            </Typography>
+          </Box>
         </TimeSlotSection>
       )}
       

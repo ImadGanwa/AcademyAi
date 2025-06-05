@@ -60,7 +60,8 @@ export const cancelUserBooking = async (bookingId: string, reason: string) => {
 
 // Get available time slots for a mentor on a specific date
 export const getMentorAvailableSlots = async (mentorId: string, date: string) => {
-  try {
+  // Commented out backend API call - returning empty array instead
+  /* try {
     console.log(`Fetching available slots for mentor ${mentorId} on date ${date}`);
     const response = await axiosInstance.get(`/api/bookings/availability/${mentorId}`, {
       params: { date }
@@ -71,7 +72,10 @@ export const getMentorAvailableSlots = async (mentorId: string, date: string) =>
     console.error('Error fetching available slots:', error);
     console.error('Error details:', error.response?.data || error.message);
     throw error;
-  }
+  } */
+  
+  // Return empty array instead of calling backend
+  return [];
 };
 
 // Rate and review a completed session
