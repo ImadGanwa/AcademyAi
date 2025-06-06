@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // TODO: Move hardcoded timeout to a central config file
+  timeout: 100000, // TODO: Move hardcoded timeout to a central config file
 });
 
 // Add a request interceptor to add the auth token
