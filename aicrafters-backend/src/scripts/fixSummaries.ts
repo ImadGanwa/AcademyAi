@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI)
 async function fixSummaries() {
   try {
     // Get course ID from command line arguments or use default
-    const courseId = process.argv[2] || '67c3e57e754c83ca019ea97e';
+    const courseId = process.argv[2] || '6840df3fac16bc2461f36499';
     
     console.log(`Fixing summaries for course ${courseId}...`);
     

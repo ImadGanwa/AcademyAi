@@ -83,16 +83,6 @@ export const mentorController = {
         return;
       }
 
-      // Validate LinkedIn URL format
-      const linkedInRegex = /^https?:\/\/(www\.)?linkedin\.com\/.+/i;
-      if (!linkedInRegex.test(professionalInfo.linkedIn)) {
-        res.status(400).json({
-          success: false,
-          error: 'Please provide a valid LinkedIn URL'
-        });
-        return;
-      }
-
       // Validate languages array
       if (!languages || !Array.isArray(languages) || languages.length === 0) {
         res.status(400).json({

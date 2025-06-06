@@ -200,11 +200,7 @@ const ViewRequestDialog: React.FC<ViewDialogProps> = ({ open, request, onClose, 
               </Box>
               <Box>
                 <Typography variant="body2" color="text.secondary">LinkedIn</Typography>
-                <Typography variant="body1" fontWeight={500}>
-                  <a href={`https://${request.linkedinUrl}`} target="_blank" rel="noopener noreferrer" style={{ color: theme.palette.primary.main }}>
-                    {request.linkedinUrl}
-                  </a>
-                </Typography>
+                <Typography variant="body1" fontWeight={500}>{request.linkedinUrl}</Typography>
               </Box>
               <Box>
                 <Typography variant="body2" color="text.secondary">Country</Typography>
